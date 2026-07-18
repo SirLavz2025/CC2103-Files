@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>SirLavz Student Portal</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="https://unpkg.com/html5-qrcode"></script>
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', sans-serif; background: radial-gradient(circle at top left, #f1f7fe 0%, #f8fbff 30%, #f3f6fa 70%, #e9eff6 100%); min-height: 100vh; }
+    .glass { background: rgba(255,255,255,0.8); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.7); box-shadow: 0 8px 32px rgba(0,0,0,0.05); }
+    .btn-primary { background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); color: white; transition: all 0.2s; cursor: pointer; }
+    .btn-primary:active { transform: scale(0.98); }
+    .option-btn { border: 2px solid #e2e8f0; transition: all 0.2s; text-align: left; padding: 1rem; border-radius: 12px; display: flex; align-items: center; gap: 1rem; cursor: pointer; background: white; width: 100%; }
+    .option-btn.selected { border-color: #6366f1; background: #f5f3ff; }
+    .option-btn:hover:not(.selected) { background: #f8fafc; }
+</style>
+</head>
+<body class="p-4 md:p-8 flex flex-col items-center">
+
+    <!-- Login Section -->
+    <div id="loginSection" class="w-full max-w-md space-y-6 mt-6">
+        <div class="text-center space-y-2">
+            <img src="ccs.jpg" class="h-16 mx-auto rounded-xl shadow-lg mb-4">
+            <h1 class="text-2xl font-extrabold text-slate-900 tracking-tight">Student Portal</h1>
+            <p class="text-sm text-slate-500 font-medium">Scan QR Pass or enter ID to begin assessment.</p>
+        </div>
+
+        <div class="glass p-6 rounded-2xl space-y-6">
+            <!-- QR Scanner for Login -->
+            <div id="loginScanner" class="w-full aspect-square bg-slate-950 rounded-xl overflow-hidden border-4 border-white shadow-inner"></div>
+
+            <div class="relative py-2">
+                <div class="absolute inset-0 flex items-center"><span class="w-full border-t border-slate-200"></span></div>
+                <div class="relative flex justify-center text-xs uppercase"><span class="bg-white px-2 text-slate-400 font-bold">Or Manual Entry</span></div>
+            </div>
+
+            <div class="flex gap-2">
+                <input type="text" id="studentIdInput" placeholder="Student ID (e.g. 241-0001)" class="flex-1 p-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-mono font-bold uppercase text-sm">
+                <button onclick="handleLogin()" class="btn-primary px-6 rounded-xl font-bold text-sm shadow-md flex items-center justify-center">
+                    <i class="fa-solid fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Portal Hub Section -->
+    <div id="portalSection" class="w-full max-w-2xl hidden space-y-6">
+        <div class="flex justify-between items-center bg-white p-5 rounded-2xl border border-slate-100 shadow-sm">
+            <div class="flex items-center gap-4">
+                <div class="h-12 w-12 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center text-xl font-bold" id="avatarLetter">?</div>
+                <div>
+                    <h2 class="font-extrabold text-slate-800" id="studentNameDisplay">Student Name</h2>
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest" id="studentInfoDisplay">Course | Year</p>
+                </div>
+            </div>
+            <button onclick="logout()" class="text-slate-400 hover:text-red-500 p-2 cursor-pointer transition-colors"><i class="fa-solid fa-power-off"></i></button>
+        </div>
+
+        <div class="space-y-3">
+            <h3 class="text-xs font-bold text-slate-500 uppercase px-1 flex items-center gap-2">
+                <i class="fa-solid fa-clipboard-list text-indigo-500"></i> Active Assessments
+            </h3>
+            <div id="assessmentList" class="space-y-3"></div>
+        </div>
+    </div>
+
+    <!-- Exam Section -->
+    <div id="examSection" class="w-full max-w-3xl hidden space-y-6">
+        <div class="bg-white p-4 rounded-2xl border flex justify-between items-center shadow-sm">
+            <h3 class="font-bold text-slate-800" id="examTitleDisplay">Exam Title</h3>
+            <div class="text-xs font-bold text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full" id="progressDisplay">Q 1 / 0</div>
+        </div>
+
+        <div class="glass p-8 rounded-3xl space-y-8 min-h-[400px] flex flex-col justify-between shadow-xl">
+            <div id="questionContainer" class="space-y-6">
+                <h4 id="questionText" class="text-lg font-bold text-slate-800 leading-tight">Loading question...</h4>
+                <div id="optionsContainer" class="grid grid-cols-1 gap-3"></div>
+            </div>
+
+            <div class="flex justify-between pt-6 border-t border-slate-100">
+                <button id="prevBtn" onclick="prevQuestion()" class="text-slate-400 font-bold text-sm px-6 py-2 rounded-xl disabled:opacity-30 cursor-pointer">Previous</button>
+                <button id="nextBtn" onclick="nextQuestion()" class="btn-primary px-8 py-2.5 rounded-xl font-bold text-sm shadow-md">Next Question</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Result Section -->
+    <div id="resultSection" class="w-full max-w-md hidden text-center space-y-6 mt-10">
+        <div class="glass p-10 rounded-3xl space-y-4 shadow-2xl">
+            <div class="h-20 w-20 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center text-4xl mx-auto mb-6 shadow-inner">
+                <i class="fa-solid fa-check-double"></i>
+            </div>
+            <h2 class="text-2xl font-extrabold text-slate-900">Submission Successful!</h2>
+            <p class="text-slate-500 text-sm">Your results have been securely recorded in the Faculty database.</p>
+            <div class="bg-white py-6 rounded-2xl border border-slate-100 my-6 shadow-inner">
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Final Score</p>
+                <div class="text-5xl font-black text-indigo-600" id="scoreDisplay">0 / 0</div>
+            </div>
+            <button onclick="backToPortal()" class="w-full bg-slate-900 hover:bg-black text-white py-3.5 rounded-xl font-bold text-sm shadow-lg transition-all cursor-pointer">Return to Dashboard</button>
+        </div>
+    </div>
+
+    <script>
+        const sk="students", ask="assessments", adk="assess_defs";
+        let currentStudent = null;
+        let activeExam = null;
+        let currentQIdx = 0;
+        let answers = [];
+        let html5QrCode = null;
+
+        window.onload = () => {
+            initLoginScanner();
+        };
+
+        async function initLoginScanner() {
+            html5QrCode = new Html5Qrcode("loginScanner");
+            try {
+                const cameras = await Html5Qrcode.getCameras();
+                if (cameras && cameras.length) {
+                    html5QrCode.start(
+                        { facingMode: "user" },
+                        { fps: 10, qrbox: { width: 250, height: 250 } },
+                        (decodedText) => {
+                            document.getElementById('studentIdInput').value = decodedText;
+                            handleLogin();
+                        }
+                    );
+                }
+            } catch (err) {
+                console.error("Scanner Error", err);
+                document.getElementById('loginScanner').innerHTML = `
+                    <div class="flex flex-col items-center justify-center h-full p-8 text-center bg-slate-900">
+                        <i class="fa-solid fa-camera-slash text-slate-700 text-4xl mb-4"></i>
+                        <p class="text-slate-500 text-xs font-bold uppercase">Camera Access Required</p>
+                    </div>
+                `;
+            }
+        }
+
+        function handleLogin() {
+            const id = document.getElementById('studentIdInput').value.trim().toUpperCase();
+            const students = JSON.parse(localStorage.getItem(sk)) || [];
+            currentStudent = students.find(s => s.id === id);
+
+            if (currentStudent) {
+                if (html5QrCode) html5QrCode.stop().catch(console.error);
+                document.getElementById('loginSection').classList.add('hidden');
+                document.getElementById('portalSection').classList.remove('hidden');
+                document.getElementById('studentNameDisplay').innerText = currentStudent.name;
+                document.getElementById('studentInfoDisplay').innerText = `${currentStudent.course} | ${currentStudent.section}`;
+                document.getElementById('avatarLetter').innerText = currentStudent.name[0];
+                renderAssessmentList();
+            } else {
+                alert("Student ID '" + id + "' is not registered.");
+            }
+        }
+
+        function logout() {
+            currentStudent = null;
+            document.getElementById('portalSection').classList.add('hidden');
+            document.getElementById('loginSection').classList.remove('hidden');
+            initLoginScanner();
+        }
+
+        function renderAssessmentList() {
+            const defs = JSON.parse(localStorage.getItem(adk)) || {};
+            const taken = JSON.parse(localStorage.getItem(ask)) || [];
+            const listDiv = document.getElementById('assessmentList');
+            listDiv.innerHTML = "";
+
+            let foundCount = 0;
+            for (let key in defs) {
+                const parts = key.split('_');
+                const type = parts[0];
+                const section = parts[parts.length-1];
+
+                if (section === currentStudent.section) {
+                    foundCount++;
+                    const hasTaken = taken.find(t => t.studentId === currentStudent.id && t.type === type && t.section === section);
+
+                    listDiv.innerHTML += `
+                        <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm flex justify-between items-center transition-all hover:border-indigo-200">
+                            <div>
+                                <h4 class="font-extrabold text-slate-800">${type}</h4>
+                                <div class="flex items-center gap-3 mt-1">
+                                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">${defs[key].length} Questions</span>
+                                    <span class="h-1 w-1 bg-slate-300 rounded-full"></span>
+                                    <span class="text-[10px] font-bold text-indigo-50 uppercase tracking-widest">${section}</span>
+                                </div>
+                            </div>
+                            ${hasTaken ?
+                                `<div class="text-right">
+                                    <p class="text-[10px] font-bold text-slate-400 uppercase mb-1">Completed</p>
+                                    <span class="bg-emerald-50 text-emerald-600 text-xs font-black px-3 py-1.5 rounded-xl border border-emerald-100">${hasTaken.score} pts</span>
+                                 </div>` :
+                                `<button onclick="startExam('${key}')" class="bg-indigo-600 text-white px-5 py-2 rounded-xl text-xs font-bold transition-all shadow-md shadow-indigo-100">Take Now</button>`
+                            }
+                        </div>
+                    `;
+                }
+            }
+
+            if (foundCount === 0) {
+                listDiv.innerHTML = `<div class="p-12 text-center text-slate-400 italic font-medium glass rounded-2xl border-dashed border-2">No assessments available for Section ${currentStudent.section} at this time.</div>`;
+            }
+        }
+
+        function startExam(key) {
+            const defs = JSON.parse(localStorage.getItem(adk)) || {};
+            if (!defs[key] || !defs[key].length) return alert("This assessment has no questions defined yet.");
+
+            activeExam = {
+                key: key,
+                questions: defs[key],
+                type: key.split('_')[0],
+                section: key.split('_')[key.split('_').length-1]
+            };
+            currentQIdx = 0;
+            answers = new Array(activeExam.questions.length).fill(null);
+
+            document.getElementById('portalSection').classList.add('hidden');
+            document.getElementById('examSection').classList.remove('hidden');
+            document.getElementById('examTitleDisplay').innerText = activeExam.type;
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            const q = activeExam.questions[currentQIdx];
+            document.getElementById('progressDisplay').innerText = `Question ${currentQIdx + 1} of ${activeExam.questions.length}`;
+            document.getElementById('questionText').innerText = q.text;
+
+            const container = document.getElementById('optionsContainer');
+            container.innerHTML = "";
+
+            q.opts.forEach((opt, i) => {
+                if(!opt) return;
+                const letter = String.fromCharCode(65 + i);
+                container.innerHTML += `
+                    <button onclick="selectOption(${i})" id="opt-btn-${i}" class="option-btn ${answers[currentQIdx] === i ? 'selected' : ''}">
+                        <span class="h-8 w-8 rounded-lg bg-white border border-slate-200 flex items-center justify-center font-bold ${answers[currentQIdx] === i ? 'text-indigo-600' : 'text-slate-400'}">${letter}</span>
+                        <span class="text-sm font-semibold text-slate-700">${opt}</span>
+                    </button>
+                `;
+            });
+
+            document.getElementById('prevBtn').disabled = currentQIdx === 0;
+            document.getElementById('nextBtn').innerText = currentQIdx === activeExam.questions.length - 1 ? "Finish Assessment" : "Next Question";
+        }
+
+        function selectOption(idx) {
+            answers[currentQIdx] = idx;
+            document.querySelectorAll('.option-btn').forEach(btn => btn.classList.remove('selected'));
+            renderQuestion();
+        }
+
+        function nextQuestion() {
+            if (answers[currentQIdx] === null) return alert("Please select an option before proceeding.");
+
+            if (currentQIdx < activeExam.questions.length - 1) {
+                currentQIdx++;
+                renderQuestion();
+            } else {
+                if(confirm("Are you sure you want to submit your answers?")) finishExam();
+            }
+        }
+
+        function prevQuestion() {
+            if (currentQIdx > 0) {
+                currentQIdx--;
+                renderQuestion();
+            }
+        }
+
+        function finishExam() {
+            let score = 0;
+            activeExam.questions.forEach((q, i) => {
+                if (parseInt(q.ans) === answers[i]) score++;
+            });
+
+            const taken = JSON.parse(localStorage.getItem(ask)) || [];
+            const result = {
+                studentId: currentStudent.id,
+                type: activeExam.type,
+                section: activeExam.section,
+                score: score
+            };
+
+            const idx = taken.findIndex(t => t.studentId === result.studentId && t.type === result.type && t.section === result.section);
+            if (idx >= 0) taken[idx] = result;
+            else taken.push(result);
+
+            localStorage.setItem(ask, JSON.stringify(taken));
+
+            document.getElementById('examSection').classList.add('hidden');
+            document.getElementById('resultSection').classList.remove('hidden');
+            document.getElementById('scoreDisplay').innerText = `${score} / ${activeExam.questions.length}`;
+        }
+
+        function backToPortal() {
+            document.getElementById('resultSection').classList.add('hidden');
+            document.getElementById('portalSection').classList.remove('hidden');
+            renderAssessmentList();
+        }
+    </script>
+</body>
+</html>
