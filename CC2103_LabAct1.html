@@ -1,0 +1,341 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>CC2103 Laboratory Activity 1: Data Structures and Abstract Data Types - Laguna University</title>
+    <style>
+        body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            color: #2c3e50;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f7f9fa;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .branding-header {
+            text-align: center;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 20px;
+            margin-bottom: 25px;
+        }
+        .logo-container {
+            margin-bottom: 12px;
+        }
+        .logo-container img {
+            max-width: 90px;
+            height: auto;
+        }
+        .branding-header h3 {
+            margin: 0 0 5px 0;
+            color: #1a365d;
+            font-size: 14pt;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        .branding-header h4 {
+            margin: 0;
+            color: #2b6cb0;
+            font-size: 11pt;
+            font-weight: 500;
+        }
+        .header-banner {
+            background: linear-gradient(135deg, #1b365d, #2c5282);
+            color: #ffffff;
+            margin: 0 -30px 25px -30px;
+            padding: 25px 30px;
+            text-align: center;
+        }
+        .header-banner h1 {
+            margin: 0 0 8px 0;
+            font-size: 22px;
+        }
+        .header-banner p {
+            margin: 0;
+            font-size: 12px;
+            color: #e2e8f0;
+            text-align: center;
+        }
+        h2 {
+            color: #1b365d;
+            font-size: 16px;
+            padding-left: 0;
+            margin-top: 25px;
+            margin-bottom: 12px;
+        }
+        p {
+            font-size: 11pt;
+            margin-bottom: 10px;
+            text-align: justify;
+        }
+        .code-container {
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 9pt;
+            padding: 12px 15px;
+            border-radius: 6px;
+            border: 1px solid #333333;
+            margin: 15px 0;
+            white-space: pre-wrap;
+            overflow-x: auto;
+        }
+        .step-box {
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        .assessment-section {
+            background-color: #ebf8ff;
+            border: 1px solid #bee3f8;
+            padding: 18px;
+            border-radius: 6px;
+            margin-top: 30px;
+        }
+        .assessment-section h2 {
+            color: #2b6cb0;
+            margin-top: 0;
+        }
+        .question-box {
+            background-color: #ffffff;
+            border: 1px dashed #cbd5e0;
+            border-radius: 4px;
+            padding: 15px;
+            margin-top: 10px;
+            margin-bottom: 15px;
+        }
+        .question-box p {
+            font-weight: bold;
+            color: #2d3748;
+            margin-bottom: 10px;
+        }
+        textarea {
+            width: 100%;
+            height: 90px;
+            padding: 10px;
+            border: 1px solid #cbd5e0;
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 10.5pt;
+            resize: vertical;
+            background-color: #fff;
+            color: #2c3e50;
+            box-sizing: border-box;
+        }
+        textarea:focus {
+            outline: none;
+            border-color: #3182ce;
+            box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1);
+        }
+        footer {
+            margin-top: 40px;
+            border-top: 1px solid #e2e8f0;
+            padding-top: 20px;
+            text-align: center;
+            font-size: 10pt;
+            color: #4a5568;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="branding-header">
+        <div class="logo-container">
+            <!-- Replace 'lu_logo.png' with the actual link or path to the Laguna University logo -->
+            <img src="lu.jpg" alt="Laguna University Logo">
+        </div>
+        <h3>Laguna University</h3>
+        <h4>College of Computing Studies</h4>
+    </div>
+
+    <div class="header-banner">
+        <h1>CC 2103 - DATA STRUCTURES AND ALGORITHMS</h1>
+        <h1>Laboratory Activity 1: Data Structures & Abstract Data Types</h1>
+        <p>CC2103 • Laboratory Activity using Apache Netbeans</p>
+    </div>
+
+    <h2>Overview & Objectives</h2>
+    <p>This laboratory activity introduces fundamental computer science concepts in Java, focusing on user-defined data types, the architectural differences between static and dynamic data structures, and the structural properties of linear versus non-linear organizations.</p>
+
+    <h2>Step 1: Setting up Apache NetBeans</h2>
+    <div class="step-box">
+        <p><strong>1. Create a New Project:</strong> Launch Apache NetBeans, go to <strong>File &gt; New Project...</strong>, select <strong>Java with Ant &gt; Java Application</strong>, and click <strong>Next</strong>.</p>
+        <p><strong>2. Project Details:</strong> Name your project <code>CC2103_Lab1Activity</code> and select your preferred working directory. Click <strong>Finish</strong>.</p>
+        <p><strong>3. Configure Package:</strong> Expand your project in the left navigation panel, right-click <strong>Source Packages</strong>, select <strong>New &gt; Java Package...</strong>, and name it <code>cc2103_lab1activity</code>.</p>
+        <p><strong>4. Create Source File:</strong> Right-click the new package, select <strong>New &gt; Java Class...</strong>, and name the class <code>CC2103_Lab1Activity</code>.</p>
+    </div>
+
+    <h2>Step 2: Source Code Implementation</h2>
+    <p>Replace any boilerplate code in your newly created file with the complete implementation provided below:</p>
+    
+    <div class="code-container">package cc2103_lab1activity;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+
+// Task 1: User-Defined Data Type
+class Course {
+    String courseCode;
+    int credits;
+    double tuitionFee;
+    boolean isActive;
+
+    public Course(String courseCode, int credits, double tuitionFee, boolean isActive) {
+        this.courseCode = courseCode;
+        this.credits = credits;
+        this.tuitionFee = tuitionFee;
+        this.isActive = isActive;
+    }
+
+    public void displayCourseInfo() {
+        System.out.println("--- Course Information (Processed Data) ---");
+        System.out.println("Course Code: " + courseCode);
+        System.out.println("Credits: " + credits);
+        System.out.println("Tuition Fee: $" + tuitionFee);
+        System.out.println("Status Active: " + isActive);
+    }
+}
+
+// Task 3 (Non-Linear Helper): Tree Node
+class EmployeeNode {
+    String name;
+    List&lt;EmployeeNode&gt; subordinates;
+
+    public EmployeeNode(String name) {
+        this.name = name;
+        this.subordinates = new ArrayList&lt;&gt;();
+    }
+
+    public void addSubordinate(EmployeeNode node) {
+        subordinates.add(node);
+    }
+}
+
+public class CC2103_Lab1Activity {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        
+        // TASK 1: Data Types via Scanner
+        System.out.println("=== TASK 1: DATA TYPES (USER INPUT) ===");
+        System.out.print("Enter Course Code (e.g., CS101): ");
+        String code = scanner.nextLine();
+        System.out.print("Enter Credits (Integer): ");
+        int creds = scanner.nextInt();
+        System.out.print("Enter Tuition Fee (Double): ");
+        double fee = scanner.nextDouble();
+        System.out.print("Is the course active? (true/false): ");
+        boolean active = scanner.nextBoolean();
+        scanner.nextLine(); 
+
+        Course userCourse = new Course(code, creds, fee, active);
+        userCourse.displayCourseInfo();
+        System.out.println();
+
+        // TASK 2: Static vs. Dynamic Data Structures
+        System.out.println("=== TASK 2: STATIC VS DYNAMIC ===");
+        String[] staticClassroom = new String[3];
+        System.out.println("Enter names for 3 static classroom slots:");
+        for (int i = 0; i &lt; staticClassroom.length; i++) {
+            System.out.print("Slot " + (i + 1) + ": ");
+            staticClassroom[i] = scanner.nextLine();
+        }
+        System.out.println("Static Array successfully filled.");
+        System.out.println();
+
+        ArrayList&lt;String&gt; dynamicClub = new ArrayList&lt;&gt;();
+        System.out.println("Enter club members dynamically (Type 'done' to finish):");
+        while (true) {
+            System.out.print("Enter member name (or 'done'): ");
+            String member = scanner.nextLine();
+            if (member.equalsIgnoreCase("done")) { break; }
+            dynamicClub.add(member);
+        }
+        System.out.println("Dynamic Club Members: " + dynamicClub);
+        System.out.println();
+
+        // TASK 3: Linear vs. Non-Linear Structures
+        System.out.println("=== TASK 3: LINEAR VS NON-LINEAR ===");
+        int[] ticketQueue = new int[3];
+        System.out.println("Enter 3 ticket numbers for linear queue:");
+        for (int i = 0; i &lt; ticketQueue.length; i++) {
+            System.out.print("Ticket " + (i + 1) + ": ");
+            ticketQueue[i] = scanner.nextInt();
+        }
+        scanner.nextLine();
+
+        System.out.print("Traversing Linear Ticket Queue: ");
+        for (int ticket : ticketQueue) { System.out.print(ticket + " "); }
+        System.out.println("\n");
+
+        System.out.print("Enter the name of the Director (Root): ");
+        String directorName = scanner.nextLine();
+        EmployeeNode director = new EmployeeNode(directorName);
+
+        System.out.print("Enter Manager A name: ");
+        EmployeeNode managerA = new EmployeeNode(scanner.nextLine());
+        System.out.print("Enter Manager B name: ");
+        EmployeeNode managerB = new EmployeeNode(scanner.nextLine());
+        
+        director.addSubordinate(managerA);
+        director.addSubordinate(managerB);
+
+        System.out.println("\nNon-Linear Hierarchy Root: " + director.name);
+        for (EmployeeNode sub : director.subordinates) {
+            System.out.println(" -&gt; " + sub.name);
+        }
+
+        scanner.close();
+        System.out.println("\nLaboratory execution completed successfully.");
+    }
+}</div>
+
+<h2>Step 3: Compilation and Execution</h2>
+<div class="step-box">
+    <p><strong>1. Format Code:</strong> Right-click inside the editor and choose <strong>Format</strong> (or press <code>Alt + Shift + F</code>).</p>
+    <p><strong>2. Run Program:</strong> Press <strong>F6</strong> or click the green <strong>Run Project</strong> toolbar button.</p>
+    <p><strong>3. Verify Outputs:</strong> Monitor the Apache NetBeans Output window, follow the interactive console instructions, and verify that all sections execute properly.</p>
+</div>
+
+<!-- LAB ASSESSMENT QUESTIONS SECTION -->
+
+<div class="assessment-section">
+    <textarea placeholder="Name">Name, Coure/Year/Section</textarea>
+    <h2>Lab Assessment Questions</h2>
+    <p>Answer these questions briefly in your lab report:</p>
+
+    <div class="question-box">
+        <p>1. What happens when you attempt to add a 4th element to a static array initialized with a size of 3? Which exception is thrown?</p>
+        <textarea placeholder="Type your answer here..."></textarea>
+    </div>
+
+    <div class="question-box">
+        <p>2. How does an ArrayList manage memory differently behind the scenes compared to a primitive array?</p>
+        <textarea placeholder="Type your answer here..."></textarea>
+    </div>
+
+    <div class="question-box">
+        <p>3. In your own words, why is an organizational chart considered a non-linear data structure rather than a linear one?</p>
+        <textarea placeholder="Type your answer here..."></textarea>
+    </div>
+</div>
+
+<footer>
+    SirLavz | RONALD T. LAVA, MSIT | Laguna University | College of Computing Studies
+</footer>
+
+</div>
+
+</body>
+</html>
