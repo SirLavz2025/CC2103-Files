@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CC 2103 - Data Structures and Algorithm</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#1B2432;
+    --navy-soft:#4B5568;
+    --bg:#EEF1F6;
+    --card-bg:#FFFFFF;
+    --border:#D9DEE6;
+
+    --purple:#5B4FCF;   --purple-bg:#EFEDFC;
+    --teal:#0E7C63;     --teal-bg:#E3F4EF;
+    --amber:#AD7209;    --amber-bg:#FBF0DD;
+    --gray:#5B6472;     --gray-bg:#EEF0F3;
+
+    --radius:14px;
+  }
+
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--navy);
+    font-family:'Inter',sans-serif;
+    line-height:1.6;
+    padding-bottom:60px;
+  }
+
+  .masthead{
+    max-width:900px;
+    margin:0 auto;
+    padding:56px 24px 32px;
+    text-align:center;
+  }
+  .masthead .tag{
+    display:inline-block;
+    font-family:'JetBrains Mono',monospace;
+    font-size:12px;
+    letter-spacing:.12em;
+    color:var(--navy-soft);
+    border:1px solid var(--border);
+    background:var(--card-bg);
+    padding:5px 12px;
+    border-radius:999px;
+    margin-bottom:18px;
+  }
+  .masthead h1{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    font-size:clamp(28px,4vw,42px);
+    margin:0 0 10px;
+    letter-spacing:-.01em;
+  }
+  .masthead p{
+    color:var(--navy-soft);
+    font-size:15px;
+    margin:0;
+  }
+
+  main{
+    max-width:900px;
+    margin:0 auto;
+    padding:0 24px;
+  }
+
+  .section-label{
+    font-family:'JetBrains Mono',monospace;
+    font-size:12px;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+    color:var(--navy-soft);
+    margin:52px 0 16px;
+    display:flex;
+    align-items:center;
+    gap:12px;
+  }
+  .section-label::after{
+    content:"";
+    flex:1;
+    height:1px;
+    background:var(--border);
+  }
+
+  /* Foundations flow */
+  .flow-row{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:18px;
+  }
+  .flow-arrows{
+    display:flex;
+    justify-content:center;
+    gap:130px;
+    padding:8px 0;
+    color:var(--navy-soft);
+    font-size:20px;
+  }
+  .flow-merge{
+    max-width:280px;
+    margin:0 auto;
+  }
+
+  /* Card catalog component */
+  .card{
+    all:unset;
+    cursor:pointer;
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+    background:var(--card-bg);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    padding:18px 20px 20px;
+    position:relative;
+    transition:border-color .15s ease, transform .15s ease;
+  }
+  .card:hover{ border-color:var(--card-accent,var(--navy-soft)); transform:translateY(-2px); }
+  .card:focus-visible{ outline:2px solid var(--card-accent,var(--navy)); outline-offset:2px; }
+  .card::before{
+    content:"";
+    position:absolute;
+    top:0; left:18px;
+    width:34px; height:5px;
+    background:var(--card-accent,var(--navy));
+    border-radius:0 0 4px 4px;
+  }
+  .card-tag{
+    font-family:'JetBrains Mono',monospace;
+    font-size:10.5px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    color:var(--card-accent-text,var(--navy-soft));
+    margin-top:4px;
+  }
+  .card-title{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    font-size:18px;
+  }
+  .card-sub{
+    font-size:13.5px;
+    color:var(--navy-soft);
+  }
+  .card-hint{
+    margin-top:10px;
+    font-size:12px;
+    color:var(--card-accent-text,var(--navy-soft));
+    display:flex;
+    align-items:center;
+    gap:4px;
+  }
+
+  .card--purple{ --card-accent:var(--purple); --card-accent-text:var(--purple); background-image:linear-gradient(var(--purple-bg),var(--purple-bg)); background-repeat:no-repeat; background-size:100% 4px; background-position:0 0;}
+  .card--teal{ --card-accent:var(--teal); --card-accent-text:var(--teal); }
+  .card--amber{ --card-accent:var(--amber); --card-accent-text:var(--amber); }
+  .card--gray{ --card-accent:var(--gray); --card-accent-text:var(--gray); }
+
+  .grid-2{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:18px;
+  }
+  .grid-terms{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:14px;
+  }
+
+  .pill-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:12px;
+  }
+  .pill{
+    all:unset;
+    cursor:pointer;
+    text-align:center;
+    background:var(--card-bg);
+    border:1px solid var(--border);
+    border-radius:999px;
+    padding:12px 10px;
+    font-size:13.5px;
+    font-weight:500;
+    transition:border-color .15s ease, background .15s ease;
+  }
+  .pill:hover{ border-color:var(--amber); background:var(--amber-bg); }
+  .pill:focus-visible{ outline:2px solid var(--amber); outline-offset:2px; }
+
+  footer{
+    max-width:900px;
+    margin:56px auto 0;
+    padding:20px 24px 0;
+    border-top:1px solid var(--border);
+    text-align:center;
+    font-family:'JetBrains Mono',monospace;
+    font-size:12px;
+    color:var(--navy-soft);
+  }
+
+  /* Modal */
+  .modal-overlay{
+    position:fixed; inset:0;
+    background:rgba(27,36,50,.5);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:24px;
+    z-index:50;
+  }
+  .modal-overlay[hidden]{ display:none; }
+  .modal{
+    background:var(--card-bg);
+    border-radius:16px;
+    max-width:520px;
+    width:100%;
+    max-height:85vh;
+    overflow-y:auto;
+    padding:32px 28px 28px;
+    position:relative;
+    border-top:6px solid var(--modal-accent,var(--navy));
+  }
+  .modal-close{
+    all:unset;
+    cursor:pointer;
+    position:absolute;
+    top:16px; right:18px;
+    font-size:20px;
+    line-height:1;
+    color:var(--navy-soft);
+    padding:4px;
+  }
+  .modal-close:hover{ color:var(--navy); }
+  .modal-tag{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    color:var(--modal-accent,var(--navy-soft));
+    margin-bottom:8px;
+  }
+  .modal h3{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    font-size:24px;
+    margin:0 0 14px;
+  }
+  .modal-body p{
+    font-size:14.5px;
+    color:var(--navy);
+    margin:0 0 12px;
+  }
+  .modal-body ul{
+    margin:0 0 12px;
+    padding-left:20px;
+    font-size:14.5px;
+  }
+  .modal-body li{ margin-bottom:6px; }
+  .modal-body strong{ color:var(--navy); }
+  .modal-body .example-label{
+    font-family:'JetBrains Mono',monospace;
+    font-size:10.5px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    color:var(--modal-accent,var(--navy-soft));
+    margin:16px 0 6px;
+  }
+  .modal-body pre{
+    background:var(--gray-bg);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:12px 14px;
+    overflow-x:auto;
+    margin:0 0 12px;
+  }
+  .modal-body code{
+    font-family:'JetBrains Mono',monospace;
+    font-size:12.5px;
+    color:var(--navy);
+    white-space:pre;
+  }
+  .modal-body table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:13px;
+    margin:0 0 12px;
+  }
+  .modal-body th, .modal-body td{
+    text-align:left;
+    padding:6px 8px;
+    border-bottom:1px solid var(--border);
+  }
+  .modal-body th{
+    font-family:'JetBrains Mono',monospace;
+    font-size:10.5px;
+    letter-spacing:.05em;
+    text-transform:uppercase;
+    color:var(--navy-soft);
+  }
+
+  @media (max-width:640px){
+    .flow-row, .grid-2, .grid-terms{ grid-template-columns:1fr; }
+    .pill-grid{ grid-template-columns:1fr 1fr; }
+    .flow-arrows{ gap:60px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <span class="tag">CC 2103</span>
+  <h1>Data Structures and Algorithm</h1>
+  <p>An interactive course reference. Tap any card for a fuller discussion.</p>
+</header>
+
+<main>
+
+  <div class="flow-row">
+    <button class="card card--purple" data-id="ds" style="--card-accent:#5B4FCF;">
+      <span class="card-tag">Foundation</span>
+      <span class="card-title">Data structures</span>
+      <span class="card-sub">How data is organized</span>
+      <span class="card-hint">Read more &rarr;</span>
+    </button>
+    <button class="card card--teal" data-id="algo">
+      <span class="card-tag">Foundation</span>
+      <span class="card-title">Algorithms</span>
+      <span class="card-sub">Steps to solve problems</span>
+      <span class="card-hint">Read more &rarr;</span>
+    </button>
+  </div>
+
+  <div class="flow-arrows"><span>&darr;</span><span>&darr;</span></div>
+
+  <div class="flow-merge">
+    <button class="card card--gray" data-id="dsa">
+      <span class="card-tag">Together</span>
+      <span class="card-title">DSA</span>
+      <span class="card-sub">Organize and solve</span>
+      <span class="card-hint">Read more &rarr;</span>
+    </button>
+  </div>
+
+  <h2 class="section-label">Types of data structures</h2>
+  <div class="grid-2">
+    <button class="card card--gray" data-id="primitive">
+      <span class="card-tag">Type</span>
+      <span class="card-title">Primitive types</span>
+      <span class="card-sub">int, float, char, bool</span>
+      <span class="card-hint">Read more &rarr;</span>
+    </button>
+    <button class="card card--purple" data-id="abstract">
+      <span class="card-tag">Type</span>
+      <span class="card-title">Abstract types</span>
+      <span class="card-sub">Arrays, lists, stacks, trees</span>
+      <span class="card-hint">Read more &rarr;</span>
+    </button>
+  </div>
+
+  <h2 class="section-label">Key DSA terms</h2>
+  <div class="grid-terms">
+    <button class="card card--gray" data-id="term-algorithm">
+      <span class="card-tag">Term</span><span class="card-title">Algorithm</span>
+      <span class="card-sub">Step-by-step instructions</span>
+      <span class="card-hint">Read more &rarr;</span>
+    </button>
+    <button class="card card--gray" data-id="term-datastructure">
+      <span class="card-tag">Term</span><span class="card-title">Data structure</span>
+      <span class="card-sub">Way to organize data</span>
+      <span class="card-hint">Read more &rarr;</span>
+    </button>
+    <button class="card card--gray" data-id="term-time">
+      <span class="card-tag">Term</span><span class="card-title">Time complexity</span>
+      <span class="card-sub">Time an algorithm takes</span>
+      <span class="card-hint">Read more &rarr;</span>
+    </button>
+    <button class="card card--gray" data-id="term-space">
+      <span class="card-tag">Term</span><span class="card-title">Space complexity</span>
+      <span class="card-sub">Memory an algorithm uses</span>
+      <span class="card-hint">Read more &rarr;</span>
+    </button>
+    <button class="card card--gray" data-id="term-bigo">
+      <span class="card-tag">Term</span><span class="card-title">Big O notation</span>
+      <span class="card-sub">Describes growth rate</span>
+      <span class="card-hint">Read more &rarr;</span>
+    </button>
+    <button class="card card--gray" data-id="term-recursion">
+      <span class="card-tag">Term</span><span class="card-title">Recursion</span>
+      <span class="card-sub">Function calls itself</span>
+      <span class="card-hint">Read more &rarr;</span>
+    </button>
+    <button class="card card--gray" data-id="term-divide">
+      <span class="card-tag">Term</span><span class="card-title">Divide and conquer</span>
+      <span class="card-sub">Break into subproblems</span>
+      <span class="card-hint">Read more &rarr;</span>
+    </button>
+    <button class="card card--gray" data-id="term-brute">
+      <span class="card-tag">Term</span><span class="card-title">Brute force</span>
+      <span class="card-sub">Try all possibilities</span>
+      <span class="card-hint">Read more &rarr;</span>
+    </button>
+  </div>
+
+  <h2 class="section-label">Where DSA is used</h2>
+  <div class="pill-grid">
+    <button class="pill" data-id="app-os">Operating systems</button>
+    <button class="pill" data-id="app-db">Database systems</button>
+    <button class="pill" data-id="app-web">Web applications</button>
+    <button class="pill" data-id="app-ml">Machine learning</button>
+    <button class="pill" data-id="app-search">Search engines</button>
+    <button class="pill" data-id="app-games">Video games</button>
+  </div>
+
+</main>
+
+<footer>
+  @SirLavz | Ronald T. Lava, MSIT | Laguna University | College of Computing Studies
+</footer>
+
+<div class="modal-overlay" id="overlay" hidden>
+  <div class="modal" id="modal">
+    <button class="modal-close" id="modal-close" aria-label="Close">&times;</button>
+    <div class="modal-tag" id="modal-tag"></div>
+    <h3 id="modal-title"></h3>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<script>
+const ACCENTS = {
+  purple: "#5B4FCF", teal: "#0E7C63", amber: "#AD7209", gray: "#5B6472"
+};
+
+const DATA = {
+  ds: {
+    tag: "Foundation", accent: "purple", title: "Data structures",
+    body: `<p>A <strong>data structure</strong> is a way of organizing and storing data so it can be accessed and used efficiently. It defines not just where values sit in memory, but the relationships between them and the operations allowed on them.</p>
+    <p>The same data stored as an array, a linked list, or a tree behaves very differently in terms of speed and memory use — the structure you choose shapes what your program can do quickly and what it does slowly.</p>
+    <div class="example-label">Example</div>
+    <p>Suppose a school needs to store 500 student records and constantly look students up by ID number.</p>
+    <ul>
+      <li><strong>Array indexed by ID:</strong> lookup is instant, O(1), but inserting a new student in the middle means shifting hundreds of records.</li>
+      <li><strong>Linked list:</strong> inserting a new student is cheap, O(1), but finding one means walking the list one by one, O(n).</li>
+      <li><strong>Hash table keyed by ID:</strong> both lookup and insertion are close to O(1) — this is why most real student information systems use something hash-table-like under the hood.</li>
+    </ul>
+    <p>The "right" structure depends entirely on which operation (lookup vs. insertion) happens most often.</p>`
+  },
+  algo: {
+    tag: "Foundation", accent: "teal", title: "Algorithms",
+    body: `<p>An <strong>algorithm</strong> is a finite, well-defined sequence of steps that transforms an input into a desired output. It's the recipe; the data structure is the pantry it works from.</p>
+    <p>Two algorithms can solve the same problem correctly but differ hugely in efficiency — this is why analyzing algorithms (time and space complexity) is as important as writing them.</p>
+    <div class="example-label">Example: finding the largest number</div>
+    <pre><code>function findMax(numbers):
+    max = numbers[0]
+    for each n in numbers:
+        if n > max:
+            max = n
+    return max</code></pre>
+    <p>Given <code>[4, 17, 2, 9, 23, 5]</code>, this algorithm checks each value once and returns <code>23</code>. It always finishes (it terminates), gives one clear answer for any list (it's unambiguous), and does the minimum work needed — one pass, O(n) — which is what makes it a good algorithm and not just "a way that works."</p>`
+  },
+  dsa: {
+    tag: "Together", accent: "gray", title: "DSA",
+    body: `<p><strong>DSA</strong> is the combined study of data structures and algorithms: how to organize data, and how to act on it efficiently.</p>
+    <p>They're taught together because the choice of structure directly limits what an algorithm can achieve — a fast search algorithm is wasted on a structure that forces slow lookups. Good programmers pick both pieces together, not in isolation.</p>
+    <div class="example-label">Example: contact search app</div>
+    <p>Say you're building a phone contacts app that needs to search 10,000 names instantly as the user types.</p>
+    <ul>
+      <li><strong>Wrong pairing:</strong> unsorted array + linear search — every keystroke scans up to 10,000 names, O(n) each time. Feels laggy.</li>
+      <li><strong>Right pairing:</strong> sorted array (or a trie) + binary search — each keystroke narrows the search in O(log n), feeling instant.</li>
+    </ul>
+    <p>The algorithm (binary search) only works fast because the data structure (sorted data) supports it. That coupling is the whole point of DSA.</p>`
+  },
+  primitive: {
+    tag: "Type", accent: "gray", title: "Primitive types",
+    body: `<p><strong>Primitive data types</strong> are the basic building blocks built directly into a programming language: integers, floating-point numbers, characters, and booleans.</p>
+    <p>They hold a single value each and are the raw material that more complex, abstract data structures are built from.</p>
+    <div class="example-label">Example</div>
+    <table>
+      <tr><th>Type</th><th>Example value</th><th>Typical use</th></tr>
+      <tr><td>int</td><td><code>23</code></td><td>Student's age</td></tr>
+      <tr><td>float</td><td><code>1.75</code></td><td>Height in meters</td></tr>
+      <tr><td>char</td><td><code>'A'</code></td><td>A single grade letter</td></tr>
+      <tr><td>bool</td><td><code>true</code></td><td>Is student enrolled?</td></tr>
+    </table>
+    <p>A student record like <code>{ age: 23, gpa: 1.75, section: 'A', enrolled: true }</code> is really just four primitives bundled together — and that bundling is the first step toward an abstract data structure.</p>`
+  },
+  abstract: {
+    tag: "Type", accent: "purple", title: "Abstract types",
+    body: `<p><strong>Abstract data structures</strong> are built on top of primitive types to model more useful collections of data: arrays, linked lists, stacks, queues, trees, and graphs.</p>
+    <ul>
+      <li><strong>Linear structures</strong> (arrays, lists, stacks, queues) arrange data in a sequence.</li>
+      <li><strong>Non-linear structures</strong> (trees, graphs) model more complex relationships, like hierarchies or networks.</li>
+    </ul>
+    <div class="example-label">Example</div>
+    <ul>
+      <li><strong>Array:</strong> <code>grades = [88, 92, 75, 100]</code> — fixed-position list of a class's scores.</li>
+      <li><strong>Stack:</strong> the "undo" button in a text editor — the last edit made is the first one undone (LIFO).</li>
+      <li><strong>Queue:</strong> a printer job list — the first document sent is the first one printed (FIFO).</li>
+      <li><strong>Tree:</strong> a university's org chart — Dean → Department Chairs → Faculty, a natural hierarchy.</li>
+      <li><strong>Graph:</strong> a campus map — buildings as nodes, walkways as edges, used to compute the shortest route between two buildings.</li>
+    </ul>`
+  },
+  "term-algorithm": {
+    tag: "Term", accent: "gray", title: "Algorithm",
+    body: `<p>A finite set of step-by-step instructions for solving a problem or completing a task. To count as an algorithm, it must be unambiguous, always terminate, and produce a correct result for valid input.</p>
+    <div class="example-label">Example: a recipe as an algorithm</div>
+    <p>"Making instant noodles" is an everyday algorithm: (1) boil 2 cups of water, (2) add noodles, (3) cook for 3 minutes, (4) add seasoning, (5) serve. Each step is unambiguous, the process always ends, and it reliably produces the same result — exactly the properties a computer-science algorithm needs, just applied to a kitchen instead of a CPU.</p>`
+  },
+  "term-datastructure": {
+    tag: "Term", accent: "gray", title: "Data structure",
+    body: `<p>A specific way of organizing data in memory so that it can be stored, accessed, and modified efficiently. Each data structure comes with its own set of allowed operations and performance trade-offs.</p>
+    <div class="example-label">Example</div>
+    <p>A library catalog is a real-world data structure: cards are sorted alphabetically by author (the organization), and the rules only let you insert a new card in its correct alphabetical slot or search by flipping through in order (the allowed operations) — you can't just drop a card anywhere and expect the system to still work.</p>`
+  },
+  "term-time": {
+    tag: "Term", accent: "gray", title: "Time complexity",
+    body: `<p>A measure of how the running time of an algorithm grows as the size of its input grows. It's usually expressed using Big O notation, e.g. O(n) for linear time or O(log n) for logarithmic time.</p>
+    <div class="example-label">Example</div>
+    <p>Looking up a word in a printed dictionary of 1,000 pages:</p>
+    <ul>
+      <li><strong>Flipping page by page from the start:</strong> O(n) — worst case, 1,000 checks.</li>
+      <li><strong>Opening near the middle and narrowing down</strong> (like you actually do): O(log n) — about 10 checks to find any word.</li>
+    </ul>
+    <p>Same task, same data — but the smarter approach scales far better as the dictionary grows.</p>`
+  },
+  "term-space": {
+    tag: "Term", accent: "gray", title: "Space complexity",
+    body: `<p>A measure of how much memory an algorithm needs relative to its input size, including both the input itself and any extra ("auxiliary") memory the algorithm uses while running.</p>
+    <div class="example-label">Example</div>
+    <p>Reversing a list of 1,000 names:</p>
+    <ul>
+      <li><strong>In-place swap</strong> (swap first and last, move inward): O(1) extra space — just a temporary variable, regardless of list size.</li>
+      <li><strong>Copy into a new reversed list:</strong> O(n) extra space — a full second list of 1,000 names is allocated.</li>
+    </ul>
+    <p>Both give the correct answer, but the in-place version is far more memory-efficient for large inputs.</p>`
+  },
+  "term-bigo": {
+    tag: "Term", accent: "gray", title: "Big O notation",
+    body: `<p>A mathematical notation that describes the upper-bound growth rate of an algorithm's time or space needs as input size increases, ignoring constants and lower-order terms.</p>
+    <p>Common classes, from fastest to slowest growing: O(1), O(log n), O(n), O(n log n), O(n²), O(2ⁿ).</p>
+    <div class="example-label">Example: 1,000 items, operations needed</div>
+    <table>
+      <tr><th>Notation</th><th>Operations</th><th>Real example</th></tr>
+      <tr><td>O(1)</td><td>1</td><td>Grabbing an array item by index</td></tr>
+      <tr><td>O(log n)</td><td>~10</td><td>Binary search</td></tr>
+      <tr><td>O(n)</td><td>1,000</td><td>Scanning a list once</td></tr>
+      <tr><td>O(n log n)</td><td>~10,000</td><td>Merge sort</td></tr>
+      <tr><td>O(n&sup2;)</td><td>1,000,000</td><td>Bubble sort</td></tr>
+    </table>
+    <p>At 1,000 items the gap already looks large — at 1,000,000 items, an O(n&sup2;) algorithm becomes unusable while O(log n) barely notices.</p>`
+  },
+  "term-recursion": {
+    tag: "Term", accent: "gray", title: "Recursion",
+    body: `<p>A technique where a function solves a problem by calling itself on a smaller version of the same problem, until it reaches a base case that can be answered directly.</p>
+    <p>Recursion is a natural fit for structures that are themselves recursive, like trees and linked lists.</p>
+    <div class="example-label">Example: factorial</div>
+    <pre><code>function factorial(n):
+    if n == 0:
+        return 1          // base case
+    return n * factorial(n - 1)   // recursive case</code></pre>
+    <p><code>factorial(4)</code> expands as <code>4 * factorial(3)</code> &rarr; <code>4 * (3 * factorial(2))</code> &rarr; ... down to <code>factorial(0) = 1</code>, then multiplies back up: <code>4 * 3 * 2 * 1 * 1 = 24</code>. Without the base case, this would call itself forever — the base case is what makes recursion, and not infinite looping.</p>`
+  },
+  "term-divide": {
+    tag: "Term", accent: "gray", title: "Divide and conquer",
+    body: `<p>An algorithm design strategy that breaks a problem into smaller subproblems of the same type, solves each subproblem (often recursively), then combines the results.</p>
+    <p>Classic examples include merge sort, quicksort, and binary search.</p>
+    <div class="example-label">Example: merge sort on [8, 3, 5, 1]</div>
+    <p><strong>Divide:</strong> split into <code>[8, 3]</code> and <code>[5, 1]</code>, then again into <code>[8] [3] [5] [1]</code>.</p>
+    <p><strong>Conquer:</strong> single items are already "sorted" — this is the base case.</p>
+    <p><strong>Combine:</strong> merge pairs back together in order: <code>[3, 8]</code> and <code>[1, 5]</code>, then merge those into <code>[1, 3, 5, 8]</code>.</p>
+    <p>Each merge step only compares a few items at a time, which is why merge sort runs in O(n log n) instead of the O(n&sup2;) of simpler sorts.</p>`
+  },
+  "term-brute": {
+    tag: "Term", accent: "gray", title: "Brute force",
+    body: `<p>An approach that tries every possible solution until it finds the correct one, without using any shortcuts or optimizations.</p>
+    <p>Brute force is simple to write and guaranteed correct, but often too slow for large inputs — it's usually the first, least efficient solution to be improved on.</p>
+    <div class="example-label">Example: cracking a 4-digit padlock</div>
+    <p>A brute-force approach tries every combination in order: 0000, 0001, 0002 ... up to 9999 — up to 10,000 attempts, guaranteed to eventually find the code.</p>
+    <p>It works, but compare it to a smarter approach that listens for clicks in the lock mechanism to narrow down each digit — that's the difference between brute force and an optimized algorithm: both can be correct, but one scales far better.</p>`
+  },
+  "app-os": {
+    tag: "Application", accent: "amber", title: "Operating systems",
+    body: `<p>Operating systems rely on data structures constantly: queues for process scheduling, trees for file systems, and hash tables for fast lookups of system resources.</p>
+    <div class="example-label">Example</div>
+    <p>When you open five apps at once, the OS scheduler keeps them in a <strong>queue</strong> (or priority queue) and gives each a small time slice on the CPU in turn — that round-robin queueing is why you can run multiple programs on one processor and it feels simultaneous.</p>`
+  },
+  "app-db": {
+    tag: "Application", accent: "amber", title: "Database systems",
+    body: `<p>Databases use tree structures like B-trees to index data for fast lookup, and hash tables to speed up queries — the choice of structure directly affects how fast a query runs.</p>
+    <div class="example-label">Example</div>
+    <p>Searching for a student by ID in a table of 2 million enrollment records: without an index, the database scans every row, O(n). With a <strong>B-tree index</strong> on the ID column, it narrows the search in a handful of steps, O(log n) — the difference between a query taking seconds versus milliseconds.</p>`
+  },
+  "app-web": {
+    tag: "Application", accent: "amber", title: "Web applications",
+    body: `<p>Web apps use structures like hash maps for session storage, queues for request handling, and trees for rendering nested UI components (like the DOM).</p>
+    <div class="example-label">Example</div>
+    <p>The webpage you're looking at right now is a <strong>tree</strong>: the page is the root, sections are branches, and cards, buttons, and text are leaves nested inside them. Your browser walks this tree to decide what to draw and where — that's why deeply nested, sprawling page structures render more slowly than flat, simple ones.</p>`
+  },
+  "app-ml": {
+    tag: "Application", accent: "amber", title: "Machine learning",
+    body: `<p>Machine learning relies on efficient data structures to handle large datasets — arrays and matrices for numerical data, trees for decision-tree models, and graphs for neural network architectures.</p>
+    <div class="example-label">Example</div>
+    <p>A <strong>decision tree</strong> predicting whether a student passes: the root node asks "attendance above 80%?" — branching to "GPA above 2.5?" and so on, until a leaf gives the prediction. Each prediction is just a walk down the tree, which is why decision trees are both fast to run and easy to explain.</p>`
+  },
+  "app-search": {
+    tag: "Application", accent: "amber", title: "Search engines",
+    body: `<p>Search engines use structures like inverted indexes (hash tables mapping words to documents) and graphs (for ranking pages by link structure) to return fast, relevant results.</p>
+    <div class="example-label">Example</div>
+    <p>An <strong>inverted index</strong> maps each word to the list of pages containing it: <code>"algorithm" &rarr; [page4, page19, page207, ...]</code>. Searching "algorithm" is then just one hash-table lookup instead of reading every page on the internet — this single structure is what makes web search return results in a fraction of a second.</p>`
+  },
+  "app-games": {
+    tag: "Application", accent: "amber", title: "Video games",
+    body: `<p>Games use spatial data structures like quad-trees and graphs for pathfinding, plus queues and stacks for managing game state, animations, and input handling in real time.</p>
+    <div class="example-label">Example</div>
+    <p>When an enemy character finds a path to the player, the game map is treated as a <strong>graph</strong> of walkable tiles, and an algorithm like A* (a graph search) explores the fewest tiles needed to find the shortest route — the same underlying idea as a GPS app finding a driving route, just applied to a game level.</p>`
+  }
+};
+
+const overlay = document.getElementById('overlay');
+const modal = document.getElementById('modal');
+const modalTag = document.getElementById('modal-tag');
+const modalTitle = document.getElementById('modal-title');
+const modalBody = document.getElementById('modal-body');
+let lastFocused = null;
+
+function openModal(id){
+  const item = DATA[id];
+  if(!item) return;
+  modalTag.textContent = item.tag;
+  modalTitle.textContent = item.title;
+  modalBody.innerHTML = item.body;
+  modal.style.setProperty('--modal-accent', ACCENTS[item.accent] || '#1B2432');
+  modalTag.style.color = ACCENTS[item.accent] || '#4B5568';
+  lastFocused = document.activeElement;
+  overlay.hidden = false;
+  document.getElementById('modal-close').focus();
+}
+
+function closeModal(){
+  overlay.hidden = true;
+  if(lastFocused) lastFocused.focus();
+}
+
+document.querySelectorAll('[data-id]').forEach(el=>{
+  el.addEventListener('click', ()=> openModal(el.getAttribute('data-id')));
+});
+
+document.getElementById('modal-close').addEventListener('click', closeModal);
+overlay.addEventListener('click', (e)=>{ if(e.target === overlay) closeModal(); });
+document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape' && !overlay.hidden) closeModal(); });
+</script>
+
+</body>
+</html>
