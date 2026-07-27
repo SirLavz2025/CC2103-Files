@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>DSA Performance Task: Introduction to DSA in Java</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 15mm 12mm;
+            background-color: #f7f9fc;
+        }
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #2c3e50;
+            background-color: #f7f9fc;
+            margin: 0;
+            padding: 0;
+            line-height: 1.5;
+            font-size: 10.5pt;
+        }
+        .header-banner {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 20px 25px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .header-banner h1 {
+            margin: 0 0 5px 0;
+            font-size: 20pt;
+            font-weight: 700;
+        }
+        .header-banner p {
+            margin: 0;
+            font-size: 11pt;
+            opacity: 0.9;
+        }
+        .student-info-box {
+            background: white;
+            border: 1px solid #cbd5e1;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: block;
+        }
+        .student-info-grid {
+            display: table;
+            width: 100%;
+        }
+        .student-info-row {
+            display: table-row;
+        }
+        .student-info-cell {
+            display: table-cell;
+            padding: 8px 10px;
+        }
+        .student-info-cell label {
+            font-weight: 600;
+            color: #334155;
+            display: block;
+            margin-bottom: 3px;
+        }
+        .student-info-cell input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #94a3b8;
+            border-radius: 4px;
+            font-size: 10pt;
+            background-color: #fff;
+        }
+        .section-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+        h2 {
+            color: #1e3c72;
+            font-size: 14pt;
+            border-left: 4px solid #2a5298;
+            padding-left: 10px;
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+        h3 {
+            color: #334155;
+            font-size: 12pt;
+            margin-top: 15px;
+            margin-bottom: 8px;
+        }
+        p {
+            margin: 0 0 10px 0;
+        }
+        ul {
+            margin: 0 0 10px 20px;
+            padding: 0;
+        }
+        li {
+            margin-bottom: 5px;
+        }
+        pre {
+            background-color: #0f172a;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 9pt;
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+        table.styled-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            font-size: 9.5pt;
+        }
+        table.styled-table th, table.styled-table td {
+            border: 1px solid #cbd5e1;
+            padding: 8px 10px;
+            text-align: left;
+        }
+        table.styled-table th {
+            background-color: #1e3c72;
+            color: white;
+            font-weight: 600;
+        }
+        table.styled-table tr:nth-child(even) {
+            background-color: #f8fafc;
+        }
+        textarea {
+            width: 100%;
+            height: 120px;
+            padding: 10px;
+            border: 1px solid #94a3b8;
+            border-radius: 6px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 10pt;
+            background-color: #fff;
+            resize: vertical;
+        }
+        .btn-container {
+            text-align: center;
+            margin: 30px 0;
+        }
+        .action-btn {
+            background-color: #0ea5e9;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 11pt;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(14, 165, 233, 0.3);
+            transition: background-color 0.2s;
+        }
+        .action-btn:hover {
+            background-color: #0284c7;
+        }
+        @media print {
+            .btn-container {
+                display: none;
+            }
+            body {
+                background-color: white;
+            }
+            .section-card, .student-info-box {
+                border: 1px solid #ccc;
+                box-shadow: none;
+            }
+            textarea {
+                border: 1px solid #000;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header-banner">
+        <h1>Performance Task: Introduction to DSA in Java</h1>
+        <p>Course: Data Structures and Algorithms | The Algorithm Analyzer</p>
+    </div>
+
+    <div class="student-info-box">
+        <div class="student-info-grid">
+            <div class="student-info-row">
+                <div class="student-info-cell" style="width: 50%;">
+                    <label for="studentName">Student Name:</label>
+                    <input type="text" id="studentName" placeholder="Enter your full name">
+                </div>
+                <div class="student-info-cell" style="width: 50%;">
+                    <label for="yearSection">Year & Section:</label>
+                    <input type="text" id="yearSection" placeholder="e.g., BSCS-DS 2B/BSIT-BA 2A">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section-card">
+        <h2>I. Objectives & Project Scenario</h2>
+        <p><strong>Objectives:</strong></p>
+        <ul>
+            <li>Demonstrate foundational understanding of Asymptotic Analysis (Big-O Notation).</li>
+            <li>Implement basic algorithms in Java utilizing primitive types, arrays, and control flow.</li>
+            <li>Measure and compare the performance (execution time) of different approaches.</li>
+            <li>Document and present findings in a structured technical report.</li>
+        </ul>
+        <p><strong>Scenario:</strong> You have been hired as a Junior Software Engineer for an analytics firm. Your team is tasked with processing a large dataset of numerical records (simulated using arrays). Before implementing complex data structures, your lead architect wants a baseline comparison of two common approaches for finding a specific value and calculating cumulative totals within the dataset.</p>
+    </div>
+
+    <div class="section-card">
+        <h2>II. Task Requirements & Java Starter Code</h2>
+        <p>Implement the code below in your Java environment, record your execution times, and complete the technical report questions that follow.</p>
+        <pre><code>import java.util.Random;
+
+public class PerformanceAnalyzer {
+
+    // Generates an array of random integers of size n
+    public static int[] generateData(int size) {
+        Random rand = new Random();
+        int[] data = new int[size];
+        for (int i = 0; i &lt; size; i++) {
+            data[i] = rand.nextInt(size);
+        }
+        return data;
+    }
+
+    // Algorithm A: Linear Search
+    public static boolean linearSearch(int[] arr, int target) {
+        for (int i = 0; i &lt; arr.length; i++) {
+            if (arr[i] == target) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // Algorithm B: Cumulative Sum
+    public static long calculateSum(int[] arr) {
+        long sum = 0;
+        for (int i = 0; i &lt; arr.length; i++) {
+            sum += arr[i];
+        }
+        return sum;
+    }
+
+    public static void main(String[] args) {
+        int[] testSizes = {10000, 100000, 1000000};
+
+        for (int size : testSizes) {
+            int[] dataset = generateData(size);
+            int target = -1; // Worst-case scenario for search
+
+            long startTime = System.nanoTime();
+            linearSearch(dataset, target);
+            long endTime = System.nanoTime();
+            long searchTime = endTime - startTime;
+
+            startTime = System.nanoTime();
+            calculateSum(dataset);
+            endTime = System.nanoTime();
+            long sumTime = endTime - startTime;
+
+            System.out.println("Dataset Size: " + size);
+            System.out.println("  - Linear Search Time: " + searchTime + " ns");
+            System.out.println("  - Sum Calculation Time: " + sumTime + " ns");
+            System.out.println("----------------------------------------");
+        }
+    }
+}</code></pre>
+    </div>
+
+    <div class="section-card">
+        <h2>III. Empirical Data Collection</h2>
+        <p>Run your Java program and record the execution times for each dataset size below:</p>
+        <table class="styled-table">
+            <thead>
+                <tr>
+                    <th>Dataset Size (N)</th>
+                    <th>Linear Search Time (ns)</th>
+                    <th>Sum Calculation Time (ns)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>10,000</strong></td>
+                    <td><input type="text" placeholder="Enter time..." style="width:100%; border:1px solid #cbd5e1; padding:4px;"></td>
+                    <td><input type="text" placeholder="Enter time..." style="width:100%; border:1px solid #cbd5e1; padding:4px;"></td>
+                </tr>
+                <tr>
+                    <td><strong>100,000</strong></td>
+                    <td><input type="text" placeholder="Enter time..." style="width:100%; border:1px solid #cbd5e1; padding:4px;"></td>
+                    <td><input type="text" placeholder="Enter time..." style="width:100%; border:1px solid #cbd5e1; padding:4px;"></td>
+                </tr>
+                <tr>
+                    <td><strong>1,000,000</strong></td>
+                    <td><input type="text" placeholder="Enter time..." style="width:100%; border:1px solid #cbd5e1; padding:4px;"></td>
+                    <td><input type="text" placeholder="Enter time..." style="width:100%; border:1px solid #cbd5e1; padding:4px;"></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="section-card">
+        <h2>IV. Technical Report & Analysis</h2>
+        
+        <h3>1. Big-O Time & Space Complexity Analysis</h3>
+        <p>State and explain the time and space complexity (Big-O notation) for both Linear Search and Cumulative Sum algorithms based on your code implementation.</p>
+        <textarea placeholder="Type your Big-O analysis here..."></textarea>
+
+        <h3 style="margin-top: 20px;">2. Empirical Data Discussion & Observations</h3>
+        <p>Compare your theoretical Big-O predictions with the practical execution times recorded in your table. Did anything surprise you? Why or why not?</p>
+        <textarea placeholder="Type your discussion and empirical observations here..."></textarea>
+    </div>
+
+    <div class="btn-container">
+        <button class="action-btn" onclick="window.print()">Save as PDF / Print Task</button>
+    </div>
+
+</body>
+</html>
