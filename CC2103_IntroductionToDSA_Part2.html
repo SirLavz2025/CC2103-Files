@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CC 2103: Data Structures & Algorithms - Interactive Lecture</title>
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --bg-dark: #0f172a;
+            --bg-card: #1e293b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent: #06b6d4;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        header {
+            background-color: var(--bg-card);
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid #334155;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-title h1 {
+            font-size: 1.5rem;
+            color: var(--accent);
+        }
+
+        .header-title p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .controls-top {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.2s, transform 0.1s;
+        }
+
+        .btn:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn-secondary {
+            background-color: #334155;
+        }
+
+        .btn-secondary:hover {
+            background-color: #475569;
+        }
+
+        main {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            height: calc(100vh - 81px);
+        }
+
+        /* Sidebar Navigation */
+        sidebar {
+            background-color: var(--bg-card);
+            border-right: 1px solid #334155;
+            padding: 1.5rem 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            overflow-y: auto;
+        }
+
+        .nav-item {
+            padding: 0.8rem 1rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-weight: 500;
+            color: var(--text-muted);
+            transition: all 0.2s;
+        }
+
+        .nav-item:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+            color: var(--text-main);
+        }
+
+        .nav-item.active {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        /* Presentation Workspace */
+        .workspace {
+            padding: 2.5rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .slide-container {
+            display: none;
+            animation: fadeIn 0.4s ease-in-out;
+        }
+
+        .slide-container.active {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2 {
+            font-size: 2rem;
+            color: var(--text-main);
+            margin-bottom: 0.5rem;
+        }
+
+        p.lead {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .info-card {
+            background-color: var(--bg-card);
+            border: 1px solid #334155;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .info-card h3 {
+            color: var(--accent);
+            font-size: 1.25rem;
+        }
+
+        /* Interactive Visualizer Canvas */
+        .visualizer-box {
+            background-color: var(--bg-card);
+            border: 1px solid #334155;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            margin-top: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .array-container {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+            align-items: center;
+            min-height: 80px;
+            background: #0f172a;
+            padding: 1rem;
+            border-radius: 0.5rem;
+        }
+
+        .array-element {
+            width: 50px;
+            height: 50px;
+            background-color: #334155;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            border-radius: 0.35rem;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .array-element.active {
+            background-color: var(--warning);
+            color: #000;
+            transform: translateY(-8px);
+        }
+
+        .array-element.found {
+            background-color: var(--success);
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .code-snippet {
+            background-color: #0f172a;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.95rem;
+            color: #38bdf8;
+            border-left: 4px solid var(--primary);
+            overflow-x: auto;
+        }
+
+        /* Voice-over bar with Larger Instructor Avatar & Talking Mouth Animation */
+        .voice-bar {
+            background-color: var(--bg-card);
+            border-top: 1px solid #334155;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .voice-status {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .teacher-avatar-container {
+            position: relative;
+            width: 95px;
+            height: 95px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 3px solid var(--text-muted);
+            background-color: #334155;
+            transition: border-color 0.3s, transform 0.3s;
+            flex-shrink: 0;
+        }
+
+        .teacher-avatar-container.speaking {
+            border-color: var(--success);
+            transform: scale(1.05);
+        }
+
+        .teacher-avatar {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center 12%;
+            transform: scale(1.5);
+            transform-origin: center 25%;
+            transition: transform 0.2s ease;
+        }
+
+        /* Dynamic Talking Mouth Action Simulation */
+        .teacher-avatar-container.speaking .teacher-avatar {
+            animation: talkMouthMovement 0.25s infinite alternate ease-in-out;
+        }
+
+        @keyframes talkMouthMovement {
+            0% { transform: scale(1.5) translateY(0px) scaleY(1); }
+            100% { transform: scale(1.52) translateY(2px) scaleY(1.08); }
+        }
+
+        .teacher-avatar-container.speaking::after {
+            content: '';
+            position: absolute;
+            top: -6px;
+            left: -6px;
+            right: -6px;
+            bottom: -6px;
+            border-radius: 50%;
+            border: 2px solid var(--success);
+            animation: avatarPulse 1.2s infinite;
+        }
+
+        @keyframes avatarPulse {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(1.2); opacity: 0; }
+        }
+
+        .pulse-dot {
+            width: 12px;
+            height: 12px;
+            background-color: var(--text-muted);
+            border-radius: 50%;
+            transition: background-color 0.3s;
+        }
+
+        .pulse-dot.active {
+            background-color: var(--success);
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+
+        /* Modal Structure */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(4px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.open {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal {
+            background-color: var(--bg-card);
+            border: 1px solid #334155;
+            width: 90%;
+            max-width: 600px;
+            border-radius: 1rem;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            transform: translateY(20px);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.open .modal {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            color: var(--accent);
+            font-size: 1.5rem;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .close-btn:hover {
+            color: var(--text-main);
+        }
+
+        table.matrix {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        table.matrix th, table.matrix td {
+            border: 1px solid #334155;
+            padding: 0.75rem;
+            text-align: left;
+        }
+
+        table.matrix th {
+            background-color: #0f172a;
+            color: var(--accent);
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-title">
+            <h1>CC 2103: Data Structures and Algorithms</h1>
+            <p>Introduction to DSA Part 2</p>
+        </div>
+        <div class="controls-top">
+            <button class="btn btn-secondary" onclick="toggleModal('glossaryModal')">Quick Summary Table</button>
+            <button class="btn" id="voiceToggleBtn" onclick="toggleSpeech()">🔊 Voice Over: ON</button>
+        </div>
+    </header>
+
+    <main>
+        <sidebar>
+            <div class="nav-item active" onclick="switchSlide(0)">1. What is an Algorithm?</div>
+            <div class="nav-item" onclick="switchSlide(1)">2. Why Analyze Algorithms?</div>
+            <div class="nav-item" onclick="switchSlide(2)">3. Analysis Types (Best, Avg, Worst)</div>
+            <div class="nav-item" onclick="switchSlide(3)">4. Interactive Linear Search Demo</div>
+            <div class="nav-item" onclick="switchSlide(4)">5. Big O & Asymptotic Notation</div>
+        </sidebar>
+
+        <div class="workspace">
+            <!-- Slide 1 -->
+            <div class="slide-container active" data-speech="Welcome to CC 2103 Data Structures and Algorithms. Let's start with the fundamental question: What is an algorithm? Think of it like a recipe. It takes inputs, follows clear rules, and produces an output.">
+                <h2>Module 1: What is an Algorithm?</h2>
+                <p class="lead">An algorithm is a step-by-step set of instructions designed to solve a specific problem or perform a computation.</p>
+                <div class="card-grid">
+                    <div class="info-card">
+                        <h3>📋 Clear & Unambiguous</h3>
+                        <p>Every single step must be precisely defined with zero room for misinterpretation.</p>
+                    </div>
+                    <div class="info-card">
+                        <h3>🛑 Finiteness</h3>
+                        <p>An algorithm must always terminate or halt after a finite number of steps.</p>
+                    </div>
+                    <div class="info-card">
+                        <h3>🎯 Inputs & Outputs</h3>
+                        <p>It takes zero or more explicit inputs and guarantees at least one valid output.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 2 -->
+            <div class="slide-container" data-speech="Why do we analyze algorithms? Because two programs can solve the same problem, but one might take a fraction of a second while the other takes hours. We measure efficiency using Time and Space complexity.">
+                <h2>Module 2: Why Do We Analyze Algorithms?</h2>
+                <p class="lead">Performance matters. Writing code that works is only the first step; making it scalable is what separates good engineers.</p>
+                <div class="card-grid">
+                    <div class="info-card">
+                        <h3>⏱️ Time Complexity</h3>
+                        <p>Measures how execution time increases as the size of the input data, represented as n, grows larger.</p>
+                    </div>
+                    <div class="info-card">
+                        <h3>💾 Space Complexity</h3>
+                        <p>Measures how much extra memory or RAM space the algorithm demands as input scales.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 3 -->
+            <div class="slide-container" data-speech="Algorithm analysis types depend heavily on the nature of the input data. We evaluate performance across three distinct cases: Best Case using Omega, Average Case using Theta, and Worst Case using Big O.">
+                <h2>Module 3: Algorithm Analysis Types</h2>
+                <p class="lead">The running time of code often changes depending on how the data is arranged. We classify performance into three core pillars:</p>
+                <div class="card-grid">
+                    <div class="info-card">
+                        <h3>🟢 Best-Case (&Omega;)</h3>
+                        <p>The minimum possible time an algorithm takes. E.g., finding your target item on the very first try.</p>
+                    </div>
+                    <div class="info-card">
+                        <h3>🟡 Average-Case (&Theta;)</h3>
+                        <p>The expected behavior over random inputs. On average, we search halfway through the dataset.</p>
+                    </div>
+                    <div class="info-card">
+                        <h3>🔴 Worst-Case (O)</h3>
+                        <p>The maximum upper bound. Murphy's Law: The item is at the very end or missing entirely.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 4 -->
+            <div class="slide-container" data-speech="Let's visualize Linear Search using Java code. Click start simulation to see how the computer checks elements step-by-step while searching for our target value.">
+                <h2>Module 4: Interactive Linear Search Visualizer (Java)</h2>
+                <p class="lead">Watch how input arrangement changes the number of steps executed in real-time.</p>
+                
+                <div class="visualizer-box">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <strong>Target Value:</strong> <span id="targetVal" style="color: var(--accent); font-size: 1.2rem;">42</span>
+                            <span id="searchStatus" style="margin-left: 2rem; font-weight: 500; color: var(--warning);">Ready to search...</span>
+                        </div>
+                        <button class="btn" onclick="runLinearSearch()">Start Simulation</button>
+                    </div>
+                    
+                    <div class="array-container" id="arrayVisual">
+                        <!-- Dynamically generated array boxes -->
+                    </div>
+
+                    <div class="code-snippet">
+<span style="color:#c678dd">public static int</span> <span style="color:#61afef">linearSearch</span>(<span style="color:#c678dd">int</span>[] arr, <span style="color:#c678dd">int</span> target) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#c678dd">for</span> (<span style="color:#c678dd">int</span> i = <span style="color:#d19a66">0</span>; i &lt; arr.<span style="color:#61afef">length</span>; i++) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#c678dd">if</span> (arr[i] == target) { <span style="color:#5c6370">// Current Comparison Step</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#c678dd">return</span> i;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#c678dd">return</span> -1;<br>
+}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 5 -->
+            <div class="slide-container" data-speech="Finally, Asymptotic Analysis and Big O Notation. We drop constants and keep only dominant terms to measure true growth rates as input approaches infinity.">
+                <h2>Module 5: Asymptotic Analysis & Big O</h2>
+                <p class="lead">Evaluating performance independent of hardware variations using asymptotic bounds.</p>
+                <div class="card-grid">
+                    <div class="info-card">
+                        <h3>Rule 1: Drop Constants</h3>
+                        <p>If an algorithm takes 3n steps, drop the constant multiplier 3, leaving O(n).</p>
+                    </div>
+                    <div class="info-card">
+                        <h3>Rule 2: Keep Dominant Terms</h3>
+                        <p>Given n<sup>2</sup> + 5n + 10, n<sup>2</sup> grows fastest. Lower terms are dropped, resulting in O(n<sup>2</sup>).</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div class="voice-bar">
+        <div class="voice-status">
+            <div class="teacher-avatar-container" id="avatarContainer">
+                
+                <img src="sirlavz.jpg" alt="Instructor" class="teacher-avatar">
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 0.3rem;">
+                <div style="display: flex; align-items: center; gap: 0.8rem;">
+                    <div class="pulse-dot" id="voicePulse"></div>
+                    <span id="voiceText" style="font-size: 0.95rem; font-weight: 600; color: var(--text-main);">Voice-over idle.</span>
+                </div
+                <span style="font-size: 0.8rem; color: var(--text-muted);">RONALD T. LAVA, MSIT</span>
+            </div>
+        </div>
+        <button class="btn btn-secondary" onclick="replaySpeech()">🔄 Replay Voice</button>
+    </div>
+
+    <!-- Glossary Modal -->
+    <div class="modal-overlay" id="glossaryModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Analysis Types Reference Summary</h3>
+                <button class="close-btn" onclick="toggleModal('glossaryModal')">&times;</button>
+            </div>
+            <p style="color: var(--text-muted); font-size: 0.95rem;">Quick lookup guide for your students:</p>
+            <table class="matrix">
+                <tr>
+                    <th>Analysis Type</th>
+                    <th>Symbol</th>
+                    <th>Meaning</th>
+                </tr>
+                <tr>
+                    <td><strong>Best-Case</strong></td>
+                    <td>&Omega; (Omega)</td>
+                    <td>Absolute minimum operations required (Lower Bound).</td>
+                </tr>
+                <tr>
+                    <td><strong>Average-Case</strong></td>
+                    <td>&Theta; (Theta)</td>
+                    <td>Typical statistical performance over mixed random inputs.</td>
+                </tr>
+                <tr>
+                    <td><strong>Worst-Case</strong></td>
+                    <td>O (Big O)</td>
+                    <td>Guaranteed maximum ceiling of execution time (Upper Bound).</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        let speechEnabled = true;
+        const slides = document.querySelectorAll('.slide-container');
+        const navItems = document.querySelectorAll('.nav-item');
+        let maleVoice = null;
+
+        function loadVoices() {
+            const voices = window.speechSynthesis.getVoices();
+            // Explicitly force a natural male voice profile selection
+            maleVoice = voices.find(v => (v.name.includes('Male') || v.name.includes('David') || v.name.includes('George') || v.name.includes('Oliver') || v.name.includes('James') || v.name.includes('Mark') || v.name.includes('Ryan')) && v.lang.startsWith('en')) ||
+                        voices.find(v => v.lang.startsWith('en') && !v.name.includes('Female') && !v.name.includes('Zira') && !v.name.includes('Victoria') && !v.name.includes('Samantha') && !v.name.includes('Karen')) || 
+                        voices[0];
+        }
+
+        window.speechSynthesis.onvoiceschanged = loadVoices;
+
+        function speakCurrentSlide() {
+            if (!speechEnabled) return;
+            window.speechSynthesis.cancel();
+            
+            if (!maleVoice) loadVoices();
+
+            const text = slides[currentSlide].getAttribute('data-speech');
+            if (text) {
+                const utterance = new SpeechSynthesisUtterance(text);
+                if (maleVoice) utterance.voice = maleVoice;
+                
+                utterance.rate = 1.0; 
+                utterance.pitch = 0.85; // Lower pitch tailored for a deep masculine faculty voice
+
+                const avatarContainer = document.getElementById('avatarContainer');
+                const voicePulse = document.getElementById('voicePulse');
+
+                document.getElementById('voiceText').innerText = "Speaking: " + text.substring(0, 55) + "...";
+                voicePulse.classList.add('active');
+                avatarContainer.classList.add('speaking');
+                
+                utterance.onend = () => {
+                    document.getElementById('voiceText').innerText = "Voice-over idle.";
+                    voicePulse.classList.remove('active');
+                    avatarContainer.classList.remove('speaking');
+                };
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        function toggleSpeech() {
+            speechEnabled = !speechEnabled;
+            const btn = document.getElementById('voiceToggleBtn');
+            const avatarContainer = document.getElementById('avatarContainer');
+            const voicePulse = document.getElementById('voicePulse');
+
+            if (speechEnabled) {
+                btn.innerText = "🔊 Voice Over: ON";
+                btn.style.backgroundColor = "var(--primary)";
+                speakCurrentSlide();
+            } else {
+                window.speechSynthesis.cancel();
+                btn.innerText = "🔇 Voice Over: OFF";
+                btn.style.backgroundColor = "#334155";
+                document.getElementById('voiceText').innerText = "Voice-over disabled.";
+                voicePulse.classList.remove('active');
+                avatarContainer.classList.remove('speaking');
+            }
+        }
+
+        function replaySpeech() {
+            if (speechEnabled) speakCurrentSlide();
+        }
+
+        function switchSlide(index) {
+            slides[currentSlide].classList.remove('active');
+            navItems[currentSlide].classList.remove('active');
+            
+            currentSlide = index;
+            
+            slides[currentSlide].classList.add('active');
+            navItems[currentSlide].classList.add('active');
+            
+            speakCurrentSlide();
+            if (currentSlide === 3) initArrayVisualizer();
+        }
+
+        function toggleModal(modalId) {
+            document.getElementById(modalId).classList.toggle('open');
+        }
+
+        // Linear Search Visualizer Logic
+        const sampleArray = [12, 25, 38, 42, 55, 70, 89];
+        const targetValue = 42;
+
+        function initArrayVisualizer() {
+            const container = document.getElementById('arrayVisual');
+            container.innerHTML = '';
+            sampleArray.forEach((val, idx) => {
+                const el = document.createElement('div');
+                el.className = 'array-element';
+                el.id = `arr-el-${idx}`;
+                el.innerText = val;
+                container.appendChild(el);
+            });
+            document.getElementById('targetVal').innerText = targetValue;
+            document.getElementById('searchStatus').innerText = "Ready to search...";
+        }
+
+        async function runLinearSearch() {
+            initArrayVisualizer();
+            const status = document.getElementById('searchStatus');
+            status.style.color = "var(--warning)";
+            
+            for (let i = 0; i < sampleArray.length; i++) {
+                const el = document.getElementById(`arr-el-${i}`);
+                el.classList.add('active');
+                status.innerText = `Checking index ${i}: Is arr[${i}] (${sampleArray[i]}) == ${targetValue}?`;
+                
+                await new Promise(r => setTimeout(r, 600));
+                
+                if (sampleArray[i] === targetValue) {
+                    el.classList.remove('active');
+                    el.classList.add('found');
+                    status.style.color = "var(--success)";
+                    status.innerText = `Found target ${targetValue} at index ${i} after ${i + 1} steps!`;
+                    return;
+                }
+                el.classList.remove('active');
+            }
+        }
+
+        window.onload = () => {
+            loadVoices();
+            initArrayVisualizer();
+            setTimeout(speakCurrentSlide, 500);
+        };
+    </script>
+</body>
+</html>
