@@ -1,0 +1,908 @@
+<div id="cc2103-app">
+  <style>
+    #cc2103-app {
+      --ink: #1f2933;
+      --muted: #64748b;
+      --line: #cbd5e1;
+      --soft: #f4f7fb;
+      --accent: #2563eb;
+      --accent-dark: #1d4ed8;
+      --answered: #16a34a;
+      --current: #f59e0b;
+      --danger: #dc2626;
+      --card: #ffffff;
+      color: var(--ink);
+      font-family: Arial, Helvetica, sans-serif;
+      min-height: 100vh;
+      background: #eef3f8;
+    }
+    #cc2103-app * { box-sizing: border-box; }
+    .exam-shell {
+      display: grid;
+      grid-template-columns: 220px minmax(0, 1fr);
+      min-height: 100vh;
+    }
+    .number-panel {
+      background: #f8fafc;
+      border-right: 1px solid var(--line);
+      padding: 18px 14px;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow: auto;
+    }
+    .brand {
+      font-weight: 700;
+      font-size: 15px;
+      margin-bottom: 6px;
+    }
+    .sub {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.35;
+      margin-bottom: 14px;
+    }
+    .numbers {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 7px;
+    }
+    .qnum {
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--ink);
+      min-height: 34px;
+      border-radius: 7px;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 12px;
+    }
+    .qnum:hover, .qnum.current { border-color: var(--current); background: #fff7ed; }
+    .qnum.answered { border-color: var(--answered); background: #dcfce7; color: #14532d; }
+    .qnum.flagged { border-color: var(--danger); background: #fee2e2; color: #7f1d1d; }
+    .main-panel {
+      padding: 28px;
+      min-width: 0;
+    }
+    .topbar {
+      display: flex;
+      gap: 14px;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 18px;
+    }
+    h1 {
+      margin: 0;
+      font-size: 28px;
+      letter-spacing: 0;
+    }
+    .course-line {
+      margin-top: 8px;
+      color: var(--muted);
+      max-width: 760px;
+      line-height: 1.45;
+    }
+    .status-strip {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+    .pill {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      padding: 9px 12px;
+      font-size: 13px;
+      min-width: 120px;
+    }
+    .pill strong { display: block; font-size: 18px; margin-top: 3px; }
+    .panel {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 18px;
+      margin-bottom: 18px;
+    }
+    .start-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+      align-items: end;
+    }
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+    input[type="text"] {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      padding: 11px 12px;
+      font-size: 15px;
+      background: #fff;
+    }
+    .button-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-top: 14px;
+    }
+    button.primary, button.secondary, button.danger {
+      border: 0;
+      border-radius: 7px;
+      padding: 11px 14px;
+      font-weight: 700;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    button.primary { background: var(--accent); color: #fff; }
+    button.primary:hover { background: var(--accent-dark); }
+    button.secondary { background: #e2e8f0; color: #1e293b; }
+    button.danger { background: var(--danger); color: #fff; }
+    button:disabled { opacity: .55; cursor: not-allowed; }
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 12px;
+    }
+    .legend span::before {
+      content: "";
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-radius: 3px;
+      margin-right: 6px;
+      vertical-align: -1px;
+      border: 1px solid var(--line);
+      background: #fff;
+    }
+    .legend .answered-key::before { background: #dcfce7; border-color: var(--answered); }
+    .legend .current-key::before { background: #fff7ed; border-color: var(--current); }
+    .legend .flagged-key::before { background: #fee2e2; border-color: var(--danger); }
+    .progress-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+    }
+    .progress-item {
+      padding: 12px;
+      background: var(--soft);
+      border-radius: 7px;
+      border: 1px solid #dbe4ef;
+    }
+    .progress-item strong { display: block; font-size: 22px; margin-top: 5px; }
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, .62);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      z-index: 20;
+    }
+    .modal-backdrop.open { display: flex; }
+    .modal {
+      width: min(820px, 100%);
+      max-height: calc(100vh - 36px);
+      overflow: auto;
+      background: var(--card);
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      box-shadow: 0 24px 70px rgba(15, 23, 42, .28);
+    }
+    .modal-head, .modal-foot {
+      padding: 15px 18px;
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+    }
+    .modal-foot { border-top: 1px solid var(--line); border-bottom: 0; flex-wrap: wrap; }
+    .modal-body { padding: 18px; }
+    .question-title {
+      font-size: 18px;
+      font-weight: 700;
+      line-height: 1.45;
+      margin-bottom: 14px;
+    }
+    .choice {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      margin-bottom: 10px;
+      cursor: pointer;
+      background: #fff;
+    }
+    .choice input { margin-top: 2px; }
+    .choice:has(input:checked) {
+      border-color: var(--accent);
+      background: #eff6ff;
+    }
+    .result-panel, .certificate {
+      display: none;
+    }
+    .result-panel.show, .certificate.show { display: block; }
+    .secure-summary {
+      position: relative;
+      user-select: none;
+      -webkit-user-select: none;
+      margin-top: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      overflow: hidden;
+      background: #fff;
+    }
+    .secure-summary::before {
+      content: "VIEW ONLY";
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      color: rgba(100, 116, 139, .12);
+      font-size: 54px;
+      font-weight: 700;
+      transform: rotate(-18deg);
+      pointer-events: none;
+    }
+    .answer-summary-panel {
+      display: none;
+    }
+    .answer-summary-panel.show {
+      display: block;
+    }
+    .answer-summary-panel::before {
+      content: "PROTECTED SUMMARY";
+    }
+    .summary-table-wrap {
+      position: relative;
+      max-height: 420px;
+      overflow: auto;
+    }
+    .summary-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    .summary-table th,
+    .summary-table td {
+      border-bottom: 1px solid var(--line);
+      padding: 9px 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+    .summary-table th {
+      background: #f8fafc;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+    .status-correct { color: var(--answered); font-weight: 700; }
+    .status-wrong, .status-unanswered { color: var(--danger); font-weight: 700; }
+    .summary-row {
+      position: relative;
+      display: grid;
+      grid-template-columns: minmax(130px, 1fr) minmax(0, 2fr);
+      gap: 10px;
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--line);
+    }
+    .summary-row:last-child { border-bottom: 0; }
+    .summary-row span:first-child {
+      color: var(--muted);
+      font-weight: 700;
+    }
+    .summary-note {
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 10px;
+    }
+    .certificate {
+      background: #fff;
+      border: 2px solid #1e293b;
+      padding: 34px;
+      text-align: center;
+      margin-top: 18px;
+    }
+    .cert-small { color: var(--muted); font-size: 14px; margin: 6px 0; }
+    .cert-title { font-size: 26px; font-weight: 700; margin: 12px 0; }
+    .cert-name { font-size: 30px; font-weight: 700; margin: 24px 0 10px; }
+    .cert-score { font-size: 34px; font-weight: 700; margin: 16px 0; }
+    .cert-footer {
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      margin-top: 34px;
+      text-align: left;
+    }
+    .warning { color: var(--danger); font-weight: 700; }
+    .form-message {
+      color: var(--danger);
+      font-size: 13px;
+      font-weight: 700;
+      margin-top: 8px;
+      min-height: 18px;
+    }
+    @media (max-width: 780px) {
+      .exam-shell { grid-template-columns: 1fr; }
+      .number-panel {
+        position: static;
+        height: auto;
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+      }
+      .numbers { grid-template-columns: repeat(10, minmax(30px, 1fr)); }
+      .main-panel { padding: 18px; }
+      .topbar, .cert-footer { display: block; }
+      .status-strip { justify-content: flex-start; margin-top: 14px; }
+      .start-grid, .progress-grid { grid-template-columns: 1fr; }
+    }
+    @media print {
+      #cc2103-app { background: #fff; }
+      .number-panel, .topbar, .panel, .modal-backdrop, .button-row, .result-panel:not(.show) { display: none !important; }
+      .secure-summary { display: none !important; }
+      .answer-summary-panel { display: none !important; }
+      .exam-shell { display: block; }
+      .main-panel { padding: 0; }
+      .certificate.show { display: block; border: 2px solid #000; }
+    }
+  </style>
+
+  <div class="exam-shell">
+    <aside class="number-panel">
+      <div class="brand">CC 2103 Pre-Test</div>
+      <div class="sub">Laguna University<br>College of Computing Studies</div>
+      <div class="numbers" id="numberGrid"></div>
+      <div class="legend">
+        <span>Unanswered</span>
+        <span class="answered-key">Answered</span>
+        <span class="current-key">Current</span>
+        <span class="flagged-key">Violation lock</span>
+      </div>
+    </aside>
+
+    <main class="main-panel">
+      <div class="topbar">
+        <div>
+          <h1>CC 2103 - Data Structures and Algorithms</h1>
+          <div class="course-line">Pre-Test | Instructor: RONALD T. LAVA, MSIT | Laguna University College of Computing Studies</div>
+        </div>
+        <div class="status-strip">
+          <div class="pill">Answered<strong id="answeredCount">0/100</strong></div>
+          <div class="pill">Violations<strong id="violationCount">0/3</strong></div>
+        </div>
+      </div>
+
+      <section class="panel" id="startPanel">
+        <div class="start-grid">
+          <div>
+            <label for="studentName">Student name</label>
+            <input id="studentName" type="text" autocomplete="name" placeholder="Enter full name" required>
+            <div class="form-message" id="nameError"></div>
+          </div>
+          <div>
+            <label for="sectionName">Section</label>
+            <input id="sectionName" type="text" placeholder="Optional">
+          </div>
+        </div>
+        <div class="button-row">
+          <button class="primary" id="startBtn" type="button">Start randomized pre-test</button>
+          <button class="secondary" id="openFirstBtn" type="button" disabled>Open question 1</button>
+          <span class="warning" id="lockNotice"></span>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="progress-grid">
+          <div class="progress-item">Total questions<strong>100</strong></div>
+          <div class="progress-item">Passing view<strong>Score certificate</strong></div>
+          <div class="progress-item">Question mode<strong>Modal, one at a time</strong></div>
+          <div class="progress-item">Security rule<strong>No tab switching</strong></div>
+        </div>
+        <div class="button-row">
+          <button class="danger" id="submitBtn" type="button" disabled>Submit pre-test</button>
+          <button class="secondary" id="reviewBtn" type="button" disabled>Open unanswered</button>
+        </div>
+      </section>
+
+      <section class="panel result-panel" id="resultPanel">
+        <h2>Result</h2>
+        <p id="scoreText"></p>
+        <div class="secure-summary" id="testSummary" aria-label="Protected test summary"></div>
+        <p class="summary-note">Summary is view-only. Copying, right-click saving, and printing this summary are disabled by the page.</p>
+        <div class="button-row">
+          <button class="primary" id="answerSummaryBtn" type="button">View answer summary</button>
+          <button class="primary" id="certBtn" type="button">Generate certificate</button>
+          <button class="secondary" id="printBtn" type="button">Print certificate</button>
+        </div>
+        <div class="secure-summary answer-summary-panel" id="answerSummaryPanel" aria-label="Protected correct and wrong answer summary"></div>
+      </section>
+
+      <section class="certificate" id="certificate">
+        <div class="cert-small">Laguna University</div>
+        <div class="cert-small">College of Computing Studies</div>
+        <div class="cert-title">Certificate of Pre-Test Completion</div>
+        <div class="cert-small">This certifies that</div>
+        <div class="cert-name" id="certName">Student</div>
+        <div class="cert-small">completed</div>
+        <div class="cert-title">CC 2103 - Data Structures and Algorithms</div>
+        <div class="cert-small">Pre-Test</div>
+        <div class="cert-score" id="certScore">Score: 0/100</div>
+        <div class="cert-small" id="certDetails"></div>
+        <div class="cert-footer">
+          <div><strong>Instructor:</strong><br>RONALD T. LAVA, MSIT</div>
+          <div><strong>Date:</strong><br><span id="certDate"></span></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="modal-backdrop" id="modalBackdrop" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal">
+      <div class="modal-head">
+        <strong id="modalTitle">Question</strong>
+        <button class="secondary" id="closeModal" type="button">Close</button>
+      </div>
+      <div class="modal-body">
+        <div class="question-title" id="questionText"></div>
+        <div id="choices"></div>
+      </div>
+      <div class="modal-foot">
+        <button class="secondary" id="prevBtn" type="button">Previous</button>
+        <button class="primary" id="nextBtn" type="button">Next</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (() => {
+      const bank = [
+        {q:"What best defines a data structure?",c:["A method of organizing, storing, and managing data for efficient access and modification","A programming language used only for databases","A list of syntax rules for Java programs","A hardware component that stores binary signals"],a:0},
+        {q:"What best defines an algorithm?",c:["A finite set of unambiguous instructions for solving a problem","A memory address assigned to a variable","A visual diagram of a computer system","A collection of unrelated data items"],a:0},
+        {q:"Why are data structures and algorithms usually studied together?",c:["The structure of data affects how efficiently an algorithm can process it","Algorithms only work when data is stored in files","Data structures replace the need for algorithms","They are both names for the same concept"],a:0},
+        {q:"Which item is a primitive data type?",c:["Integer","Array","Linked list","Tree"],a:0},
+        {q:"Which item is a non-primitive data structure?",c:["Stack","Character","Boolean","Float"],a:0},
+        {q:"What does Big-O notation commonly describe?",c:["An upper bound or growth rate of an algorithm's resource use","The exact number of CPU cycles on every computer","The brand of compiler used","The number of programming languages supported"],a:0},
+        {q:"Which complexity grows fastest as n becomes large?",c:["O(n^2)","O(log n)","O(1)","O(n)"],a:0},
+        {q:"Which complexity represents constant time?",c:["O(1)","O(n)","O(n log n)","O(n^2)"],a:0},
+        {q:"What is space complexity concerned with?",c:["How memory requirements grow as input size changes","How many users can open a program","How long a monitor stays active","How many folders a project contains"],a:0},
+        {q:"A good algorithm should generally be:",c:["Finite, clear, effective, and efficient","Infinite and ambiguous","Dependent on one computer only","Written without inputs or outputs"],a:0},
+        {q:"What is a one-dimensional array?",c:["A linear collection of elements accessed by one index","A table addressed by row and column","A chain of nodes connected by pointers","A set of recursive function calls"],a:0},
+        {q:"In most programming languages, array indexing commonly starts at:",c:["0","1","-1","The array length"],a:0},
+        {q:"What is the main advantage of arrays?",c:["Direct access to elements by index","Automatic sorting of every value","Insertion in the middle with no shifting","Unlimited size after declaration in all languages"],a:0},
+        {q:"A two-dimensional array is commonly used to represent:",c:["Rows and columns","Only a single variable","A stack top only","A binary search tree"],a:0},
+        {q:"Which operation visits each element of an array?",c:["Traverse","Enqueue","Pop","Hash"],a:0},
+        {q:"When inserting into the middle of an array, what often happens?",c:["Elements after the insertion point must shift","The array becomes a queue automatically","The array loses its indexes","No element positions are affected"],a:0},
+        {q:"What does an array delete operation commonly require after removing a middle element?",c:["Shifting following elements to close the gap","Changing all values to null","Sorting the array descending","Creating a recursive call"],a:0},
+        {q:"Which array operation changes the value stored at a known index?",c:["Update","Search","Traverse","Split"],a:0},
+        {q:"A multidimensional array extends the idea of arrays by:",c:["Using more than one index dimension","Removing all indexes","Allowing only character data","Preventing traversal"],a:0},
+        {q:"What is a limitation of fixed-size arrays?",c:["Their capacity is set before use or difficult to change","They cannot store numbers","They cannot be searched","They always use linked nodes"],a:0},
+        {q:"What is searching in data structures?",c:["Finding whether and where a target item exists","Putting elements in sorted order","Removing the first inserted item","Converting keys to indexes"],a:0},
+        {q:"Linear search checks elements:",c:["One by one until the target is found or the list ends","Only at the middle position","By repeatedly dividing a sorted list","By applying a hash function"],a:0},
+        {q:"What is the worst-case time complexity of linear search in an array of n items?",c:["O(n)","O(1)","O(log n)","O(n log n)"],a:0},
+        {q:"Binary search requires the data to be:",c:["Sorted","Stored only in a stack","Unsorted","Stored only as strings"],a:0},
+        {q:"Binary search works by:",c:["Comparing the target with the middle item and discarding half of the search space","Checking every item from left to right","Swapping adjacent elements repeatedly","Following next pointers until null"],a:0},
+        {q:"What is the typical time complexity of binary search?",c:["O(log n)","O(n)","O(n^2)","O(1) for every case"],a:0},
+        {q:"In a successful binary search, if the target is less than the middle element, the next search area is:",c:["The left half","The right half","The entire array again","Only the last element"],a:0},
+        {q:"Jump search improves over linear search by:",c:["Jumping ahead by blocks, then linearly searching within a likely block","Sorting the data first with bubble sort","Using a stack to reverse the data","Deleting half the records"],a:0},
+        {q:"Interpolation search is most suitable when values are:",c:["Sorted and fairly uniformly distributed","Unsorted and duplicated heavily","Stored only in linked lists","Encrypted before searching"],a:0},
+        {q:"Exponential search is useful because it:",c:["Finds a range where the target may exist before applying binary search","Always searches all elements twice","Requires no comparisons","Works only with stacks"],a:0},
+        {q:"What is sorting?",c:["Arranging data according to a specified order","Finding a single target element","Adding an item to the rear of a structure","Calling a function from itself"],a:0},
+        {q:"Why is sorting important before some searches?",c:["Sorted data can make searching more efficient","Sorting removes all duplicates automatically","Sorting changes primitive types into objects","Sorting prevents memory use"],a:0},
+        {q:"Bubble sort repeatedly:",c:["Compares adjacent items and swaps them when out of order","Chooses a pivot and partitions recursively","Splits the array into halves before merging","Uses a hash function to place items"],a:0},
+        {q:"Insertion sort builds a sorted portion by:",c:["Taking each new item and inserting it into its correct position","Selecting a random pivot each pass","Moving only the largest item to a stack","Deleting unsorted items"],a:0},
+        {q:"Selection sort works by:",c:["Repeatedly selecting the smallest or largest remaining item and placing it in position","Only comparing neighboring pairs once","Dividing the input into equal halves","Using FIFO order"],a:0},
+        {q:"Which simple sort is often efficient for small or nearly sorted data?",c:["Insertion sort","Selection sort in every case","Hashing","Tree traversal"],a:0},
+        {q:"What does sorting stability mean?",c:["Equal keys keep their original relative order after sorting","The algorithm never crashes","The sorted array cannot be modified","The algorithm uses no memory"],a:0},
+        {q:"Divide and conquer algorithms generally:",c:["Break a problem into smaller subproblems, solve them, then combine results","Store all data in a queue","Use only one loop and no conditions","Avoid recursion completely"],a:0},
+        {q:"Quicksort is based on:",c:["Choosing a pivot and partitioning elements around it","Only swapping adjacent pairs until no swaps occur","Directly indexing every value with a hash key","Removing elements from the front"],a:0},
+        {q:"Merge sort works by:",c:["Dividing the list and merging sorted sublists","Selecting the minimum item for each position","Searching for the middle target","Using stack push and pop only"],a:0},
+        {q:"What is recursion?",c:["A technique where a function calls itself","A data item with two indexes","A queue operation that inserts data","A sorting method that never repeats"],a:0},
+        {q:"A recursive solution must include:",c:["A base case that stops the recursion","Only global variables","An infinite loop","A queue front pointer"],a:0},
+        {q:"Direct recursion occurs when:",c:["A function calls itself directly","Two functions call each other mutually","A method is called by the operating system only","A function has no return value"],a:0},
+        {q:"Indirect recursion occurs when:",c:["Functions call one another in a cycle","A function calls itself as the last statement","A loop runs inside an array","A linked list points to null"],a:0},
+        {q:"Tail recursion means the recursive call is:",c:["The last operation performed by the function","The first operation before all work","Called more than once in the same function","Not allowed to return"],a:0},
+        {q:"Head recursion means the recursive call is:",c:["Made before the remaining processing in the function","The last statement only","Never made inside the function","Used only for queues"],a:0},
+        {q:"Tree recursion occurs when:",c:["A recursive function makes more than one recursive call","A function has no base case","Only one call is made at the end","A tree is stored in an array"],a:0},
+        {q:"The recursive factorial of n is commonly defined as:",c:["n * factorial(n - 1), with a base case such as factorial(0) = 1","n + factorial(n + 1) forever","n / factorial(0) only","factorial(n) = n for all n"],a:0},
+        {q:"A common recursion mistake is:",c:["Missing or unreachable base case","Using a parameter","Returning a value","Solving a smaller instance"],a:0},
+        {q:"Recursive binary search differs from iterative binary search mainly because it:",c:["Solves the smaller search range through function calls","Does not require sorted data","Checks every item no matter what","Uses a stack data structure explicitly for storage"],a:0},
+        {q:"What is a linked list?",c:["A sequence of nodes where each node stores data and one or more links","A fixed block of adjacent memory accessed only by index","A sorted table generated by hashing","A recursive function without data"],a:0},
+        {q:"A node in a singly linked list usually contains:",c:["Data and a link to the next node","Only a previous pointer","Only an array index","A queue front and rear"],a:0},
+        {q:"The first node of a linked list is commonly referenced by:",c:["Head","Rear","Pivot","Root only"],a:0},
+        {q:"The last node of a singly linked list usually points to:",c:["Null","The previous node","The first array index","A random pivot"],a:0},
+        {q:"Compared with arrays, linked lists are usually better for:",c:["Insertions and deletions when the target node or position is known","Direct random access by index","Binary search without extra work","Storing only primitive values"],a:0},
+        {q:"A disadvantage of singly linked lists is:",c:["They do not provide direct access by numeric index","They cannot grow dynamically","They require sorted values","They cannot be traversed"],a:0},
+        {q:"Inserting a node after a given node in a singly linked list requires:",c:["Updating links so the new node points to the next node and the given node points to the new node","Shifting every later node in memory","Sorting the entire list","Changing the data type of every node"],a:0},
+        {q:"Deleting a middle node in a singly linked list requires:",c:["Linking the previous node to the deleted node's next node","Changing the head to null every time","Using a hash function","Moving all nodes to adjacent memory"],a:0},
+        {q:"A doubly linked list node contains:",c:["Links to both previous and next nodes","Only a next link","Only a row and column index","Only a recursive call"],a:0},
+        {q:"A circular linked list is one where:",c:["The last node links back to the first node","Every node points to null","Nodes are stored in sorted array order","Only the head node has data"],a:0},
+        {q:"What principle does a stack follow?",c:["Last in, first out (LIFO)","First in, first out (FIFO)","Smallest in, first out","Random in, random out"],a:0},
+        {q:"The insertion operation in a stack is called:",c:["Push","Pop","Dequeue","Traverse"],a:0},
+        {q:"The removal operation in a stack is called:",c:["Pop","Enqueue","Merge","Probe"],a:0},
+        {q:"The operation that reads the top stack element without removing it is:",c:["Peek","Delete front","Partition","Hash"],a:0},
+        {q:"A stack underflow occurs when:",c:["Pop is attempted on an empty stack","Push is attempted on a nonempty stack","The stack has one item","Peek returns the top item"],a:0},
+        {q:"A stack overflow can occur when:",c:["Pushing onto a full fixed-size stack","Popping from a stack with many items","Checking whether the stack is empty","Reading the top without removing it"],a:0},
+        {q:"In Java's Stack class, which method adds an element to the top?",c:["push()","offer()","removeFirst()","containsKey()"],a:0},
+        {q:"In Java's Stack class, which method removes and returns the top element?",c:["pop()","peek()","empty()","search()"],a:0},
+        {q:"Which is a common application of stacks?",c:["Checking balanced parentheses","Serving customers in arrival order","Storing key-value pairs by hash","Maintaining a waiting line"],a:0},
+        {q:"Why does recursion rely on stack-like behavior internally?",c:["Function calls are stored and completed in last-called, first-returned order","Recursive calls are always processed by a queue","Every recursive function sorts data first","The heap deletes old calls immediately"],a:0},
+        {q:"What principle does a queue follow?",c:["First in, first out (FIFO)","Last in, first out (LIFO)","Highest value first only","Random access by index"],a:0},
+        {q:"The operation that adds an item to the rear of a queue is:",c:["Enqueue","Dequeue","Pop","Pivot"],a:0},
+        {q:"The operation that removes an item from the front of a queue is:",c:["Dequeue","Push","Peek only","Partition"],a:0},
+        {q:"The front pointer in a queue identifies:",c:["The next element to be removed or accessed","The newest element inserted","The middle pivot","The hash index"],a:0},
+        {q:"The rear pointer in a queue identifies:",c:["The end where new elements are inserted","The node before the head","The smallest key","The recursive base case"],a:0},
+        {q:"Which is a real-world example of a queue?",c:["People waiting in line at an ATM","A stack of plates where the top plate is removed first","A recursive factorial calculation","A binary tree traversal only"],a:0},
+        {q:"Which queue operation checks the front item without removing it?",c:["peek()","pop()","push()","merge()"],a:0},
+        {q:"A queue implemented using a one-dimensional array must usually track:",c:["Front and rear positions","Only a root node","Only previous links","Only a pivot"],a:0},
+        {q:"Which Java collection can implement the Queue interface?",c:["LinkedList","String","Integer only","Hashtable only"],a:0},
+        {q:"Which computer science use case commonly uses queues?",c:["Scheduling tasks or processes in arrival order","Undoing the most recent command only","Recursive tree printing only","Mapping keys to values"],a:0},
+        {q:"What is a tree data structure?",c:["A non-linear hierarchical structure of nodes connected by edges","A linear structure with only adjacent memory cells","A table that stores only primitive values","A queue with front and rear pointers"],a:0},
+        {q:"The topmost node of a tree is called the:",c:["Root","Leaf","Rear","Pivot"],a:0},
+        {q:"A node with no children is called a:",c:["Leaf","Root always","Parent only","Hash bucket"],a:0},
+        {q:"In a tree, an edge represents:",c:["A connection between two nodes","A sorted array index","A stack overflow condition","A hash collision"],a:0},
+        {q:"A binary tree is a tree where each node has at most:",c:["Two children","One child","Three children exactly","n children only"],a:0},
+        {q:"A strict binary tree is one where each internal node has:",c:["Exactly two children","Exactly one child","No children","Any number of children"],a:0},
+        {q:"A complete binary tree is filled:",c:["Level by level, with the last level filled from left to right","Only on the right side","With every key hashed first","In alphabetical order only"],a:0},
+        {q:"In a binary search tree, values smaller than a node are placed:",c:["In the left subtree","In the right subtree","Only at the root","Outside the tree"],a:0},
+        {q:"An in-order traversal of a binary search tree visits nodes in:",c:["Sorted order","Reverse insertion order always","FIFO order","Random hash order"],a:0},
+        {q:"Which structure is naturally represented as a tree?",c:["A computer file system","A single integer variable","A stack top value only","A hash collision counter"],a:0},
+        {q:"What is a hash table?",c:["A structure that stores data associatively using keys mapped to indexes","A recursive function for sorting","A queue that removes from the front","A binary tree with exactly two leaves"],a:0},
+        {q:"Hashing converts a key into:",c:["An index or address in a table","A stack operation","A sorted linked list","A recursive base case"],a:0},
+        {q:"A hash function should ideally:",c:["Distribute keys evenly across the table","Return the same index for every key","Require sorted input","Use recursion for every lookup"],a:0},
+        {q:"A collision occurs when:",c:["Two different keys map to the same table index","A stack is empty","A queue has no rear pointer","A tree has a root"],a:0},
+        {q:"Linear probing handles collisions by:",c:["Checking subsequent table slots until an open slot is found","Creating a new linked list for every key automatically","Sorting all keys after every insert","Deleting the colliding key"],a:0},
+        {q:"Separate chaining handles collisions by:",c:["Storing multiple items at the same index using a linked structure such as a list","Moving every key to the next array","Rejecting all duplicate indexes","Using only recursive search"],a:0},
+        {q:"Which operation retrieves a value associated with a key in a hash table?",c:["Search or get","Push","Dequeue","In-order traversal"],a:0},
+        {q:"Why are hash tables useful for large amounts of data?",c:["They can provide fast average-case search, insert, and delete by key","They always preserve sorted order","They require no memory","They prevent all collisions"],a:0},
+        {q:"In Java, which class stores key-value pairs using hashing concepts?",c:["Hashtable","Stack only","Queue only","Scanner"],a:0},
+        {q:"What can poor hash distribution cause?",c:["More collisions and slower operations","Automatic tree balancing","Perfect O(1) access in every case","Removal of all duplicate values"],a:0}
+      ];
+
+      const state = {
+        started: false,
+        locked: false,
+        current: 0,
+        violations: 0,
+        quiz: [],
+        answers: Array(100).fill(null),
+        submitted: false,
+        submitting: false,
+        securityPausedUntil: 0
+      };
+
+      const els = {
+        grid: document.getElementById("numberGrid"),
+        startBtn: document.getElementById("startBtn"),
+        openFirstBtn: document.getElementById("openFirstBtn"),
+        submitBtn: document.getElementById("submitBtn"),
+        reviewBtn: document.getElementById("reviewBtn"),
+        modal: document.getElementById("modalBackdrop"),
+        modalTitle: document.getElementById("modalTitle"),
+        questionText: document.getElementById("questionText"),
+        choices: document.getElementById("choices"),
+        closeModal: document.getElementById("closeModal"),
+        prevBtn: document.getElementById("prevBtn"),
+        nextBtn: document.getElementById("nextBtn"),
+        answeredCount: document.getElementById("answeredCount"),
+        violationCount: document.getElementById("violationCount"),
+        lockNotice: document.getElementById("lockNotice"),
+        nameError: document.getElementById("nameError"),
+        resultPanel: document.getElementById("resultPanel"),
+        scoreText: document.getElementById("scoreText"),
+        testSummary: document.getElementById("testSummary"),
+        answerSummaryBtn: document.getElementById("answerSummaryBtn"),
+        answerSummaryPanel: document.getElementById("answerSummaryPanel"),
+        certBtn: document.getElementById("certBtn"),
+        printBtn: document.getElementById("printBtn"),
+        certificate: document.getElementById("certificate"),
+        certName: document.getElementById("certName"),
+        certScore: document.getElementById("certScore"),
+        certDetails: document.getElementById("certDetails"),
+        certDate: document.getElementById("certDate"),
+        studentName: document.getElementById("studentName"),
+        sectionName: document.getElementById("sectionName")
+      };
+
+      function shuffle(items) {
+        const copy = items.slice();
+        for (let i = copy.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [copy[i], copy[j]] = [copy[j], copy[i]];
+        }
+        return copy;
+      }
+
+      function renderNumbers() {
+        els.grid.innerHTML = "";
+        for (let i = 0; i < 100; i++) {
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "qnum";
+          btn.textContent = i + 1;
+          btn.disabled = !state.started;
+          if (state.answers[i] !== null) btn.classList.add("answered");
+          if (i === state.current && state.started) btn.classList.add("current");
+          if (state.locked) btn.classList.add("flagged");
+          btn.addEventListener("click", () => openQuestion(i));
+          els.grid.appendChild(btn);
+        }
+      }
+
+      function updateStatus() {
+        const answered = state.answers.filter(v => v !== null).length;
+        els.answeredCount.textContent = `${answered}/100`;
+        els.violationCount.textContent = `${state.violations}/3`;
+        els.openFirstBtn.disabled = !state.started || state.locked;
+        els.submitBtn.disabled = !state.started || state.submitted;
+        els.reviewBtn.disabled = !state.started || state.locked || state.submitted;
+        renderNumbers();
+      }
+
+      function startExam() {
+        if (!els.studentName.value.trim()) {
+          els.nameError.textContent = "Student name is required before starting the pre-test.";
+          els.studentName.focus();
+          safeAlert("Please enter your full name before starting the pre-test.");
+          return;
+        }
+        els.nameError.textContent = "";
+        const agreed = safeConfirm("Warning: Do not refresh this page during the pre-test. Refreshing may reset your answers and attempt record. Click OK to start.");
+        if (!agreed) return;
+        state.started = true;
+        state.locked = false;
+        state.submitted = false;
+        state.submitting = false;
+        state.violations = 0;
+        state.answers = Array(100).fill(null);
+        state.quiz = shuffle(bank).map(item => {
+          const choices = shuffle(item.c.map((text, index) => ({ text, index })));
+          return {
+            q: item.q,
+            c: choices.map(choice => choice.text),
+            a: choices.findIndex(choice => choice.index === item.a)
+          };
+        });
+        state.current = 0;
+        els.resultPanel.classList.remove("show");
+        els.certificate.classList.remove("show");
+        els.answerSummaryPanel.classList.remove("show");
+        els.answerSummaryPanel.innerHTML = "";
+        els.lockNotice.textContent = "";
+        updateStatus();
+        openQuestion(0);
+      }
+
+      function questionAt(displayIndex) {
+        return state.quiz[displayIndex];
+      }
+
+      function openQuestion(index) {
+        if (!state.started || state.locked || state.submitted) return;
+        state.current = index;
+        const item = questionAt(index);
+        els.modalTitle.textContent = `Question ${index + 1} of 100`;
+        els.questionText.textContent = item.q;
+        els.choices.innerHTML = "";
+        item.c.forEach((choice, choiceIndex) => {
+          const id = `q${index}_c${choiceIndex}`;
+          const label = document.createElement("label");
+          label.className = "choice";
+          label.setAttribute("for", id);
+          label.innerHTML = `<input type="radio" id="${id}" name="choice" value="${choiceIndex}"><span>${choice}</span>`;
+          const input = label.querySelector("input");
+          input.checked = state.answers[index] === choiceIndex;
+          input.addEventListener("change", () => {
+            state.answers[index] = choiceIndex;
+            updateStatus();
+          });
+          els.choices.appendChild(label);
+        });
+        els.prevBtn.disabled = index === 0;
+        els.nextBtn.textContent = index === 99 ? "Close" : "Next";
+        els.modal.classList.add("open");
+        updateStatus();
+      }
+
+      function closeModal() {
+        els.modal.classList.remove("open");
+      }
+
+      function submitExam(reason = "submitted") {
+        if (!state.started || state.submitted) return;
+        state.submitting = true;
+        state.submitted = true;
+        closeModal();
+        let score = 0;
+        state.answers.forEach((answer, displayIndex) => {
+          if (answer === questionAt(displayIndex).a) score++;
+        });
+        const answered = state.answers.filter(v => v !== null).length;
+        const unanswered = 100 - answered;
+        const incorrect = answered - score;
+        const percentage = Math.round(score);
+        els.scoreText.textContent = `Score: ${score}/100. Answered: ${answered}/100. Security violations: ${state.violations}/3. Status: ${reason}.`;
+        els.testSummary.innerHTML = [
+          ["Student", escapeHtml(els.studentName.value.trim() || "Student")],
+          ["Section", escapeHtml(els.sectionName.value.trim() || "Not provided")],
+          ["Score", `${score}/100`],
+          ["Percentage", `${percentage}%`],
+          ["Correct answers", score],
+          ["Incorrect answers", incorrect],
+          ["Unanswered", unanswered],
+          ["Security violations", `${state.violations}/3`],
+          ["Submission status", escapeHtml(reason)],
+          ["Submitted on", escapeHtml(new Date().toLocaleString())]
+        ].map(([label, value]) => `<div class="summary-row"><span>${label}</span><strong>${value}</strong></div>`).join("");
+        els.resultPanel.classList.add("show");
+        updateStatus();
+      }
+
+      function renderAnswerSummary() {
+        const rows = state.quiz.map((item, index) => {
+          const answer = state.answers[index];
+          const isUnanswered = answer === null;
+          const isCorrect = answer === item.a;
+          const status = isUnanswered ? "Unanswered" : isCorrect ? "Correct" : "Wrong";
+          const statusClass = isUnanswered ? "status-unanswered" : isCorrect ? "status-correct" : "status-wrong";
+          const studentAnswer = isUnanswered ? "No answer" : item.c[answer];
+          const correctAnswer = item.c[item.a];
+          return `<tr>
+            <td>${index + 1}</td>
+            <td class="${statusClass}">${status}</td>
+            <td>${escapeHtml(studentAnswer)}</td>
+            <td>${escapeHtml(correctAnswer)}</td>
+          </tr>`;
+        }).join("");
+        els.answerSummaryPanel.innerHTML = `<div class="summary-table-wrap">
+          <table class="summary-table">
+            <thead>
+              <tr>
+                <th>No.</th>
+                <th>Status</th>
+                <th>Student answer</th>
+                <th>Correct answer</th>
+              </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>`;
+        els.answerSummaryPanel.classList.add("show");
+      }
+
+      function escapeHtml(value) {
+        return String(value).replace(/[&<>"']/g, char => ({
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          "\"": "&quot;",
+          "'": "&#39;"
+        }[char]));
+      }
+
+      function recordViolation() {
+        if (!state.started || state.submitted || state.locked || state.submitting || Date.now() < state.securityPausedUntil) return;
+        state.violations++;
+        if (state.violations >= 3) {
+          state.locked = true;
+          els.lockNotice.textContent = "Maximum tab/window violations reached. The pre-test has been locked and submitted.";
+          submitExam("locked after maximum security violations");
+        } else {
+          els.lockNotice.textContent = `Warning: changing tabs/windows is not allowed. ${3 - state.violations} violation(s) remaining.`;
+        }
+        updateStatus();
+      }
+
+      function generateCertificate() {
+        const scoreMatch = els.scoreText.textContent.match(/Score: (\d+\/100)/);
+        const score = scoreMatch ? scoreMatch[1] : "0/100";
+        const name = els.studentName.value.trim() || "Student";
+        const section = els.sectionName.value.trim();
+        els.certName.textContent = name;
+        els.certScore.textContent = `Score: ${score}`;
+        els.certDetails.textContent = `${section ? "Section: " + section + " | " : ""}Security violations: ${state.violations}/3`;
+        els.certDate.textContent = new Date().toLocaleDateString(undefined, {year:"numeric", month:"long", day:"numeric"});
+        els.certificate.classList.add("show");
+      }
+
+      function pauseSecurity() {
+        state.securityPausedUntil = Date.now() + 1200;
+      }
+
+      function safeAlert(message) {
+        pauseSecurity();
+        try {
+          window.alert(message);
+        } finally {
+          pauseSecurity();
+        }
+      }
+
+      function safeConfirm(message) {
+        pauseSecurity();
+        try {
+          return window.confirm(message);
+        } finally {
+          pauseSecurity();
+        }
+      }
+
+      els.startBtn.addEventListener("click", startExam);
+      els.studentName.addEventListener("input", () => {
+        if (els.studentName.value.trim()) els.nameError.textContent = "";
+      });
+      els.openFirstBtn.addEventListener("click", () => openQuestion(0));
+      els.closeModal.addEventListener("click", closeModal);
+      els.prevBtn.addEventListener("click", () => openQuestion(Math.max(0, state.current - 1)));
+      els.nextBtn.addEventListener("click", () => {
+        if (state.current >= 99) closeModal();
+        else openQuestion(state.current + 1);
+      });
+      els.reviewBtn.addEventListener("click", () => {
+        const firstUnanswered = state.answers.findIndex(v => v === null);
+        openQuestion(firstUnanswered === -1 ? 0 : firstUnanswered);
+      });
+      els.submitBtn.addEventListener("click", () => {
+        state.submitting = true;
+        const unanswered = state.answers.filter(v => v === null).length;
+        if (unanswered && !safeConfirm(`${unanswered} question(s) are unanswered. Submit anyway?`)) {
+          state.submitting = false;
+          return;
+        }
+        submitExam("submitted by student");
+      });
+      els.answerSummaryBtn.addEventListener("click", renderAnswerSummary);
+      els.certBtn.addEventListener("click", generateCertificate);
+      els.printBtn.addEventListener("click", () => {
+        generateCertificate();
+        window.print();
+      });
+      els.testSummary.addEventListener("contextmenu", event => event.preventDefault());
+      els.testSummary.addEventListener("copy", event => event.preventDefault());
+      els.testSummary.addEventListener("cut", event => event.preventDefault());
+      els.testSummary.addEventListener("dragstart", event => event.preventDefault());
+      els.answerSummaryPanel.addEventListener("contextmenu", event => event.preventDefault());
+      els.answerSummaryPanel.addEventListener("copy", event => event.preventDefault());
+      els.answerSummaryPanel.addEventListener("cut", event => event.preventDefault());
+      els.answerSummaryPanel.addEventListener("dragstart", event => event.preventDefault());
+      document.addEventListener("keydown", event => {
+        if (!els.answerSummaryPanel.classList.contains("show")) return;
+        const key = event.key.toLowerCase();
+        if ((event.ctrlKey || event.metaKey) && ["c", "p", "s", "u"].includes(key)) {
+          event.preventDefault();
+        }
+        if (event.key === "PrintScreen") {
+          event.preventDefault();
+        }
+      });
+      document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === "hidden") recordViolation();
+      });
+      window.addEventListener("blur", () => {
+        setTimeout(() => {
+          if (state.submitting) return;
+          if (document.visibilityState === "visible") recordViolation();
+        }, 150);
+      });
+      window.addEventListener("beforeunload", event => {
+        if (!state.started || state.submitted || state.submitting) return;
+        event.preventDefault();
+        event.returnValue = "Refreshing or leaving this page may reset your pre-test answers.";
+      });
+
+      renderNumbers();
+      updateStatus();
+    })();
+  </script>
+</div>
