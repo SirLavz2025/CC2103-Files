@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asymptotic Notations: Detailed Visualization & Java Examples</title>
+    <!-- Bootstrap 5 CSS CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --bg-color: #f8f9fa;
+            --card-bg: #ffffff;
+            --code-bg: #1e1e1e;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        /* Navbar styling */
+        .navbar {
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        /* Sidebar styling */
+        .sidebar {
+            background-color: var(--card-bg);
+            border-right: 1px solid #dee2e6;
+            min-height: calc(100vh - 56px);
+            padding-top: 20px;
+        }
+
+        .sidebar .nav-link {
+            color: #495057;
+            font-weight: 500;
+            padding: 10px 20px;
+            margin-bottom: 5px;
+            border-radius: 0.375rem;
+            transition: all 0.2s ease;
+        }
+
+        .sidebar .nav-link:hover, .sidebar .nav-link.active {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        .sidebar .nav-link i {
+            margin-right: 10px;
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: 30px;
+        }
+
+        /* Cards */
+        .card {
+            border: none;
+            border-radius: 0.5rem;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            margin-bottom: 20px;
+            background-color: var(--card-bg);
+        }
+
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+        }
+
+        .card-header {
+            background-color: transparent;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            font-weight: 600;
+            padding: 15px 20px;
+        }
+
+        /* Math and Code Blocks */
+        .math-notation {
+            font-family: 'Fira Code', monospace;
+            background: #e9ecef;
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: #d63384;
+            font-weight: 500;
+        }
+
+        pre code {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.85rem;
+        }
+
+        .code-window {
+            background-color: var(--code-bg);
+            color: #d4d4d4;
+            border-radius: 6px;
+            padding: 15px;
+            overflow-x: auto;
+        }
+
+        /* Modal Customization */
+        .modal-content {
+            border-radius: 0.75rem;
+            border: none;
+            box-shadow: 0 1rem 3rem rgba(0,0,0,0.175);
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border-top-left-radius: 0.75rem;
+            border-top-right-radius: 0.75rem;
+        }
+
+        .modal-header .btn-close {
+            filter: brightness(0) invert(1);
+        }
+
+        /* Interactive Canvas */
+        canvas {
+            width: 100% !important;
+            height: auto !important;
+            max-height: 250px;
+        }
+
+        .badge-custom {
+            font-size: 0.75rem;
+            padding: 0.35em 0.65em;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Top Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+        <div class="container-fluid">
+            <a class="navbar-brand fw-bold" href="#"><i class="fa-solid fa-chart-line me-2"></i>Complexity Analysis Dashboard</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item"><a class="nav-link active" href="#"><i class="fa-solid fa-house"></i> Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#infoModal" onclick="loadModalContent('overview')"><i class="fa-solid fa-circle-info"></i> Guide</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar Navigation -->
+            <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block sidebar collapse">
+                <div class="position-sticky pt-3">
+                    <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted text-uppercase fs-7">
+                        <span>Navigation</span>
+                    </h6>
+                    <ul class="nav flex-column">
+                        <li class="nav-item"><a class="nav-link active" href="#overview"><i class="fa-solid fa-book-open"></i> Introduction</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#" onclick="openDetailModal('bigoh')"><i class="fa-solid fa-arrow-trend-up"></i> Big Oh (O)</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#" onclick="openDetailModal('omega')"><i class="fa-solid fa-arrow-trend-down"></i> Omega (Ω)</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#" onclick="openDetailModal('theta')"><i class="fa-solid fa-arrows-split-up-and-left"></i> Theta (Θ)</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#" onclick="openDetailModal('accuracy')"><i class="fa-solid fa-bullseye"></i> Accuracy Check</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#" onclick="openDetailModal('misconceptions')"><i class="fa-solid fa-triangle-exclamation"></i> Misconceptions</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#" onclick="openDetailModal('properties')"><i class="fa-solid fa-list-check"></i> Properties</a></li>
+                    </ul>
+                </div>
+            </nav>
+
+            <!-- Main Dashboard Area -->
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 main-content">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2 fw-bold text-dark">Asymptotic Notations & Java Analysis</h1>
+                    <div class="btn-toolbar mb-2 mb-md-0">
+                        <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#infoModal" onclick="loadModalContent('overview')">
+                            <i class="fa-solid fa-circle-question me-1"></i> Quick Overview
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Intro Card -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="card bg-gradient text-white" style="background: linear-gradient(135deg, #2c3e50, #4ca1af);">
+                            <div class="card-body p-4">
+                                <h3>Algorithm Efficiency & Asymptotic Analysis</h3>
+                                <p class="lead mb-0">Asymptotic notations are mathematical tools used to describe the running time or space complexity of algorithms by removing machine-dependent constants and focusing on how execution scales as input size ($n$) approaches infinity.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Grid of Notations -->
+                <div class="row">
+                    <!-- Big Oh Card -->
+                    <div class="col-md-4">
+                        <div class="card h-100 border-top border-danger border-4">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <span>Big Oh ($O$)</span>
+                                <span class="badge bg-danger badge-custom">Upper Bound</span>
+                            </div>
+                            <div class="card-body">
+                                <h6 class="text-muted">Mathematical Definition</h6>
+                                <p><span class="math-notation">f(n) &le; c &middot; g(n)</span> for all <span class="math-notation">n &ge; n_0</span></p>
+                                <hr>
+                                <p class="small text-muted">Guarantees the maximum runtime behavior. The algorithm will never grow faster than this rate asymptotically.</p>
+                                <button class="btn btn-outline-danger btn-sm w-100" onclick="openDetailModal('bigoh')"><i class="fa-solid fa-eye me-1"></i> Detailed Java View</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Omega Card -->
+                    <div class="col-md-4">
+                        <div class="card h-100 border-top border-success border-4">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <span>Omega ($\Omega$)</span>
+                                <span class="badge bg-success badge-custom">Lower Bound</span>
+                            </div>
+                            <div class="card-body">
+                                <h6 class="text-muted">Mathematical Definition</h6>
+                                <p><span class="math-notation">f(n) &ge; c &middot; g(n)</span> for all <span class="math-notation">n &ge; n_0</span></p>
+                                <hr>
+                                <p class="small text-muted">Guarantees the minimum runtime behavior. The algorithm will at least take this much time to complete execution.</p>
+                                <button class="btn btn-outline-success btn-sm w-100" onclick="openDetailModal('omega')"><i class="fa-solid fa-eye me-1"></i> Detailed Java View</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Theta Card -->
+                    <div class="col-md-4">
+                        <div class="card h-100 border-top border-primary border-4">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <span>Theta ($\Theta$)</span>
+                                <span class="badge bg-primary badge-custom">Average/Tight Bound</span>
+                            </div>
+                            <div class="card-body">
+                                <h6 class="text-muted">Mathematical Definition</h6>
+                                <p><span class="math-notation">c_1g(n) &le; f(n) &le; c_2g(n)</span></p>
+                                <hr>
+                                <p class="small text-muted">Tight bound representing both upper and lower limits simultaneously. Highly accurate growth description.</p>
+                                <button class="btn btn-outline-primary btn-sm w-100" onclick="openDetailModal('theta')"><i class="fa-solid fa-eye me-1"></i> Detailed Java View</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Secondary Row: Accuracy & Misconceptions & Properties -->
+                <div class="row mt-4">
+                    <!-- Accuracy Card -->
+                    <div class="col-md-4">
+                        <div class="card h-100">
+                            <div class="card-header bg-light fw-bold"><i class="fa-solid fa-scale-balanced me-2 text-warning"></i>Which One is Accurate?</div>
+                            <div class="card-body">
+                                <p><strong>Theta ($\Theta$)</strong> is mathematically the most accurate and complete bound because it bounds the algorithm from both above and below.</p>
+                                <button class="btn btn-sm btn-dark w-100 mt-2" onclick="openDetailModal('accuracy')">Read Explanation</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Misconceptions Card -->
+                    <div class="col-md-4">
+                        <div class="card h-100">
+                            <div class="card-header bg-light fw-bold"><i class="fa-solid fa-triangle-exclamation me-2 text-danger"></i>Is Big O = Worst Case?</div>
+                            <div class="card-body">
+                                <p><strong>NO!</strong> Big O is merely an upper bound. While often used for worst-case analysis, it can also describe best or average case behavior.</p>
+                                <button class="btn btn-sm btn-dark w-100 mt-2" onclick="openDetailModal('misconceptions')">Learn Why</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Properties Card -->
+                    <div class="col-md-4">
+                        <div class="card h-100">
+                            <div class="card-header bg-light fw-bold"><i class="fa-solid fa-gears me-2 text-secondary"></i>Asymptotic Properties</div>
+                            <div class="card-body">
+                                <ul class="small ps-3 mb-3">
+                                    <li><strong>Transitivity:</strong> If $f = O(g)$ and $g = O(h)$, then $f = O(h)$.</li>
+                                    <li><strong>Reflexivity & Symmetry:</strong> $\Theta$ is symmetric.</li>
+                                    <li><strong>Transpose Symmetry:</strong> $f=O(g) \iff g=\Omega(f)$.</li>
+                                </ul>
+                                <button class="btn btn-sm btn-dark w-100" onclick="openDetailModal('properties')">View All Properties</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Java Interactive Section Preview -->
+                <div class="row mt-4 mb-5">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+                                <span><i class="fa-solid fa-code me-2"></i>Java Implementation & Visualization Engine</span>
+                                <span class="badge bg-secondary">JDK 17+ Ready</span>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-lg-6">
+                                        <p class="text-muted">Click any button above to launch the modal containing comprehensive Java code snippets, algorithmic graphs, and runtime complexity breakdowns.</p>
+                                        <div class="code-window">
+                                            <pre><code>public class AsymptoticDemo {
+    // Linear Search: Demonstrates O(n) Upper & Omega(1) Lower Bound
+    public static int linearSearch(int[] arr, int target) {
+        for (int i = 0; i &lt; arr.length; i++) {
+            if (arr[i] == target) return i; // Best Case: O(1)
+        }
+        return -1; // Worst Case: O(n)
+    }
+}</code></pre>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6 d-flex flex-column justify-content-center align-items-center">
+                                        <div class="text-center w-100">
+                                            <canvas id="previewCanvas" width="400" height="200"></canvas>
+                                            <p class="small text-muted mt-2">Dynamic growth curve visualization ($f(n) = 3n^2 + 5n + 1$)</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Bootstrap Interactive Modal -->
+    <div class="modal fade" id="detailModal" tabindex="-1" aria-labelledby="detailModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold" id="detailModalLabel"><i class="fa-solid fa-laptop-code me-2"></i>Detailed Visualization & Java Example</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="modalBodyContent">
+                    <!-- Dynamic content injected here -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS Bundle CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Chart.js for graphs -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        // Draw static preview chart
+        const ctxPreview = document.getElementById('previewCanvas').getContext('2d');
+        new Chart(ctxPreview, {
+            type: 'line',
+            data: {
+                labels: ['10', '20', '30', '40', '50'],
+                datasets: [{
+                    label: 'O(n^2) Upper Bound',
+                    data: [100, 400, 900, 1600, 2500],
+                    borderColor: '#e74c3c',
+                    tension: 0.1,
+                    fill: false
+                }, {
+                    label: 'Omega(n) Lower Bound',
+                    data: [10, 20, 30, 40, 50],
+                    borderColor: '#2ecc71',
+                    tension: 0.1,
+                    fill: false
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } } },
+                scales: { x: { display: true }, y: { display: false } }
+            }
+        });
+
+        // Modal content router based on topic
+        function openDetailModal(topic) {
+            const modalTitle = document.getElementById('detailModalLabel');
+            const modalBody = document.getElementById('modalBodyContent');
+            
+            let htmlContent = '';
+            let title = '';
+
+            switch(topic) {
+                case 'bigoh':
+                    title = 'Big Oh (O) - Upper Bound Analysis';
+                    htmlContent = `
+                        <h6 class="fw-bold text-danger">1. Definition & Mathematical Formalism</h6>
+                        <p>Big Oh notation characterizes the <strong>upper bound</strong> of an algorithm's growth. Formally, $f(n) = O(g(n))$ if there exist positive constants $c$ and $n_0$ such that:</p>
+                        <div class="p-2 bg-light border rounded text-center font-monospace mb-3">0 &le; f(n) &le; c \cdot g(n) \quad \text{for all } n \ge n_0</div>
+                        <h6 class="fw-bold text-danger">2. Java Algorithm Example: Array Maximum Finder</h6>
+                        <div class="code-window mb-3">
+                            <pre><code>public class BigOhExample {
+    // Finds maximum element. Time Complexity: O(n) Upper Bound
+    public static int findMax(int[] arr) {
+        if (arr == null || arr.length == 0) throw new IllegalArgumentException();
+        int max = arr[0]; // O(1)
+        for (int i = 1; i &lt; arr.length; i++) { // Executes n-1 times
+            if (arr[i] &gt; max) {
+                max = arr[i]; // O(1)
+            }
+        }
+        return max; // O(1)
+    }
+}</code></pre>
+                        </div>
+                        <p class="small text-muted">Regardless of array sorting order, the loop runs exactly $n-1$ times, making $O(n)$ a valid upper bound guarantee.</p>
+                    `;
+                    break;
+
+                case 'omega':
+                    title = 'Omega (Ω) - Lower Bound Analysis';
+                    htmlContent = `
+                        <h6 class="fw-bold text-success">1. Definition & Mathematical Formalism</h6>
+                        <p>Omega notation characterizes the <strong>lower bound</strong> of an algorithm's growth. Formally, $f(n) = \Omega(g(n))$ if there exist positive constants $c$ and $n_0$ such that:</p>
+                        <div class="p-2 bg-light border rounded text-center font-monospace mb-3">0 &le; c \cdot g(n) \le f(n) \quad \text{for all } n \ge n_0</div>
+                        <h6 class="fw-bold text-success">2. Java Algorithm Example: Linear Search Best Case</h6>
+                        <div class="code-window mb-3">
+                            <pre><code>public class OmegaExample {
+    // Omega(1) Lower Bound for finding element at first index
+    public static int searchFirst(int[] arr, int target) {
+        if (arr.length > 0 && arr[0] == target) {
+            return 0; // Best Case execution: Omega(1) constant time
+        }
+        return -1;
+    }
+}</code></pre>
+                        </div>
+                        <p class="small text-muted">Omega ensures the algorithm will take <em>at least</em> this amount of time under optimal conditions.</p>
+                    `;
+                    break;
+
+                case 'theta':
+                    title = 'Theta (Θ) - Average / Tight Bound Analysis';
+                    htmlContent = `
+                        <h6 class="fw-bold text-primary">1. Definition & Mathematical Formalism</h6>
+                        <p>Theta notation provides a <strong>tight bound</strong>, bounding functions from both above and below. $f(n) = \Theta(g(n))$ if:</p>
+                        <div class="p-2 bg-light border rounded text-center font-monospace mb-3">c_1 \cdot g(n) \le f(n) \le c_2 \cdot g(n) \quad \text{for all } n \ge n_0</div>
+                        <h6 class="fw-bold text-primary">2. Java Algorithm Example: Iterative Matrix Addition</h6>
+                        <div class="code-window mb-3">
+                            <pre><code>public class ThetaExample {
+    // Theta(n^2) tight growth rate for NxN matrix traversal
+    public static void printMatrix(int[][] matrix, int n) {
+        for (int i = 0; i &lt; n; i++) {
+            for (int j = 0; j &lt; n; j++) {
+                System.out.print(matrix[i][j] + " ");
+            }
+            System.out.println();
+        }
+    }
+}</code></pre>
+                        </div>
+                        <p class="small text-muted">The nested loops always execute exactly $n \times n$ operations, making Theta the exact asymptotic growth indicator.</p>
+                    `;
+                    break;
+
+                case 'accuracy':
+                    title = 'Which One is Accurate? Big Oh vs Omega vs Theta';
+                    htmlContent = `
+                        <h5 class="text-dark fw-bold mb-3">Theta ($\Theta$) is the Most Complete and Accurate Bound</h5>
+                        <p>While Big Oh ($O$) is heavily favored in industry because upper-bound guarantees prevent software scalability surprises, <strong>Theta ($\Theta$)</strong> is mathematically the most accurate.</p>
+                        <ul class="list-group list-group-flush mb-3">
+                            <li class="list-group-item"><strong>Big Oh</strong> only promises growth won't exceed a ceiling ($f(n) \le c \cdot g(n)$). An algorithm running in $O(n^2)$ time can technically run in $O(1)$ time on specific inputs, making it an loose bound if not tight.</li>
+                            <li class="list-group-item"><strong>Omega</strong> only guarantees a floor.</li>
+                            <li class="list-group-item"><strong>Theta</strong> provides precise equivalence, locking growth rate strictly between two constant multiples.</li>
+                        </ul>
+                    `;
+                    break;
+
+                case 'misconceptions':
+                    title = 'Common Misconception: Is Big O for Worst Case?';
+                    htmlContent = `
+                        <h5 class="text-danger fw-bold mb-3">Myth: Big O = Worst Case, Omega = Best Case, Theta = Average Case</h5>
+                        <p class="lead fs-6"><strong>FALSE!</strong> This is one of the most widespread misconceptions in computer science education.</p>
+                        <hr>
+                        <p>Asymptotic notations describe <em>rate of growth functions</em>, not specific execution scenarios:</p>
+                        <ul>
+                            <li><strong>Big Oh ($O$)</strong> can be used to describe the best case, average case, or worst case. For example, linear search is $O(1)$ in the best case and $O(n)$ in the worst case. Both are valid Big Oh statements!</li>
+                            <li><strong>Theta ($\Theta$)</strong> can be used for worst-case runtime if both upper and lower bounds match tightly for that scenario.</li>
+                        </ul>
+                    `;
+                    break;
+
+                case 'properties':
+                    title = 'Properties of Asymptotic Notations';
+                    htmlContent = `
+                        <h6 class="fw-bold text-dark">Core Mathematical Properties</h6>
+                        <div class="accordion" id="propAccordion">
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="headingOne">
+                                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne">1. Transitivity</button>
+                                </h2>
+                                <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#propAccordion">
+                                    <div class="accordion-body small">If $f(n) = O(g(n))$ and $g(n) = O(h(n))$, then $f(n) = O(h(n))$. Applies similarly to $\Omega$, $\Theta$, $o$, and $\omega$.</div>
+                                </div>
+                            </div>
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="headingTwo">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo">2. Reflexivity</button>
+                                </h2>
+                                <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#propAccordion">
+                                    <div class="accordion-body small">$f(n) = O(f(n))$, $f(n) = \Omega(f(n))$, and $f(n) = \Theta(f(n))$. Any function is bound to itself.</div>
+                                </div>
+                            </div>
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="headingThree">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree">3. Transpose Symmetry</button>
+                                </h2>
+                                <div id="collapseThree" class="accordion-collapse collapse" data-bs-parent="#propAccordion">
+                                    <div class="accordion-body small">$f(n) = O(g(n)) \iff g(n) = \Omega(f(n))$. Upper bounds mirror lower bounds across function pairs.</div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    break;
+            }
+
+            modalTitle.innerHTML = `<i class="fa-solid fa-code me-2"></i>${title}`;
+            modalBody.innerHTML = htmlContent;
+
+            // Trigger Bootstrap modal display
+            const myModal = new bootstrap.Modal(document.getElementById('detailModal'));
+            myModal.show();
+        }
+    </script>
+</body>
+</html>
