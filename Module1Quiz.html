@@ -737,7 +737,54 @@
     const today = new Date().toISOString().split('T')[0];
     // Set the value of the input to today's date
     document.getElementById('assessmentDate').value = today;
+// ==========================================
+    // ADDITIONAL BROWSER INSPECT & SOURCE PROTECTION
+    // ==========================================
 
+    // 1. Disable Right-Click Context Menu
+    document.addEventListener('contextmenu', function (e) {
+        e.preventDefault();
+        alert("Right-click is disabled during this assessment.");
+    });
+
+    // 2. Block Common Developer Tool Keyboard Shortcuts
+    document.addEventListener('keydown', function (e) {
+        // Prevent F12
+        if (e.key === 'F12') {
+            e.preventDefault();
+            return false;
+        }
+        
+        // Prevent Ctrl+U (View Source) & Ctrl+S (Save Page)
+        if (e.ctrlKey && (e.key === 'u' || e.key === 'U' || e.key === 's' || e.key === 'S')) {
+            e.preventDefault();
+            return false;
+        }
+
+        // Prevent Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C (DevTools)
+        if (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.key === 'J' || e.key === 'j' || e.key === 'C' || e.key === 'c')) {
+            e.preventDefault();
+            return false;
+        }
+    });
+
+    // 3. DevTools Detector (Debugger Trap)
+    // If someone manages to open DevTools, this periodically fires a debugger statement 
+    // or checks window dimension discrepancies to freeze/detect inspection.
+    setInterval(function() {
+        if (!isQuizActive) return;
+        
+        const threshold = 160;
+        const widthThreshold = window.outerWidth - window.innerWidth > threshold;
+        const heightThreshold = window.outerHeight - window.innerHeight > threshold;
+        
+        if (widthThreshold || heightThreshold) {
+            document.body.innerHTML = "<h2 style='text-align:center; margin-top:50px; color:red;'>Security Violation Detected: Developer Tools are not allowed during the quiz.</h2>";
+            setTimeout(() => {
+                location.reload();
+            }, 3000);
+        }
+    }, 1000);
 </script>
 
 </body>
