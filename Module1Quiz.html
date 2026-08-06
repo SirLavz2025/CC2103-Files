@@ -1,0 +1,744 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>CC 2103 - Data Structures and Algorithms: Prelim Quiz 1</title>
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-color: #1e293b;
+            --border-color: #e2e8f0;
+            --success: #22c55e;
+            --error: #ef4444;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            padding: 15px;
+            margin-top: 10px;
+        }
+
+        @media (min-width: 640px) {
+            .container {
+                padding: 30px;
+                margin-top: 20px;
+            }
+            body {
+                padding: 20px;
+            }
+        }
+
+        h1 {
+            color: var(--primary);
+            text-align: center;
+            margin-bottom: 5px;
+            font-size: 20px;
+        }
+
+        @media (min-width: 640px) {
+            h1 {
+                font-size: 24px;
+            }
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #64748b;
+            margin-bottom: 20px;
+            font-size: 13px;
+        }
+
+        .student-info-card {
+            background: #f1f5f9;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        @media (min-width: 640px) {
+            .student-info-card {
+                padding: 20px;
+                margin-bottom: 25px;
+            }
+        }
+
+        .student-info-card h3 {
+            margin-top: 0;
+            color: var(--primary);
+            font-size: 15px;
+            margin-bottom: 15px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        @media (min-width: 640px) {
+            .form-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 15px;
+            }
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .form-group.full-width {
+            grid-column: span 1;
+        }
+
+        @media (min-width: 640px) {
+            .form-group.full-width {
+                grid-column: span 2;
+            }
+        }
+
+        .form-group label {
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .form-group input, .form-group select {
+            padding: 10px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 14px;
+            background: #fff;
+            width: 100%;
+        }
+
+        /* Card and Interaction Styles */
+        .card-container {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
+
+        @media (min-width: 640px) {
+            .card-container {
+                padding: 25px;
+            }
+        }
+
+        .card-header-label {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+
+        .card-question-text {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-color);
+            margin-bottom: 15px;
+            line-height: 1.4;
+        }
+
+        @media (min-width: 640px) {
+            .card-question-text {
+                font-size: 16px;
+                margin-bottom: 20px;
+            }
+        }
+
+        /* Drop Zone */
+        .drop-zone {
+            width: 100%;
+            min-height: 55px;
+            border: 2px dashed #cbd5e1;
+            border-radius: 8px;
+            background: #f8fafc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+            box-sizing: border-box;
+            margin-bottom: 15px;
+            transition: all 0.2s;
+            font-size: 13px;
+            color: #64748b;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        @media (min-width: 640px) {
+            .drop-zone {
+                min-height: 60px;
+                font-size: 14px;
+                margin-bottom: 20px;
+            }
+        }
+
+        .drop-zone.drag-over {
+            border-color: var(--primary);
+            background: #e0e7ff;
+        }
+
+        .drop-zone.filled {
+            border-style: solid;
+            border-color: var(--primary);
+            background: #eef2ff;
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        /* Draggable Items Pool */
+        .pool-title {
+            font-size: 12px;
+            font-weight: 700;
+            color: #64748b;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .draggables-pool {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            background: #f1f5f9;
+            padding: 12px;
+            border-radius: 8px;
+            min-height: 80px;
+            border: 1px solid var(--border-color);
+        }
+
+        @media (min-width: 640px) {
+            .draggables-pool {
+                flex-direction: row;
+                flex-wrap: wrap;
+                gap: 10px;
+                padding: 15px;
+            }
+        }
+
+        .draggable-item {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 12px 14px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            transition: transform 0.1s, background-color 0.2s, border-color 0.2s;
+            user-select: none;
+            text-align: center;
+        }
+
+        @media (min-width: 640px) {
+            .draggable-item {
+                padding: 10px 14px;
+                font-size: 13px;
+                text-align: left;
+                cursor: grab;
+            }
+            .draggable-item:active {
+                cursor: grabbing;
+            }
+        }
+
+        .draggable-item:hover {
+            background-color: #f8fafc;
+            border-color: var(--primary);
+        }
+
+        .draggable-item.dragging {
+            opacity: 0.4;
+        }
+
+        /* Navigation Controls */
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        @media (min-width: 640px) {
+            .controls {
+                margin-top: 20px;
+            }
+        }
+
+        .btn {
+            padding: 12px 16px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            flex: 1;
+            text-align: center;
+        }
+
+        .btn:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .btn:disabled {
+            background-color: #cbd5e1;
+            cursor: not-allowed;
+        }
+
+        .progress-indicator {
+            text-align: center;
+            font-weight: 600;
+            color: #64748b;
+            font-size: 13px;
+            margin-bottom: 12px;
+        }
+
+        @media (min-width: 640px) {
+            .progress-indicator {
+                font-size: 14px;
+                margin-bottom: 15px;
+            }
+        }
+
+        #reviewerSection, #finalScoreSection {
+            display: none;
+        }
+
+        .final-score-card {
+            text-align: center;
+            padding: 15px;
+        }
+
+        @media (min-width: 640px) {
+            .final-score-card {
+                padding: 30px;
+            }
+        }
+
+        .score-big {
+            font-size: 30px;
+            font-weight: bold;
+            color: var(--primary);
+            margin: 15px 0;
+        }
+
+        @media (min-width: 640px) {
+            .score-big {
+                font-size: 36px;
+            }
+        }
+
+        .review-item-card {
+            background: #f8fafc;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 12px;
+            text-align: left;
+        }
+
+        @media (min-width: 640px) {
+            .review-item-card {
+                padding: 15px;
+                margin-bottom: 15px;
+            }
+        }
+
+        .review-item-card.correct-item {
+            border-left: 4px solid var(--success);
+        }
+
+        .review-item-card.wrong-item {
+            border-left: 4px solid var(--error);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>CC 2103: Data Structures & Algorithms</h1>
+    <div class="subtitle">Module 1 Quiz</div>
+
+    <!-- Student Information Form -->
+    <div id="setupSection" class="student-info-card">
+        <h3>Enter Student & Assessment Details</h3>
+        <div class="form-grid">
+            <div class="form-group full-width">
+                <label for="studentName">Full Name:</label>
+                <input type="text" id="studentName" required placeholder="e.g., LAVA, RONALD T.">
+            </div>
+            <div class="form-group">
+                <label for="studentCourse">Course:</label>
+                <select id="studentCourse" required>
+                    <option value="">-- Select Course --</option>
+                    <option value="BSIT BA">BSIT BA</option>
+                    <option value="BSCS DS">BSCS DS</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="studentYear">Year:</label>
+                <select id="studentYear" required>
+                    <option value="">-- Select Year --</option>
+                    <option value="1">1st Year</option>
+                    <option value="2">2nd Year</option>
+                    <option value="3">3rd Year</option>
+                    <option value="4">4th Year</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="studentSection">Section:</label>
+                <select id="studentSection" required>
+                    <option value="">-- Select Section --</option>
+                    <option value="2A">2A</option>
+                    <option value="2B">2B</option>
+                    <option value="2C">2C</option>
+                    <option value="2D">2D</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="assessmentDate">Date:</label>
+                <input type="date" id="assessmentDate" required>
+            </div>
+            <div class="form-group full-width">
+                <label for="instructorName">Instructor:</label>
+                <input type="text" id="instructorName" value="RONALD T. LAVA, MSIT" readonly style="background-color: #e2e8f0; cursor: not-allowed;">
+            </div>
+        </div>
+        <button type="button" class="btn" style="margin-top: 20px; width: 100%;" onclick="startReviewer()">Start Quiz</button>
+    </div>
+
+    <!-- Reviewer Section -->
+    <div id="reviewerSection">
+        <div class="student-summary" id="activeStudentSummary" style="font-size: 12px; color: #64748b; margin-bottom: 15px; background: #f1f5f9; padding: 10px; border-radius: 6px; line-height: 1.4;"></div>
+        <div class="progress-indicator" id="progressText">Question 1 of 30</div>
+        
+        <div class="card-container">
+            <div class="card-header-label">Module 1 Quiz 1</div>
+            <div class="card-question-text" id="questionText"></div>
+            
+            <div class="drop-zone" id="dropZone" ondragover="allowDrop(event)" ondragleave="removeDropStyle(event)" ondrop="dropItem(event)">
+                Drag answer here, or tap an option below
+            </div>
+
+            <div class="pool-title">Available Answers Pool (Tap or Drag):</div>
+            <div class="draggables-pool" id="draggablesPool"></div>
+        </div>
+
+        <div class="controls">
+            <button type="button" class="btn" id="prevBtn" onclick="prevCard()">Previous</button>
+            <button type="button" class="btn" id="nextBtn" onclick="nextCard()" disabled>Next</button>
+        </div>
+    </div>
+
+    <!-- Final Score Section -->
+    <div id="finalScoreSection" class="final-score-card">
+        <h3>Quiz Completed!</h3>
+        <div class="student-summary" id="finalStudentSummary" style="margin: 15px 0; text-align: left; font-size: 13px; background: #f8fafc; padding: 12px; border-radius: 8px; border: 1px solid var(--border-color); line-height: 1.4;"></div>
+        <div class="score-big" id="finalScoreText"></div>
+        
+        <div style="text-align: left; margin-top: 20px;">
+            <h4 style="color: var(--primary); border-bottom: 2px solid var(--border-color); padding-bottom: 8px; font-size: 16px;">Detailed Item Review</h4>
+            <div id="detailedReviewContainer"></div>
+        </div>
+
+        <button type="button" class="btn" style="margin-top: 20px; width: 100%;" onclick="resetReviewer()">Retake Quiz</button>
+    </div>
+</div>
+
+<script>
+    window.addEventListener('DOMContentLoaded', () => {
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('assessmentDate').value = today;
+    });
+
+    const reviewerData = [
+        { q: "What term describes a specialized format for organizing, processing, retrieving, and storing data efficiently?", answer: "Data Structure", exp: "A data structure is a specialized format used to organize, process, retrieve, and store data effectively." },
+        { q: "What are the two broad primary categories into which data structures are classified?", answer: "Primitive and Non-Primitive", exp: "Data structures are fundamentally categorized into primitive data structures and non-primitive (structured) data structures." },
+        { q: "Give an example of a primitive data structure built directly into hardware or language architectures.", answer: "Integer", exp: "Integer (along with floats, characters, and pointers) is considered a primitive data structure." },
+        { q: "Name a linear data structure where elements are processed in a First-In, First-Out (FIFO) manner.", answer: "Queue", exp: "A queue operates strictly on a FIFO principle where elements enter at the rear and exit from the front." },
+        { q: "Name a core data structure that is inherently non-linear and organizes data hierarchically.", answer: "Tree", exp: "Trees (and graphs) are non-linear data structures arranging data in hierarchical parent-child relationships." },
+        { q: "What term defines a finite set of well-defined instructions written to solve a specific problem or perform a computation?", answer: "Algorithm", exp: "An algorithm is a step-by-step procedure designed to solve a computing problem." },
+        { q: "According to Donald Knuth, what property specifies that an algorithm must invariably halt or terminate after a countable number of steps?", answer: "Finiteness", exp: "Finiteness requires that an algorithm must always terminate after executing a finite sequence of instructions." },
+        { q: "What Knuth algorithm property specifies that each instruction must be clear, unambiguous, and leave no room for subjective interpretation?", answer: "Definiteness", exp: "Definiteness ensures that every instruction is precisely specified and entirely unambiguous." },
+        { q: "Performance analysis of an algorithm is evaluated using time complexity and what other primary complexity metric?", answer: "Space Complexity", exp: "Algorithm efficiency is evaluated analytically via time complexity (runtime speed) and space complexity (memory usage)." },
+        { q: "What type of theoretical analysis studies algorithm performance as input size grows infinitely large toward infinity?", answer: "Asymptotic Analysis", exp: "Asymptotic analysis evaluates how resource requirements scale as input size (n) approaches infinity." },
+        { q: "Which asymptotic notation represents the upper bound or worst-case scenario of an algorithm's growth rate?", answer: "Big-O", exp: "Big-O notation (O) establishes an upper bound guarantee for worst-case execution performance." },
+        { q: "Which asymptotic notation represents the lower bound or best-case scenario of an algorithm?", answer: "Big-Omega", exp: "Big-Omega notation (Ω) characterizes the lower bound or best-case execution behavior." },
+        { q: "Which asymptotic notation provides a tight bound representing both upper and lower growth constraints?", answer: "Big-Theta", exp: "Big-Theta notation (Θ) provides a tight bound, meaning the function grows at the same rate from above and below." },
+        { q: "What is the Big-O time complexity of a single loop that runs exactly n times doing constant-time operations?", answer: "O(n)", exp: "A loop iterating n times scales linearly with input size n, yielding O(n) time complexity." },
+        { q: "What is the standard time complexity of an algorithm featuring nested loops where both iterate up to n?", answer: "O(n^2)", exp: "Nested loops running independently up to n execute roughly n * n operations, resulting in quadratic time complexity O(n^2)." },
+        { q: "What time complexity category does Binary Search exhibit due to cutting the search space in half at each step?", answer: "O(log n)", exp: "Binary search cuts the search space in half at each step, yielding logarithmic time complexity O(log n)." },
+        { q: "Which common growth rate represents exponential time complexity, making it extremely poor for large inputs?", answer: "O(2^n)", exp: "Exponential time complexity O(2^n) grows extremely fast and becomes intractable for large inputs." },
+        { q: "What is the space complexity of an algorithm that utilizes a fixed number of scalar variables regardless of input size n?", answer: "O(1)", exp: "Constant space complexity O(1) indicates that memory consumption remains fixed regardless of input size." },
+        { q: "When analyzing polynomial functions like f(n) = 3n^2 + 5n + 2 in Big-O analysis, what terms and coefficients are dropped?", answer: "Lower-order terms and constant coefficients", exp: "Asymptotic analysis drops constant coefficients and lower-order terms as they become insignificant at scale." },
+        { q: "What array operation takes O(1) constant time when directly accessing elements via their index?", answer: "Accessing", exp: "Direct index-based access computes target memory locations instantly, taking O(1) constant time." },
+        { q: "What linear data structure operates on a Last-In, First-Out (LIFO) principle?", answer: "Stack", exp: "A stack operates on a LIFO principle where the last element pushed is the first one popped out." },
+        { q: "What is the primary advantage of a linked list over a static array regarding memory allocation and sizing?", answer: "Dynamic sizing", exp: "Linked lists support dynamic sizing, allowing them to grow or shrink dynamically during execution." },
+        { q: "What specific type of time complexity guarantee ensures an algorithm will never exceed a specified running time for any input size n?", answer: "Worst-case time complexity", exp: "Worst-case time complexity provides an absolute upper bound guarantee on execution duration." },
+        { q: "If an algorithm takes O(1) time, what happens to its execution time when the input size n doubles?", answer: "It remains constant", exp: "Constant time execution O(1) is completely unaffected by input size scale changes." },
+        { q: "What is the space complexity of a recursive function that makes n recursive calls, storing an activation stack of depth n?", answer: "O(n)", exp: "A recursion depth of n requires storing n active stack frames concurrently, resulting in linear O(n) space complexity." },
+        { q: "Why are constant multipliers (such as comparing 5n versus 100n) ignored in Big-O notation?", answer: "Asymptotic growth focuses on long-term scaling trends as n approaches infinity", exp: "Big-O evaluates long-term scaling trends as input size approaches infinity, making fixed multipliers negligible." },
+        { q: "What sorting or searching strategy repeatedly divides a sorted collection in half?", answer: "Binary Search", exp: "Binary search uses a divide-and-conquer strategy by halving the search collection on each step." },
+        { q: "What data structure links individual nodes together via pointers or references, allowing non-contiguous memory storage?", answer: "Linked List", exp: "A linked list consists of nodes where each node contains data and a reference pointing to the next node." },
+        { q: "What type of data structure category includes arrays, stacks, queues, and linked lists where items form a sequence?", answer: "Linear", exp: "Linear data structures organize elements in a sequential, linear order." },
+        { q: "What is the term for empirical evaluation methods that measure exact execution time in seconds using physical hardware?", answer: "Benchmarking", exp: "Benchmarking is empirical performance testing measuring real-world execution times on specific hardware." }
+    ];
+
+    let currentIndex = 0;
+    let userAnswers = new Array(reviewerData.length).fill(null);
+    let studentInfo = {};
+    let poolCache = {};
+    let isQuizActive = false;
+
+    // Anti-Refresh / Close Warning Protection
+    window.addEventListener('beforeunload', function (e) {
+        if (!isQuizActive) return;
+        e.preventDefault();
+        e.returnValue = ''; // Standard way to trigger browser confirmation dialog on reload/close
+    });
+
+    // Anti-Tab Switching / Visibility Warning
+    document.addEventListener('visibilitychange', function () {
+        if (!isQuizActive) return;
+        if (document.hidden) {
+            alert("Warning: Tab switching or leaving the quiz page is monitored. Please stay on this screen to avoid penalties.");
+        }
+    });
+
+    function startReviewer() {
+        const name = document.getElementById('studentName').value.trim();
+        const course = document.getElementById('studentCourse').value;
+        const year = document.getElementById('studentYear').value;
+        const section = document.getElementById('studentSection').value;
+        const date = document.getElementById('assessmentDate').value;
+        const instructor = document.getElementById('instructorName').value;
+
+        if (!name || !course || !year || !section || !date) {
+            alert('Please fill out all student and assessment details before starting.');
+            return;
+        }
+
+        studentInfo = { name, course, year, section, date, instructor };
+        isQuizActive = true; // Activate proctoring checks
+
+        document.getElementById('activeStudentSummary').innerHTML = `
+            <strong>Student:</strong> ${name}<br>
+            <strong>Course & Section:</strong> ${course} - ${year}${section}<br>
+            <strong>Instructor:</strong> ${instructor} | <strong>Date:</strong> ${date}
+        `;
+
+        document.getElementById('setupSection').style.display = 'none';
+        document.getElementById('reviewerSection').style.display = 'block';
+        
+        loadCard();
+    }
+
+    function getShuffledPool(index, correctAnswer) {
+        if (poolCache[index]) return poolCache[index];
+
+        let distractors = reviewerData
+            .map(item => item.answer)
+            .filter(ans => ans !== correctAnswer);
+        
+        distractors.sort(() => Math.random() - 0.5);
+        let selectedDistractors = distractors.slice(0, 4);
+        
+        let pool = [...selectedDistractors, correctAnswer];
+        pool.sort(() => Math.random() - 0.5);
+        
+        poolCache[index] = pool;
+        return pool;
+    }
+
+    function loadCard() {
+        const item = reviewerData[currentIndex];
+        document.getElementById('progressText').innerText = `Question ${currentIndex + 1} of ${reviewerData.length}`;
+        document.getElementById('questionText').innerText = item.q;
+
+        const dropZone = document.getElementById('dropZone');
+        const poolContainer = document.getElementById('draggablesPool');
+        
+        poolContainer.innerHTML = '';
+
+        const poolAnswers = getShuffledPool(currentIndex, item.answer);
+
+        poolAnswers.forEach((ansText, idx) => {
+            const el = document.createElement('div');
+            el.className = 'draggable-item';
+            el.draggable = true;
+            el.innerText = ansText;
+            el.id = `drag-item-${idx}`;
+
+            // Desktop Drag Events
+            el.addEventListener('dragstart', (e) => {
+                e.dataTransfer.setData('text/plain', ansText);
+                setTimeout(() => el.classList.add('dragging'), 0);
+            });
+            el.addEventListener('dragend', () => {
+                el.classList.remove('dragging');
+            });
+
+            // Mobile/Tablet Tap-to-Select Support
+            el.addEventListener('click', () => {
+                selectAnswer(ansText);
+            });
+
+            poolContainer.appendChild(el);
+        });
+
+        if (userAnswers[currentIndex] !== null) {
+            dropZone.innerText = userAnswers[currentIndex];
+            dropZone.classList.add('filled');
+            document.getElementById('nextBtn').disabled = false;
+        } else {
+            dropZone.innerText = "Drag answer here, or tap an option below";
+            dropZone.classList.remove('filled');
+            document.getElementById('nextBtn').disabled = true;
+        }
+
+        document.getElementById('prevBtn').disabled = currentIndex === 0;
+    }
+
+    function selectAnswer(ansText) {
+        userAnswers[currentIndex] = ansText;
+        const dropZone = document.getElementById('dropZone');
+        dropZone.innerText = ansText;
+        dropZone.classList.add('filled');
+        document.getElementById('nextBtn').disabled = false;
+    }
+
+    function allowDrop(e) {
+        e.preventDefault();
+        document.getElementById('dropZone').classList.add('drag-over');
+    }
+
+    function removeDropStyle(e) {
+        e.preventDefault();
+        document.getElementById('dropZone').classList.remove('drag-over');
+    }
+
+    function dropItem(e) {
+        e.preventDefault();
+        const dropZone = document.getElementById('dropZone');
+        dropZone.classList.remove('drag-over');
+
+        const droppedText = e.dataTransfer.getData('text/plain');
+        if (!droppedText) return;
+
+        selectAnswer(droppedText);
+    }
+
+    function nextCard() {
+        if (currentIndex < reviewerData.length - 1) {
+            currentIndex++;
+            loadCard();
+        } else {
+            showFinalScore();
+        }
+    }
+
+    function prevCard() {
+        if (currentIndex > 0) {
+            currentIndex--;
+            loadCard();
+        }
+    }
+
+    function showFinalScore() {
+        isQuizActive = false; // Deactivate proctoring checks once finished
+        document.getElementById('reviewerSection').style.display = 'none';
+        document.getElementById('finalScoreSection').style.display = 'block';
+
+        let rawScore = 0;
+        reviewerData.forEach((item, index) => {
+            if (userAnswers[index] !== null && userAnswers[index].toLowerCase().trim() === item.answer.toLowerCase().trim()) {
+                rawScore++;
+            }
+        });
+
+        const scaledScore = (rawScore / reviewerData.length) * 50 + 50;
+        const displayScore = scaledScore % 1 === 0 ? scaledScore : scaledScore.toFixed(2);
+
+        document.getElementById('finalStudentSummary').innerHTML = `
+            <strong>Name:</strong> ${studentInfo.name}<br>
+            <strong>Course & Year:</strong> ${studentInfo.course} - ${studentInfo.year}${studentInfo.section}<br>
+            <strong>Date:</strong> ${studentInfo.date} | <strong>Instructor:</strong> ${studentInfo.instructor}
+        `;
+
+        document.getElementById('finalScoreText').innerText = `Final Score: ${displayScore}\n(${rawScore} / ${reviewerData.length} Correct)`;
+
+        const reviewContainer = document.getElementById('detailedReviewContainer');
+        reviewContainer.innerHTML = '';
+
+        reviewerData.forEach((item, index) => {
+            const userAns = userAnswers[index] !== null ? userAnswers[index] : "No answer provided";
+            const isCorrect = userAnswers[index] !== null && userAnswers[index].toLowerCase().trim() === item.answer.toLowerCase().trim();
+            
+            const card = document.createElement('div');
+            card.className = `review-item-card ${isCorrect ? 'correct-item' : 'wrong-item'}`;
+            
+            card.innerHTML = `
+                <p style="margin: 0 0 5px 0; font-weight: 600; font-size: 13px;">Q${index + 1}: ${item.q}</p>
+                <p style="margin: 3px 0; font-size: 13px;"><strong>Your Answer:</strong> ${userAns} ${isCorrect ? '✓' : '✗'}</p>
+                <p style="margin: 3px 0; font-size: 13px;"><strong>Correct Answer:</strong> ${item.answer}</p>
+                <p style="margin: 5px 0 0 0; font-size: 12px; color: #64748b;"><em>Explanation:</em> ${item.exp}</p>
+            `;
+            reviewContainer.appendChild(card);
+        });
+
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function resetReviewer() {
+        currentIndex = 0;
+        userAnswers = new Array(reviewerData.length).fill(null);
+        poolCache = {};
+        document.getElementById('finalScoreSection').style.display = 'none';
+        document.getElementById('setupSection').style.display = 'block';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Get today's date in YYYY-MM-DD format
+    const today = new Date().toISOString().split('T')[0];
+    // Set the value of the input to today's date
+    document.getElementById('assessmentDate').value = today;
+
+</script>
+
+</body>
+</html>
