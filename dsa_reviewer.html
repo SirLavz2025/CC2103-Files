@@ -1,0 +1,1182 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DSA Two-Choice Reviewer</title>
+
+<style>
+:root {
+  --bg: #f5f7fb;
+  --card: #ffffff;
+  --ink: #182033;
+  --muted: #65708a;
+  --primary: #4f46e5;
+  --primary-dark: #312e81;
+  --success: #15803d;
+  --danger: #b91c1c;
+  --line: #dde3ee;
+  --shadow: 0 10px 28px rgba(27,39,75,.10);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+}
+
+header {
+  background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+  color: white;
+  padding: 32px 18px;
+}
+
+.container {
+  width: min(1120px, calc(100% - 36px));
+  margin: auto;
+}
+
+h1 {
+  margin: 0 0 8px;
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+}
+
+header p {
+  margin: 0;
+  opacity: .9;
+}
+
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 20px 0;
+}
+
+.actions,
+.bottom-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+button {
+  border: 0;
+  border-radius: 9px;
+  padding: 10px 14px;
+  font: inherit;
+  font-weight: bold;
+  cursor: pointer;
+  transition: .2s;
+}
+
+button:hover {
+  transform: translateY(-1px);
+  filter: brightness(.96);
+}
+
+.primary {
+  background: var(--primary);
+  color: white;
+}
+
+.secondary {
+  background: white;
+  color: var(--primary);
+  border: 1px solid var(--primary);
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.stat {
+  background: var(--card);
+  padding: 16px;
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+}
+
+.stat strong {
+  display: block;
+  font-size: 1.4rem;
+}
+
+.stat span {
+  color: var(--muted);
+  font-size: .84rem;
+}
+
+.intro {
+  background: #eef2ff;
+  border-left: 4px solid var(--primary);
+  padding: 14px 16px;
+  border-radius: 8px;
+  margin-bottom: 18px;
+  color: #31376d;
+}
+
+.question {
+  background: var(--card);
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+  padding: 20px;
+  margin: 14px 0;
+}
+
+.question-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.question h3 {
+  margin: 0 0 15px;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.badge {
+  background: #eef2ff;
+  color: #3e3a9e;
+  border-radius: 999px;
+  padding: 4px 9px;
+  font-size: .76rem;
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+.options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.option {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 13px;
+  cursor: pointer;
+  min-height: 52px;
+}
+
+.option:hover {
+  background: #fafaff;
+  border-color: var(--primary);
+}
+
+.option input {
+  width: 18px;
+  height: 18px;
+  margin: 1px 0 0;
+  accent-color: var(--primary);
+  cursor: pointer;
+}
+
+.option span {
+  line-height: 1.4;
+}
+
+.feedback {
+  display: none;
+  margin-top: 12px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-weight: bold;
+}
+
+.feedback.correct {
+  display: block;
+  background: #dcfce7;
+  color: var(--success);
+}
+
+.feedback.incorrect {
+  display: block;
+  background: #fee2e2;
+  color: var(--danger);
+}
+
+.correct-answer {
+  display: none;
+  color: var(--muted);
+  font-size: .9rem;
+  margin-top: 10px;
+}
+
+.correct-answer.visible {
+  display: block;
+}
+
+.bottom-actions {
+  position: sticky;
+  bottom: 0;
+  justify-content: center;
+  background: rgba(245,247,251,.94);
+  backdrop-filter: blur(8px);
+  padding: 14px 0;
+  margin-top: 20px;
+}
+
+.modal-background {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  background: rgba(12,18,35,.6);
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+}
+
+.modal-background.open {
+  display: flex;
+}
+
+.modal {
+  width: min(600px, 100%);
+  max-height: 90vh;
+  overflow-y: auto;
+  background: white;
+  border-radius: 16px;
+  padding: 25px;
+  position: relative;
+  box-shadow: 0 25px 70px rgba(0,0,0,.3);
+}
+
+.modal-close {
+  position: absolute;
+  right: 12px;
+  top: 8px;
+  background: transparent;
+  color: #555;
+  font-size: 1.5rem;
+}
+
+.score-box {
+  background: #eef2ff;
+  border-radius: 10px;
+  padding: 16px;
+  margin: 15px 0;
+}
+
+.answer-key {
+  max-height: 440px;
+  overflow-y: auto;
+}
+
+.answer-key-row {
+  padding: 9px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+@media (max-width: 650px) {
+  .stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .question-header {
+    flex-direction: column;
+  }
+
+  .options {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="container">
+    <h1>Data Structures and Algorithms Reviewer</h1>
+    <p>
+      Two-choice multiple-choice reviewer with automatic question shuffling.
+    </p>
+  </div>
+</header>
+
+<main class="container">
+
+  <div class="toolbar">
+    <h2>Multiple Choice Reviewer</h2>
+
+    <div class="actions">
+      <button class="secondary" id="answerKeyButton">
+        Answer Key
+      </button>
+
+      <button class="primary" id="resultsButton">
+        View Results
+      </button>
+    </div>
+  </div>
+
+  <div class="stats">
+    <div class="stat">
+      <strong id="shownCount">0</strong>
+      <span>Questions shown</span>
+    </div>
+
+    <div class="stat">
+      <strong id="answeredCount">0</strong>
+      <span>Answered</span>
+    </div>
+
+    <div class="stat">
+      <strong id="correctCount">0</strong>
+      <span>Correct</span>
+    </div>
+
+    <div class="stat">
+      <strong id="progressPercent">0%</strong>
+      <span>Progress</span>
+    </div>
+  </div>
+
+  <div class="intro">
+    Select one checkbox for each question. Every question contains exactly two choices.
+    Questions are shuffled automatically when the page loads.
+  </div>
+
+  <section id="questionContainer"></section>
+
+  <div class="bottom-actions">
+    <button class="primary" id="checkButton">
+      Check Answers
+    </button>
+
+    <button class="secondary" id="resetButton">
+      Reset Answers
+    </button>
+  </div>
+
+</main>
+
+<div class="modal-background" id="modalBackground">
+  <div class="modal">
+    <button class="modal-close" id="modalClose">&times;</button>
+    <div id="modalBody"></div>
+  </div>
+</div>
+
+<script>
+"use strict";
+
+const questionBank = [
+  {
+    answer: "Primitive",
+    question: "Which data structure category includes integers, characters, and Boolean values?",
+    choices: ["Primitive", "Non-primitive"],
+    category: "Recall"
+  },
+  {
+    answer: "Finiteness",
+    question: "Which characteristic means that an algorithm eventually terminates?",
+    choices: ["Finiteness", "Input"],
+    category: "Recall"
+  },
+  {
+    answer: "Big-O",
+    question: "Which notation describes an algorithm's upper-bound growth rate?",
+    choices: ["Big-O", "Big-Pi"],
+    category: "Recall"
+  },
+  {
+    answer: "Organize data for efficient operations",
+    question: "What is the main reason for using a data structure?",
+    choices: [
+      "Organize data for efficient operations",
+      "Eliminate algorithms"
+    ],
+    category: "Understand"
+  },
+  {
+    answer: "Space complexity",
+    question: "Which factor measures the amount of memory used by a program?",
+    choices: ["Space complexity", "Syntax complexity"],
+    category: "Understand"
+  },
+  {
+    answer: "O(n)",
+    question: "What is the complexity of a loop that examines every employee once?",
+    choices: ["O(n)", "O(1)"],
+    category: "Apply"
+  },
+  {
+    answer: "O(n)",
+    question: "What is the overall complexity of two separate loops that each repeat n times?",
+    choices: ["O(n)", "O(n²)"],
+    category: "Analyze"
+  },
+  {
+    answer: "O(n²)",
+    question: "What complexity applies when an operation is performed for every pair of students?",
+    choices: ["O(n²)", "O(log n)"],
+    category: "Analyze"
+  },
+  {
+    answer: "The result may depend on the machine and test input",
+    question: "What limitation applies when execution time is measured on one computer and one test dataset?",
+    choices: [
+      "The result may depend on the machine and test input",
+      "It determines Big-Theta automatically"
+    ],
+    category: "Evaluate"
+  },
+  {
+    answer: "How data will be organized and what operations are required",
+    question: "What should be considered first before choosing a structure for an online voting system?",
+    choices: [
+      "How data will be organized and what operations are required",
+      "The interface color"
+    ],
+    category: "Create"
+  },
+  {
+    answer: "Integer array",
+    question: "What structure is declared by int[] scores in Java?",
+    choices: ["Integer array", "Integer object"],
+    category: "Recall"
+  },
+  {
+    answer: "11",
+    question: "What is the highest valid index in a 12-element, zero-based array?",
+    choices: ["11", "12"],
+    category: "Recall"
+  },
+  {
+    answer: "Two-dimensional array",
+    question: "What type of array represents a seating chart arranged in rows and columns?",
+    choices: ["Two-dimensional array", "One-dimensional array"],
+    category: "Recall"
+  },
+  {
+    answer: "It allows access through position",
+    question: "What is the benefit of direct indexing in arrays?",
+    choices: [
+      "It allows access through position",
+      "It automatically sorts elements"
+    ],
+    category: "Understand"
+  },
+  {
+    answer: "Traversal",
+    question: "What operation processes every array value to calculate a total?",
+    choices: ["Traversal", "Deletion"],
+    category: "Understand"
+  },
+  {
+    answer: "22",
+    question: "For int[] age={18,21,19,20,22,24}; what is age[4]?",
+    choices: ["22", "20"],
+    category: "Apply"
+  },
+  {
+    answer: "24",
+    question: "How many positions are available in int[][] room = new int[4][6]?",
+    choices: ["24", "20"],
+    category: "Apply"
+  },
+  {
+    answer: "It processes the 2D array systematically",
+    question: "What do nested row and column loops accomplish for a rectangular table?",
+    choices: [
+      "It processes the 2D array systematically",
+      "It deletes the final column"
+    ],
+    category: "Analyze"
+  },
+  {
+    answer: "Update",
+    question: "What operation replaces one student score without moving other scores?",
+    choices: ["Update", "Delete"],
+    category: "Evaluate"
+  },
+  {
+    answer: "A fixed-size array structure",
+    question: "What representation fits known product categories with a fixed number of entries?",
+    choices: [
+      "A fixed-size array structure",
+      "A sorting algorithm"
+    ],
+    category: "Create"
+  },
+  {
+    answer: "Search key",
+    question: "What is the value used to locate a particular record called?",
+    choices: ["Search key", "Pivot"],
+    category: "Recall"
+  },
+  {
+    answer: "Linear Search",
+    question: "Which method examines potential matches sequentially?",
+    choices: ["Linear Search", "Binary Search"],
+    category: "Recall"
+  },
+  {
+    answer: "Binary Search",
+    question: "Which algorithm divides a search interval into two portions?",
+    choices: ["Binary Search", "Linear Search"],
+    category: "Recall"
+  },
+  {
+    answer: "Interpolation Search",
+    question: "Which technique estimates a position using data values?",
+    choices: ["Interpolation Search", "Bubble Search"],
+    category: "Recall"
+  },
+  {
+    answer: "Exponential Search",
+    question: "Which algorithm expands a range using powers before applying another search?",
+    choices: ["Exponential Search", "Selection Search"],
+    category: "Recall"
+  },
+  {
+    answer: "Ternary Search",
+    question: "Which technique divides the search space into three portions?",
+    choices: ["Ternary Search", "Binary Search"],
+    category: "Recall"
+  },
+  {
+    answer: "The records are organized, allowing repeated reduction",
+    question: "Why is binary search appropriate for records arranged by accession number?",
+    choices: [
+      "The records are organized, allowing repeated reduction",
+      "It checks every record"
+    ],
+    category: "Understand"
+  },
+  {
+    answer: "It inspects records one at a time without prior ordering",
+    question: "Why is linear search useful for unordered records?",
+    choices: [
+      "It inspects records one at a time without prior ordering",
+      "It needs the middle record"
+    ],
+    category: "Understand"
+  },
+  {
+    answer: "Divide and conquer",
+    question: "What principle is used when checking the middle value and discarding half?",
+    choices: ["Divide and conquer", "Data duplication"],
+    category: "Understand"
+  },
+  {
+    answer: "More records make efficient location harder",
+    question: "Why does searching matter more as a database grows?",
+    choices: [
+      "More records make efficient location harder",
+      "More data is always constant time"
+    ],
+    category: "Understand"
+  },
+  {
+    answer: "3",
+    question: "How many linear-search comparisons find 72 in 41, 18, 72, 33, 56, 90?",
+    choices: ["3", "6"],
+    category: "Apply"
+  },
+  {
+    answer: "31",
+    question: "What value is examined first in binary search on 12, 18, 25, 31, 44, 57, 69?",
+    choices: ["31", "25"],
+    category: "Apply"
+  },
+  {
+    answer: "Search the upper half",
+    question: "After comparing target 57 to 31, what should binary search do?",
+    choices: ["Search the upper half", "Search the lower half"],
+    category: "Apply"
+  },
+  {
+    answer: "15",
+    question: "A linear search has 15 records and the target is last. How many comparisons are needed?",
+    choices: ["15", "7"],
+    category: "Apply"
+  },
+  {
+    answer: "9",
+    question: "For 81 records, what jump-search block size is close to square root n?",
+    choices: ["9", "6"],
+    category: "Apply"
+  },
+  {
+    answer: "Exponential Search",
+    question: "A search examines positions 1, 2, 4, 8, 16, and so on. What method is it?",
+    choices: ["Exponential Search", "Linear Search"],
+    category: "Apply"
+  },
+  {
+    answer: "Ternary Search",
+    question: "What algorithm uses two internal positions to create three candidate regions?",
+    choices: ["Ternary Search", "Binary Search"],
+    category: "Apply"
+  },
+  {
+    answer: "8",
+    question: "For 128 elements, how many remain after four binary reductions?",
+    choices: ["8", "16"],
+    category: "Apply"
+  },
+  {
+    answer: "Interpolation Search",
+    question: "Which search fits uniformly distributed numerical values?",
+    choices: ["Interpolation Search", "Linear Search"],
+    category: "Apply"
+  },
+  {
+    answer: "Linear search directly",
+    question: "For 50 unsorted records searched only once, what is most practical?",
+    choices: ["Linear search directly", "Binary search"],
+    category: "Analyze"
+  },
+  {
+    answer: "Binary search",
+    question: "For one million sorted product IDs searched thousands of times, what is generally preferable?",
+    choices: ["Binary search", "Linear search"],
+    category: "Analyze"
+  },
+  {
+    answer: "The position estimate may be less effective",
+    question: "What concern applies when interpolation search uses highly clustered values?",
+    choices: [
+      "The position estimate may be less effective",
+      "It is always constant time"
+    ],
+    category: "Analyze"
+  },
+  {
+    answer: "Jump Search",
+    question: "Which search skips blocks and then searches an appropriate block sequentially?",
+    choices: ["Jump Search", "Ternary Search"],
+    category: "Analyze"
+  },
+  {
+    answer: "Binary search requires ordered data",
+    question: "What must be recognized when binary search is used on randomly ordered data?",
+    choices: [
+      "Binary search requires ordered data",
+      "Random order is faster"
+    ],
+    category: "Analyze"
+  },
+  {
+    answer: "It may suit small or unsorted datasets",
+    question: "How should the claim linear search is always inferior be evaluated?",
+    choices: [
+      "It may suit small or unsorted datasets",
+      "It is always O(1)"
+    ],
+    category: "Evaluate"
+  },
+  {
+    answer: "Maintain an organized collection and use efficient search",
+    question: "What is appropriate for a frequently searched collection that changes little?",
+    choices: [
+      "Maintain an organized collection and use efficient search",
+      "Randomize after every search"
+    ],
+    category: "Evaluate"
+  },
+  {
+    answer: "Algorithm B",
+    question: "For a large ordered collection, which is better: sequential checking or eliminating large portions?",
+    choices: ["Algorithm B", "Algorithm A"],
+    category: "Evaluate"
+  },
+  {
+    answer: "Maintain ordering and implement binary search",
+    question: "What design fits an ascending directory searched by student number?",
+    choices: [
+      "Maintain ordering and implement binary search",
+      "Shuffle the directory periodically"
+    ],
+    category: "Create"
+  },
+  {
+    answer: "Return position when found and negative when absent",
+    question: "What convention clearly indicates found versus absent?",
+    choices: [
+      "Return position when found and negative when absent",
+      "Always return zero"
+    ],
+    category: "Create"
+  },
+  {
+    answer: "Arrange data according to a specified order",
+    question: "What is the primary purpose of sorting?",
+    choices: [
+      "Arrange data according to a specified order",
+      "Encrypt a database"
+    ],
+    category: "Recall"
+  },
+  {
+    answer: "Bubble Sort",
+    question: "Which algorithm compares neighboring elements?",
+    choices: ["Bubble Sort", "Merge Sort"],
+    category: "Recall"
+  },
+  {
+    answer: "Selection Sort",
+    question: "Which algorithm repeatedly chooses an element from the unsorted portion?",
+    choices: ["Selection Sort", "Bubble Sort"],
+    category: "Recall"
+  },
+  {
+    answer: "Insertion Sort",
+    question: "Which algorithm builds a sorted portion by placing each new item properly?",
+    choices: ["Insertion Sort", "Quick Sort"],
+    category: "Recall"
+  },
+  {
+    answer: "Pivot",
+    question: "In Quick Sort, what element divides data into partitions?",
+    choices: ["Pivot", "Counter"],
+    category: "Recall"
+  },
+  {
+    answer: "Merge Sort",
+    question: "Which algorithm divides data and then combines sorted sections?",
+    choices: ["Merge Sort", "Selection Sort"],
+    category: "Recall"
+  },
+  {
+    answer: "Different comparisons, swaps, or assignments",
+    question: "Why can algorithms with the same Big-O have different practical performance?",
+    choices: [
+      "Different comparisons, swaps, or assignments",
+      "All execute exactly the same instructions"
+    ],
+    category: "Understand"
+  },
+  {
+    answer: "It can require little rearrangement",
+    question: "Why is Insertion Sort attractive for nearly ordered data?",
+    choices: [
+      "It can require little rearrangement",
+      "It never compares values"
+    ],
+    category: "Understand"
+  },
+  {
+    answer: "Find an appropriate unsorted element and place it finally",
+    question: "What is the main idea behind Selection Sort?",
+    choices: [
+      "Find an appropriate unsorted element and place it finally",
+      "Divide data into three parts"
+    ],
+    category: "Understand"
+  },
+  {
+    answer: "It breaks problems into smaller parts then combines results",
+    question: "Why is Merge Sort considered divide and conquer?",
+    choices: [
+      "It breaks problems into smaller parts then combines results",
+      "It avoids dividing data"
+    ],
+    category: "Understand"
+  },
+  {
+    answer: "25, 29, 22, 31",
+    question: "After one left-to-right Bubble Sort pass on 31, 25, 29, 22, what is the result?",
+    choices: ["25, 29, 22, 31", "22, 25, 29, 31"],
+    category: "Apply"
+  },
+  {
+    answer: "2",
+    question: "In ascending Selection Sort on 9, 4, 7, 2, 6, what value goes first?",
+    choices: ["2", "4"],
+    category: "Apply"
+  },
+  {
+    answer: "Between 3 and 8",
+    question: "Where is 7 inserted into sorted portion 3, 8, 12?",
+    choices: ["Between 3 and 8", "After 12"],
+    category: "Apply"
+  },
+  {
+    answer: "7, 16, 29, 35, 48",
+    question: "What is the ascending sorted version of 48, 16, 35, 7, 29?",
+    choices: ["7, 16, 29, 35, 48", "48, 35, 29, 16, 7"],
+    category: "Apply"
+  },
+  {
+    answer: "18",
+    question: "With Quick Sort pivot 30, which value belongs on the lower side?",
+    choices: ["18", "42"],
+    category: "Apply"
+  },
+  {
+    answer: "Merge sections in sorted order",
+    question: "After Merge Sort reduces data to individual elements, what happens next?",
+    choices: ["Merge sections in sorted order", "Delete elements"],
+    category: "Apply"
+  },
+  {
+    answer: "8",
+    question: "A 16-element list is first divided by Merge Sort. How many are in each half?",
+    choices: ["8", "4"],
+    category: "Apply"
+  },
+  {
+    answer: "Merge Sort",
+    question: "Which listed method has O(n log n) time complexity?",
+    choices: ["Merge Sort", "Bubble Sort"],
+    category: "Apply"
+  },
+  {
+    answer: "It may increase by roughly four times",
+    question: "For O(n²), what happens when input doubles?",
+    choices: [
+      "It may increase by roughly four times",
+      "It stays the same"
+    ],
+    category: "Apply"
+  },
+  {
+    answer: "It tends to support efficient recursive processing",
+    question: "What is the usual effect of Quick Sort's nearly equal partitions?",
+    choices: [
+      "It tends to support efficient recursive processing",
+      "It guarantees O(1) time"
+    ],
+    category: "Apply"
+  },
+  {
+    answer: "Insertion Sort",
+    question: "Which sorting algorithm benefits most from a nearly sorted dataset?",
+    choices: ["Insertion Sort", "Selection Sort"],
+    category: "Analyze"
+  },
+  {
+    answer: "Selection Sort",
+    question: "Which algorithm minimizes swaps while locating the next smallest item?",
+    choices: ["Selection Sort", "Bubble Sort"],
+    category: "Analyze"
+  },
+  {
+    answer: "Insertion Sort",
+    question: "Which algorithm moves new values backward into their proper place?",
+    choices: ["Insertion Sort", "Merge Sort"],
+    category: "Analyze"
+  },
+  {
+    answer: "Poor pivot selection",
+    question: "What issue causes Quick Sort to make one huge and one tiny partition?",
+    choices: ["Poor pivot selection", "Excessive traversal"],
+    category: "Analyze"
+  },
+  {
+    answer: "Merge Sort merges divided sections; Quick Sort partitions around a pivot",
+    question: "How do Merge Sort and Quick Sort differ?",
+    choices: [
+      "Merge Sort merges divided sections; Quick Sort partitions around a pivot",
+      "Both use adjacent swaps only"
+    ],
+    category: "Analyze"
+  },
+  {
+    answer: "Merge Sort",
+    question: "For very large data, which basic choice avoids quadratic behavior?",
+    choices: ["Merge Sort", "Bubble Sort"],
+    category: "Evaluate"
+  },
+  {
+    answer: "A simple quadratic method may be acceptable",
+    question: "For only a few records where simplicity matters, what conclusion is reasonable?",
+    choices: [
+      "A simple quadratic method may be acceptable",
+      "Merge Sort is always required"
+    ],
+    category: "Evaluate"
+  },
+  {
+    answer: "Reconsider it because Bubble Sort is slow for large datasets",
+    question: "How should Bubble Sort be evaluated for a very large dataset?",
+    choices: [
+      "Reconsider it because Bubble Sort is slow for large datasets",
+      "It is always fastest"
+    ],
+    category: "Evaluate"
+  },
+  {
+    answer: "Merge Sort",
+    question: "What divide-and-conquer sort fits a large reporting system?",
+    choices: ["Merge Sort", "Selection Sort"],
+    category: "Create"
+  },
+  {
+    answer: "Quick Sort",
+    question: "Which sort can improve through thoughtful pivot selection?",
+    choices: ["Quick Sort", "Bubble Sort"],
+    category: "Create"
+  }
+];
+
+let questionOrder = [];
+let selectedAnswers = {};
+
+function shuffle(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const randomIndex = Math.floor(Math.random() * (i + 1));
+
+    const temporary = array[i];
+    array[i] = array[randomIndex];
+    array[randomIndex] = temporary;
+  }
+}
+
+function shuffleChoices() {
+  questionBank.forEach(function (item) {
+    shuffle(item.choices);
+  });
+}
+
+function normalize(value) {
+  return String(value || "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, "");
+}
+
+function initializeReviewer() {
+  questionOrder = questionBank.map(function (_, index) {
+    return index;
+  });
+
+  shuffle(questionOrder);
+  shuffleChoices();
+  selectedAnswers = {};
+
+  renderQuestions();
+}
+
+function renderQuestions() {
+  const container = document.getElementById("questionContainer");
+
+  container.innerHTML = "";
+
+  questionOrder.forEach(function (id, position) {
+    const item = questionBank[id];
+
+    const card = document.createElement("article");
+    card.className = "question";
+    card.dataset.id = id;
+
+    const header = document.createElement("div");
+    header.className = "question-header";
+
+    const title = document.createElement("h3");
+    title.textContent = (position + 1) + ". " + item.question;
+
+    const badge = document.createElement("span");
+    badge.className = "badge";
+    badge.textContent = item.category;
+
+    header.appendChild(title);
+    header.appendChild(badge);
+
+    const optionsContainer = document.createElement("div");
+    optionsContainer.className = "options";
+
+    item.choices.forEach(function (choice) {
+      const label = document.createElement("label");
+      label.className = "option";
+
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.value = choice;
+      checkbox.name = "question-" + id;
+
+      checkbox.checked = selectedAnswers[id] === choice;
+
+      checkbox.addEventListener("change", function () {
+        const allCheckboxes =
+          optionsContainer.querySelectorAll("input[type='checkbox']");
+
+        allCheckboxes.forEach(function (otherCheckbox) {
+          if (otherCheckbox !== checkbox) {
+            otherCheckbox.checked = false;
+          }
+        });
+
+        if (checkbox.checked) {
+          selectedAnswers[id] = choice;
+        } else {
+          delete selectedAnswers[id];
+        }
+
+        updateStatistics();
+      });
+
+      const choiceText = document.createElement("span");
+      choiceText.textContent = choice;
+
+      label.appendChild(checkbox);
+      label.appendChild(choiceText);
+      optionsContainer.appendChild(label);
+    });
+
+    const feedback = document.createElement("div");
+    feedback.className = "feedback";
+
+    const answer = document.createElement("div");
+    answer.className = "correct-answer";
+    answer.textContent = "Correct answer: " + item.answer;
+
+    card.appendChild(header);
+    card.appendChild(optionsContainer);
+    card.appendChild(feedback);
+    card.appendChild(answer);
+
+    container.appendChild(card);
+  });
+
+  updateStatistics();
+}
+
+function updateStatistics() {
+  const answered = Object.keys(selectedAnswers).length;
+
+  const correct = questionOrder.filter(function (id) {
+    return normalize(selectedAnswers[id]) === normalize(questionBank[id].answer);
+  }).length;
+
+  document.getElementById("shownCount").textContent = questionOrder.length;
+  document.getElementById("answeredCount").textContent = answered;
+  document.getElementById("correctCount").textContent = correct;
+  document.getElementById("progressPercent").textContent =
+    Math.round((answered / questionOrder.length) * 100) + "%";
+}
+
+function checkAnswers() {
+  document.querySelectorAll(".question").forEach(function (card) {
+    const id = Number(card.dataset.id);
+    const item = questionBank[id];
+    const selected = selectedAnswers[id] || "";
+
+    const feedback = card.querySelector(".feedback");
+    const answer = card.querySelector(".correct-answer");
+
+    answer.classList.add("visible");
+
+    if (!selected) {
+      feedback.className = "feedback incorrect";
+      feedback.textContent = "No choice selected.";
+    } else if (normalize(selected) === normalize(item.answer)) {
+      feedback.className = "feedback correct";
+      feedback.textContent = "Correct!";
+    } else {
+      feedback.className = "feedback incorrect";
+      feedback.textContent = "Incorrect.";
+    }
+  });
+
+  updateStatistics();
+}
+
+function resetReviewer() {
+  selectedAnswers = {};
+
+  questionOrder = questionBank.map(function (_, index) {
+    return index;
+  });
+
+  shuffle(questionOrder);
+  shuffleChoices();
+  renderQuestions();
+}
+
+function showResults() {
+  const answered = Object.keys(selectedAnswers).length;
+
+  const correct = questionOrder.filter(function (id) {
+    return normalize(selectedAnswers[id]) === normalize(questionBank[id].answer);
+  }).length;
+
+  const percentage = Math.round((correct / questionOrder.length) * 100);
+
+  document.getElementById("modalBody").innerHTML =
+    "<h2>Results</h2>" +
+    "<div class='score-box'>" +
+    "<strong>" +
+    correct +
+    " / " +
+    questionOrder.length +
+    " correct (" +
+    percentage +
+    "%)</strong><br>" +
+    "<span>" +
+    answered +
+    " question(s) answered.</span>" +
+    "</div>";
+
+  document.getElementById("modalBackground").classList.add("open");
+}
+
+function showAnswerKey() {
+  let content = "<h2>Answer Key</h2><div class='answer-key'>";
+
+  questionBank.forEach(function (item, index) {
+    content +=
+      "<div class='answer-key-row'>" +
+      "<strong>" +
+      (index + 1) +
+      ".</strong> " +
+      item.answer +
+      "</div>";
+  });
+
+  content += "</div>";
+
+  document.getElementById("modalBody").innerHTML = content;
+  document.getElementById("modalBackground").classList.add("open");
+}
+
+function closeModal() {
+  document.getElementById("modalBackground").classList.remove("open");
+}
+
+document.getElementById("checkButton").addEventListener("click", checkAnswers);
+
+document.getElementById("resetButton").addEventListener("click", resetReviewer);
+
+document.getElementById("resultsButton").addEventListener("click", showResults);
+
+document.getElementById("answerKeyButton").addEventListener("click", showAnswerKey);
+
+document.getElementById("modalClose").addEventListener("click", closeModal);
+
+document.getElementById("modalBackground").addEventListener("click", function (event) {
+  if (event.target.id === "modalBackground") {
+    closeModal();
+  }
+});
+
+document.addEventListener("keydown", function (event) {
+  if (event.key === "Escape") {
+    closeModal();
+  }
+});
+
+initializeReviewer();
+</script>
+
+</body>
+</html>
