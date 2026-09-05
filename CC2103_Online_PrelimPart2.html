@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CC 2103 - DSA Prelim Exam Part 2</title>
+    <!-- jsPDF Library for Client-Side Certificate Generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --danger: #dc2626;
+            --success: #16a34a;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #0f172a;
+            --border: #cbd5e1;
+            --drop-bg: #f1f5f9;
+            --item-bg: #1e293b;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 2rem 1rem;
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        header {
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .student-bar {
+            background: #ffffff;
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex: 1;
+        }
+
+        .student-bar input {
+            padding: 0.5rem;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+
+        .timer-badge {
+            background-color: var(--text);
+            color: #ffffff;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            font-size: 1.25rem;
+            font-weight: 700;
+            font-family: monospace;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .timer-badge.warning {
+            background-color: var(--danger);
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+
+        .proctor-panel {
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+
+        .proctor-btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .proctor-btn:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .proctor-btn:disabled {
+            background-color: #94a3b8;
+            cursor: not-allowed;
+        }
+
+        /* Floating, Draggable Proctoring Window */
+        .floating-proctor {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 9999;
+            background: rgba(15, 23, 42, 0.95);
+            border: 2px solid var(--primary);
+            border-radius: 8px;
+            padding: 8px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(4px);
+            cursor: move;
+            resize: both;
+            overflow: hidden;
+            min-width: 220px;
+            min-height: 120px;
+            max-width: 500px;
+            max-height: 300px;
+        }
+
+        .floating-header {
+            color: #ffffff;
+            font-size: 0.75rem;
+            font-weight: bold;
+            margin-bottom: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            pointer-events: none;
+        }
+
+        .preview-container {
+            display: flex;
+            gap: 6px;
+            width: 100%;
+            height: calc(100% - 20px);
+        }
+
+        .preview-box {
+            flex: 1;
+            height: 100%;
+            background: #000;
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .preview-box video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .preview-label {
+            position: absolute;
+            bottom: 2px;
+            left: 2px;
+            background: rgba(0, 0, 0, 0.6);
+            color: #fff;
+            font-size: 0.65rem;
+            padding: 1px 4px;
+            border-radius: 2px;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #94a3b8;
+            margin-right: 4px;
+        }
+
+        .status-indicator.active {
+            background-color: var(--success);
+        }
+
+        .section-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 0.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .badge {
+            background: #e0e7ff;
+            color: #3730a3;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .drag-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .panel {
+            background-color: var(--drop-bg);
+            border: 2px dashed var(--border);
+            border-radius: 6px;
+            padding: 0.75rem;
+            min-height: 220px;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .panel-header {
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: #64748b;
+            text-transform: uppercase;
+        }
+
+        .code-block {
+            background-color: var(--item-bg);
+            color: #38bdf8;
+            font-family: monospace;
+            padding: 0.6rem;
+            border-radius: 4px;
+            cursor: grab;
+            white-space: pre;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .code-block.correct {
+            background-color: var(--success) !important;
+            color: #ffffff !important;
+        }
+
+        .code-block.incorrect {
+            background-color: var(--danger) !important;
+            color: #ffffff !important;
+        }
+
+        .save-btn {
+            background-color: var(--success);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .submit-btn {
+            width: 100%;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.9rem;
+            font-size: 1.05rem;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .submit-btn:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .submit-btn:disabled {
+            background-color: #94a3b8;
+            cursor: not-allowed;
+        }
+
+        .cert-btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 1rem;
+        }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            text-align: center;
+            width: 90%;
+            max-width: 400px;
+        }
+
+        .score-display {
+            font-size: 2.8rem;
+            font-weight: 800;
+            color: var(--primary);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>CC 2103 - Data Structures and Algorithms</h1>
+        <h2>Prelim Exam Part 2</h2>
+    </header>
+
+    <div class="top-bar">
+        <div class="student-bar">
+            <label for="studentId"><strong>Student ID:</strong></label>
+            <input type="text" id="studentId" placeholder="e.g. 251-0001" onchange="checkAttemptStatus()">
+            <button type="button" class="save-btn" onclick="loadStudentData()">Load Exam Progress</button>
+        </div>
+        <div class="timer-badge" id="timerBadge">
+            ⏱️ <span id="timerDisplay">30:00</span>
+        </div>
+    </div>
+
+    <div class="proctor-panel">
+        <div>
+            <strong>Proctoring Session:</strong>
+            <span style="font-size:0.85rem; color:#64748b;">(Video window is floating in the bottom-right corner)</span>
+        </div>
+        <button type="button" class="proctor-btn" id="startProctorBtn" onclick="initProctoring()">Start Verification & Recording</button>
+    </div>
+
+    <!-- Category 1 -->
+    <div class="section-card" id="card-cat1">
+        <div class="section-header">
+            <h3>1. Finding Minimum Element in Array</h3>
+            <span class="badge">10 Points</span>
+        </div>
+        <div class="drag-container">
+            <div class="panel" id="source-cat1" ondragover="allowDrop(event)" ondrop="drop(event, 'cat1')">
+                <div class="panel-header">Scrambled Blocks</div>
+                <div class="code-block" draggable="true" ondragstart="drag(event)" id="cat1-4">            if (arr[i] < min) { min = arr[i]; }</div>
+                <div class="code-block" draggable="true" ondragstart="drag(event)" id="cat1-1">public class ArrayOps {</div>
+                <div class="code-block" draggable="true" ondragstart="drag(event)" id="cat1-6">}</div>
+                <div class="code-block" draggable="true" ondragstart="drag(event)" id="cat1-3">        for (int i = 1; i < arr.length; i++) {</div>
+                <div class="code-block" draggable="true" ondragstart="drag(event)" id="cat1-2">    public static int findMin(int[] arr) { int min = arr[0];</div>
+                <div class="code-block" draggable="true" ondragstart="drag(event)" id="cat1-5">        return min; }</div>
+            </div>
+            <div class="panel" id="target-cat1" ondragover="allowDrop(event)" ondrop="drop(event, 'cat1')">
+                <div class="panel-header">Solution Area</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Category 2 -->
+    <div class="section-card" id="card-cat2">
+        <div class="section-header">
+            <h3>2. Linear Search Algorithm</h3>
+            <span class="badge">10 Points</span>
+        </div>
+        <div class="drag-container">
+            <div class="panel" id="source-cat2" ondragover="allowDrop(event)" ondrop="drop(event, 'cat2')">
+                <div class="panel-header">Scrambled Blocks</div>
+                <div class="code-block" draggable="true" ondragstart="drag(event)" id="cat2-3">        for (int i = 0; i < arr.length; i++) {</div>
+                <div class="code-block" draggable="true" ondragstart="drag(event)" id="cat2-5">        return -1;</div>
+                <div class="code-block" draggable="true" ondragstart="drag(event)" id="cat2-1">public class SearchUtils {</div>
+                <div class="code-block" draggable="true" ondragstart="drag(event)" id="cat2-4">            if (arr[i] == target) return i; }</div>
+                <div class="code-block" draggable="true" ondragstart="drag(event)" id="cat2-2">    public static int linearSearch(int[] arr, int target) {</div>
+                <div class="code-block" draggable="true" ondragstart="drag(event)" id="cat2-6">}</div>
+            </div>
+            <div class="panel" id="target-cat2" ondragover="allowDrop(event)" ondrop="drop(event, 'cat2')">
+                <div class="panel-header">Solution Area</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Category 3 -->
+    <div class="section-card" id="card-cat3">
+        <div class="section-header">
+            <h3>3. Selection Sort Algorithm</h3>
+            <span class="badge">10 Points</span>
+        </div>
+        <div class="drag-container">
+            <div class="panel" id="source-cat3" ondragover="allowDrop(event)" ondrop="drop(event, 'cat3')">
+                <div class="panel-header">Scrambled Blocks</div>
+                <div class="code-block" draggable="true" ondragstart="drag(event)" id="cat3-4">            for (int j = i + 1; j < n; j++) if (arr[j] < arr[minIdx]) minIdx = j;</div>
+                <div class="code-block" draggable="true" ondragstart="drag(event)" id="cat3-2">    public static void selectionSort(int[] arr) { int n = arr.length;</div>
+                <div class="code-block" draggable="true" ondragstart="drag(event)" id="cat3-5">            int temp = arr[minIdx]; arr[minIdx] = arr[i]; arr[i] = temp; }</div>
+                <div class="code-block" draggable="true" ondragstart="drag(event)" id="cat3-1">public class SortUtils {</div>
+                <div class="code-block" draggable="true" ondragstart="drag(event)" id="cat3-3">        for (int i = 0; i < n - 1; i++) { int minIdx = i;</div>
+                <div class="code-block" draggable="true" ondragstart="drag(event)" id="cat3-6">}</div>
+            </div>
+            <div class="panel" id="target-cat3" ondragover="allowDrop(event)" ondrop="drop(event, 'cat3')">
+                <div class="panel-header">Solution Area</div>
+            </div>
+        </div>
+    </div>
+
+    <button type="button" class="submit-btn" id="finalSubmitBtn" onclick="submitExam()">Submit Final Exam</button>
+</div>
+
+<!-- Floating Draggable Camera/Screen Preview Container -->
+<div class="floating-proctor" id="floatingProctor">
+    <div class="floating-header">
+        <span><span class="status-indicator" id="statusCam"></span>Cam <span class="status-indicator" id="statusRec"></span>Rec</span>
+        <span>⋮ Drag Me</span>
+    </div>
+    <div class="preview-container">
+        <div class="preview-box">
+            <video id="camPreview" autoplay muted playsinline></video>
+            <span class="preview-label">Camera</span>
+        </div>
+        <div class="preview-box">
+            <video id="screenPreview" autoplay muted playsinline></video>
+            <span class="preview-label">Screen</span>
+        </div>
+    </div>
+</div>
+
+<!-- Results & Certificate Modal -->
+<div class="modal-overlay" id="scoreModal">
+    <div class="modal-content">
+        <h2>Exam Results</h2>
+        <div class="score-display" id="finalGrade">0.0</div>
+        <p id="scoreDetails">Raw Points: 0 / 30</p>
+        <p id="attemptWarning" style="color: var(--danger); font-weight: bold; display: none;">
+            ⚠️ You have already submitted your exam. No further attempts allowed.
+        </p>
+        <button class="cert-btn" onclick="generateCertificate()">🎓 Download Certificate</button>
+        <br><br>
+        <button class="save-btn" onclick="document.getElementById('scoreModal').style.display='none'">Close</button>
+    </div>
+</div>
+
+<script>
+    const categories = ['cat1', 'cat2', 'cat3'];
+    
+    const correctAnswers = {
+        cat1: ['cat1-1', 'cat1-2', 'cat1-3', 'cat1-4', 'cat1-5', 'cat1-6'],
+        cat2: ['cat2-1', 'cat2-2', 'cat2-3', 'cat2-4', 'cat2-5', 'cat2-6'],
+        cat3: ['cat3-1', 'cat3-2', 'cat3-3', 'cat3-4', 'cat3-5', 'cat3-6']
+    };
+
+    let lastScoreData = { studentId: '', grade: '0.0', raw: 0 };
+    let isSubmitted = false;
+
+    // --- SECURITY RESTRICTIONS ---
+    document.addEventListener('contextmenu', e => e.preventDefault());
+    document.addEventListener('keydown', e => {
+        if (
+            e.keyCode === 123 || 
+            (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74 || e.keyCode === 67)) || 
+            (e.ctrlKey && (e.keyCode === 85 || e.keyCode === 83))
+        ) {
+            e.preventDefault();
+            e.stopPropagation();
+            return false;
+        }
+    });
+
+    // --- SINGLE ATTEMPT CHECKER ---
+    function checkAttemptStatus() {
+        const studentId = document.getElementById('studentId').value.trim();
+        if (!studentId) return false;
+
+        const resultData = localStorage.getItem(`exam_results_${studentId}`);
+        if (resultData) {
+            isSubmitted = true;
+            lastScoreData = JSON.parse(resultData);
+            
+            // Disable interactions
+            lockExamUI();
+            
+            // Render previous state & visual answers
+            loadStudentData(true);
+            evaluateAnswersVisualOnly();
+
+            // Display lockdown modal
+            document.getElementById('attemptWarning').style.display = 'block';
+            showModal(lastScoreData.grade, lastScoreData.raw);
+            return true;
+        }
+        return false;
+    }
+
+    function lockExamUI() {
+        document.getElementById('finalSubmitBtn').disabled = true;
+        document.getElementById('finalSubmitBtn').innerText = "Exam Completed (1 Attempt Only)";
+        document.getElementById('startProctorBtn').disabled = true;
+        document.getElementById('studentId').readOnly = true;
+
+        document.querySelectorAll('.code-block').forEach(el => {
+            el.setAttribute('draggable', 'false');
+            el.style.cursor = 'not-allowed';
+        });
+    }
+
+    // --- MAKE FLOATING WINDOW DRAGGABLE ---
+    const floatingWin = document.getElementById('floatingProctor');
+    let isDragging = false, offsetStartX = 0, offsetStartY = 0;
+
+    floatingWin.addEventListener('mousedown', e => {
+        if (e.offsetX > floatingWin.clientWidth - 15 && e.offsetY > floatingWin.clientHeight - 15) return;
+        isDragging = true;
+        offsetStartX = e.clientX - floatingWin.offsetLeft;
+        offsetStartY = e.clientY - floatingWin.offsetTop;
+    });
+
+    document.addEventListener('mousemove', e => {
+        if (!isDragging) return;
+        let x = e.clientX - offsetStartX;
+        let y = e.clientY - offsetStartY;
+
+        x = Math.max(0, Math.min(x, window.innerWidth - floatingWin.clientWidth));
+        y = Math.max(0, Math.min(y, window.innerHeight - floatingWin.clientHeight));
+
+        floatingWin.style.left = `${x}px`;
+        floatingWin.style.top = `${y}px`;
+        floatingWin.style.bottom = 'auto';
+        floatingWin.style.right = 'auto';
+    });
+
+    document.addEventListener('mouseup', () => { isDragging = false; });
+
+    // --- PROCTORING: Camera & Screen Recording ---
+    let cameraStream = null;
+    let screenStream = null;
+    let mediaRecorder = null;
+    let recordedChunks = [];
+
+    async function initProctoring() {
+        if (isSubmitted) {
+            alert('This Student ID has already completed the exam.');
+            return;
+        }
+
+        try {
+            cameraStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+            document.getElementById('camPreview').srcObject = cameraStream;
+            document.getElementById('statusCam').classList.add('active');
+
+            screenStream = await navigator.mediaDevices.getDisplayMedia({ video: { displaySurface: "monitor" } });
+            document.getElementById('screenPreview').srcObject = screenStream;
+            document.getElementById('statusRec').classList.add('active');
+
+            mediaRecorder = new MediaRecorder(screenStream);
+            recordedChunks = [];
+            
+            mediaRecorder.ondataavailable = event => {
+                if (event.data.size > 0) recordedChunks.push(event.data);
+            };
+            mediaRecorder.start();
+
+            const startBtn = document.getElementById('startProctorBtn');
+            startBtn.disabled = true;
+            startBtn.innerText = "Monitoring Active";
+
+            screenStream.getVideoTracks()[0].onended = () => {
+                alert('Screen sharing stopped! Exam integrity invalidated.');
+                submitExam();
+            };
+
+            startTimer();
+        } catch (err) {
+            alert('Camera and Screen sharing permissions are required to take this exam.');
+            console.error(err);
+        }
+    }
+
+    function stopProctoring() {
+        if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+            mediaRecorder.onstop = () => {
+                if (recordedChunks.length > 0) {
+                    const blob = new Blob(recordedChunks, { type: 'video/webm' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.style.display = 'none';
+                    a.href = url;
+                    a.download = `proctor_recording_${lastScoreData.studentId || 'exam'}.webm`;
+                    document.body.appendChild(a);
+                    a.click();
+                    setTimeout(() => {
+                        document.body.removeChild(a);
+                        window.URL.revokeObjectURL(url);
+                    }, 100);
+                }
+            };
+            mediaRecorder.stop();
+        }
+
+        if (cameraStream) cameraStream.getTracks().forEach(track => track.stop());
+        if (screenStream) screenStream.getTracks().forEach(track => track.stop());
+    }
+
+    // --- TIMER SYSTEM ---
+    let timeRemaining = 30 * 60;
+    let timerInterval = null;
+
+    function startTimer() {
+        if (timerInterval) return;
+        timerInterval = setInterval(() => {
+            timeRemaining--;
+            let mins = Math.floor(timeRemaining / 60);
+            let secs = timeRemaining % 60;
+
+            document.getElementById('timerDisplay').innerText = 
+                `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+
+            if (timeRemaining <= 300) {
+                document.getElementById('timerBadge').classList.add('warning');
+            }
+
+            if (timeRemaining <= 0) {
+                clearInterval(timerInterval);
+                alert('Time is up! Submitting exam automatically.');
+                submitExam();
+            }
+        }, 1000);
+    }
+
+    function getStudentId() {
+        const id = document.getElementById('studentId').value.trim();
+        if (!id) {
+            alert('Please enter a valid Student ID first.');
+            return null;
+        }
+        return id;
+    }
+
+    // --- LOCAL STORAGE MANAGERS ---
+    function saveProgressLocally() {
+        if (isSubmitted) return;
+        const studentId = document.getElementById('studentId').value.trim();
+        if (!studentId) return;
+
+        const solutions = {};
+        categories.forEach(cat => {
+            const targetPanel = document.getElementById(`target-${cat}`);
+            solutions[cat] = Array.from(targetPanel.querySelectorAll('.code-block')).map(el => el.id);
+        });
+
+        const stateData = {
+            solutions: solutions,
+            timeRemaining: timeRemaining
+        };
+
+        localStorage.setItem(`exam_state_${studentId}`, JSON.stringify(stateData));
+    }
+
+    function loadStudentData(isInternal = false) {
+        const studentId = getStudentId();
+        if (!studentId) return;
+
+        if (!isInternal && checkAttemptStatus()) return;
+
+        const rawData = localStorage.getItem(`exam_state_${studentId}`);
+
+        if (rawData) {
+            const state = JSON.parse(rawData);
+            if (state.solutions) {
+                categories.forEach(cat => {
+                    const targetIds = state.solutions[cat] || [];
+                    const targetPanel = document.getElementById(`target-${cat}`);
+                    targetIds.forEach(id => {
+                        const el = document.getElementById(id);
+                        if (el) targetPanel.appendChild(el);
+                    });
+                });
+            }
+            if (state.timeRemaining) {
+                timeRemaining = state.timeRemaining;
+            }
+            if (!isInternal) alert("Progress loaded successfully.");
+        } else if (!isInternal) {
+            alert("No saved progress found for this ID.");
+        }
+    }
+
+    // --- DRAG & DROP HANDLERS ---
+    function allowDrop(ev) { if (!isSubmitted) ev.preventDefault(); }
+    function drag(ev) {
+        if (isSubmitted) return;
+        ev.dataTransfer.setData("text", ev.target.id);
+    }
+    function drop(ev, cat) {
+        if (isSubmitted) return;
+        ev.preventDefault();
+        const el = document.getElementById(ev.dataTransfer.getData("text"));
+        let targetPanel = ev.target;
+        while (targetPanel && !targetPanel.classList.contains('panel')) targetPanel = targetPanel.parentElement;
+        if (targetPanel) {
+            targetPanel.appendChild(el);
+            saveProgressLocally();
+        }
+    }
+
+    // --- SUBMISSION & EVALUATION ---
+    function evaluateAnswersVisualOnly() {
+        document.querySelectorAll('.code-block').forEach(el => {
+            el.classList.remove('correct', 'incorrect');
+        });
+
+        categories.forEach(cat => {
+            const targetPanel = document.getElementById(`target-${cat}`);
+            const userBlocks = Array.from(targetPanel.querySelectorAll('.code-block'));
+            const correctArrangement = correctAnswers[cat];
+
+            userBlocks.forEach((block, idx) => {
+                if (block.id === correctArrangement[idx]) {
+                    block.classList.add('correct');
+                } else {
+                    block.classList.add('incorrect');
+                }
+            });
+
+            const sourcePanel = document.getElementById(`source-${cat}`);
+            const remainingBlocks = Array.from(sourcePanel.querySelectorAll('.code-block'));
+            remainingBlocks.forEach(block => {
+                block.classList.add('incorrect');
+            });
+        });
+    }
+
+    function submitExam() {
+        const studentId = getStudentId();
+        if (!studentId) return;
+
+        if (checkAttemptStatus()) {
+            return;
+        }
+
+        let totalRawPoints = 0;
+
+        document.querySelectorAll('.code-block').forEach(el => {
+            el.classList.remove('correct', 'incorrect');
+        });
+
+        categories.forEach(cat => {
+            const targetPanel = document.getElementById(`target-${cat}`);
+            const userBlocks = Array.from(targetPanel.querySelectorAll('.code-block'));
+            const correctArrangement = correctAnswers[cat];
+
+            let catPoints = 0;
+
+            userBlocks.forEach((block, idx) => {
+                if (block.id === correctArrangement[idx]) {
+                    block.classList.add('correct');
+                    catPoints += (10 / correctArrangement.length);
+                } else {
+                    block.classList.add('incorrect');
+                }
+            });
+
+            const sourcePanel = document.getElementById(`source-${cat}`);
+            const remainingBlocks = Array.from(sourcePanel.querySelectorAll('.code-block'));
+            remainingBlocks.forEach(block => {
+                block.classList.add('incorrect');
+            });
+
+            totalRawPoints += Math.round(catPoints);
+        });
+
+        const finalGrade = (50 + (totalRawPoints / 30) * 50).toFixed(1);
+
+        lastScoreData = {
+            studentId: studentId,
+            grade: finalGrade,
+            raw: totalRawPoints
+        };
+
+        // Lock attempt status in LocalStorage permanently for this Student ID
+        localStorage.setItem(`exam_results_${studentId}`, JSON.stringify(lastScoreData));
+        saveProgressLocally();
+
+        isSubmitted = true;
+        lockExamUI();
+
+        alert(`Exam submitted successfully!\nRaw Score: ${totalRawPoints} / 30\nFinal Grade: ${finalGrade}%`);
+        
+        stopProctoring();
+        if (timerInterval) clearInterval(timerInterval);
+        showModal(finalGrade, totalRawPoints);
+    }
+
+    function showModal(grade, raw) {
+        document.getElementById('finalGrade').innerText = grade;
+        document.getElementById('scoreDetails').innerText = `Raw Score: ${raw} / 30 pts`;
+        document.getElementById('scoreModal').style.display = 'flex';
+    }
+
+    // --- CERTIFICATE GENERATOR (jsPDF) ---
+    function generateCertificate() {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF({
+            orientation: 'landscape',
+            unit: 'mm',
+            format: 'a4'
+        });
+
+        const studentId = lastScoreData.studentId || "Student";
+        const grade = lastScoreData.grade;
+        const dateStr = new Date().toLocaleDateString();
+
+        doc.setLineWidth(3);
+        doc.setDrawColor(37, 99, 235);
+        doc.rect(10, 10, 277, 190);
+
+        doc.setLineWidth(1);
+        doc.setDrawColor(15, 23, 42);
+        doc.rect(14, 14, 269, 182);
+
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(28);
+        doc.setTextColor(37, 99, 235);
+        doc.text("CERTIFICATE OF COMPLETION", 148.5, 45, { align: "center" });
+
+        doc.setFontSize(14);
+        doc.setFont("helvetica", "normal");
+        doc.setTextColor(15, 23, 42);
+        doc.text("This is to certify that student", 148.5, 65, { align: "center" });
+
+        doc.setFontSize(22);
+        doc.setFont("helvetica", "bold");
+        doc.setTextColor(22, 163, 74);
+        doc.text(`ID: ${studentId}`, 148.5, 80, { align: "center" });
+
+        doc.setFontSize(14);
+        doc.setFont("helvetica", "normal");
+        doc.setTextColor(15, 23, 42);
+        doc.text("has successfully completed the examination for", 148.5, 95, { align: "center" });
+
+        doc.setFontSize(18);
+        doc.setFont("helvetica", "bold");
+        doc.text("CC 2103: Data Structures and Algorithms - Prelim Exam Part 2", 148.5, 110, { align: "center" });
+
+        doc.setFontSize(16);
+        doc.setFont("helvetica", "normal");
+        doc.text(`Final Grade Attained: ${grade}%`, 148.5, 130, { align: "center" });
+
+        doc.setFontSize(11);
+        doc.text(`Issued On: ${dateStr}`, 40, 165);
+
+        doc.setLineWidth(0.5);
+        doc.line(200, 165, 260, 165);
+        doc.text("Exam Administrator", 230, 172, { align: "center" });
+
+        doc.save(`Exam_Certificate_${studentId}.pdf`);
+    }
+</script>
+
+</body>
+</html>
