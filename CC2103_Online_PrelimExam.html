@@ -1,0 +1,1226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>CC 2103 - Data Structures and Algorithms Preliminary Examination</title>
+<style>
+  :root {
+    --bg-color: #f8fafc;
+    --card-bg: #ffffff;
+    --primary: #2563eb;
+    --primary-dark: #1d4ed8;
+    --border: #cbd5e1;
+    --text: #0f172a;
+    --cell-bg: #ffffff;
+    --empty-bg: #0f172a;
+    --danger: #dc2626;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+
+  html { width: 100%; min-height: 100%; -webkit-text-size-adjust: 100%; }
+
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text);
+    margin: 0;
+    padding: 20px;
+    width: 100%;
+    min-width: 0;
+    overflow-x: hidden;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  header {
+    background: var(--card-bg);
+    padding: 15px 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+  }
+
+  h1 { margin: 0; font-size: 1.5rem; color: var(--primary-dark); }
+
+  .header-status { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+
+  .warning-box {
+    font-size: 1rem;
+    font-weight: bold;
+    background: #fef2f2;
+    color: var(--danger);
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: 1px solid #fca5a5;
+  }
+
+  .timer-box {
+    font-size: 1.25rem;
+    font-weight: bold;
+    background: #f1f5f9;
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+  }
+
+  .timer-box.warning {
+    color: var(--danger);
+    background: #fef2f2;
+    border-color: #fca5a5;
+    animation: pulse 1s infinite;
+  }
+
+  @keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.7; }
+    100% { opacity: 1; }
+  }
+
+  /* Adjustable & Movable Camera Feed Window */
+  .monitor-feed-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 99;
+    background: #0f172a;
+    border: 2px solid var(--primary);
+    border-radius: 10px;
+    padding: 6px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    touch-action: none;
+  }
+
+  .monitor-header {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #1e293b;
+    padding: 4px 8px;
+    border-radius: 6px;
+    margin-bottom: 6px;
+    cursor: move;
+  }
+
+  .rec-indicator {
+    color: #ef4444;
+    font-size: 0.7rem;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .rec-dot {
+    width: 7px;
+    height: 7px;
+    background-color: #ef4444;
+    border-radius: 50%;
+    animation: pulse 1s infinite;
+  }
+
+  .monitor-controls {
+    display: flex;
+    gap: 6px;
+  }
+
+  .monitor-btn {
+    background: #334155;
+    color: #ffffff;
+    border: none;
+    padding: 0 6px;
+    font-size: 0.75rem;
+    border-radius: 4px;
+    cursor: pointer;
+    line-height: 18px;
+  }
+
+  .monitor-btn:hover {
+    background: var(--primary);
+  }
+
+  .monitor-feed-container video {
+    width: 160px;
+    height: 110px;
+    object-fit: cover;
+    border-radius: 6px;
+    background: #000;
+  }
+
+  .monitor-feed-container.minimized video {
+    display: none;
+  }
+
+  .toggle-cam-btn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 98;
+    background: #1e293b;
+    color: white;
+    border: 1px solid var(--primary);
+    padding: 8px 12px;
+    font-size: 0.8rem;
+    border-radius: 8px;
+    cursor: pointer;
+    display: none;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+  }
+
+  .main-layout {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  .grid-section {
+    flex: 1 1 650px;
+    background: var(--card-bg);
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .clues-section {
+    flex: 1 1 450px;
+    background: var(--card-bg);
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    max-height: 850px;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .controls { margin-bottom: 15px; display: flex; gap: 10px; width: 100%; }
+
+  button {
+    background-color: var(--primary);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    font-size: 1rem;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+
+  button:hover { background-color: var(--primary-dark); }
+  button:disabled { background-color: #94a3b8; cursor: not-allowed; }
+
+  #crossword-container {
+    width: 100%;
+    max-width: 100%;
+    max-height: 70vh;
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-x pan-y;
+    padding: 10px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background-color: #f1f5f9;
+  }
+
+  .crossword-grid {
+    display: grid;
+    gap: 1px;
+    background-color: var(--empty-bg);
+    border: 2px solid var(--empty-bg);
+    border-radius: 4px;
+    user-select: none;
+    width: max-content;
+    min-width: max-content;
+  }
+
+  .cell {
+    width: 28px;
+    height: 28px;
+    background-color: var(--cell-bg);
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .cell.empty { background-color: var(--empty-bg); }
+
+  .cell-number {
+    position: absolute;
+    top: 1px;
+    left: 2px;
+    font-size: 8px;
+    font-weight: bold;
+    color: #475569;
+    pointer-events: none;
+  }
+
+  .cell input {
+    width: 100%;
+    height: 100%;
+    border: none;
+    text-align: center;
+    font-size: 13px;
+    font-weight: bold;
+    text-transform: uppercase;
+    background: transparent;
+    color: var(--text);
+    padding: 0;
+    margin: 0;
+  }
+
+  .cell input:focus {
+    outline: 2px solid var(--primary);
+    background-color: #e0e7ff;
+    z-index: 2;
+  }
+
+  .cell input:disabled { background-color: #f1f5f9; color: #334155; }
+
+  .clues-container { display: flex; flex: 1; gap: 15px; overflow-y: auto; }
+  .clue-column { flex: 1; }
+
+  .clue-column h2 {
+    font-size: 1.1rem;
+    border-bottom: 2px solid var(--border);
+    padding-bottom: 5px;
+    color: var(--primary-dark);
+    margin-top: 0;
+  }
+
+  .clue-list { list-style: none; padding: 0; margin: 0; }
+
+  .clue-item {
+    font-size: 0.85rem;
+    margin-bottom: 8px;
+    line-height: 1.3;
+    padding: 4px;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+
+  .clue-item:hover { background-color: #f1f5f9; }
+  .clue-item strong { color: var(--primary-dark); }
+
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.7);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .modal-overlay.open { display: flex; }
+
+  .modal-card {
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    max-width: 450px;
+    width: 90%;
+    text-align: center;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
+  }
+
+  .score-display {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: var(--primary-dark);
+    margin: 15px 0;
+  }
+
+  #student-info-modal { display:flex; }
+  #student-info-modal.closed { display:none; }
+  .student-form { text-align:left; margin-top:15px; }
+  .student-form label { display:block; font-weight:700; margin:12px 0 6px; }
+  .student-form input { width:100%; box-sizing:border-box; padding:11px 12px; border:1px solid #cbd5e1; border-radius:8px; font-size:1rem; }
+  .student-form input:focus { outline:2px solid #2563eb; }
+  .form-error { color:#dc2626; min-height:20px; margin-top:8px; font-size:.9rem; }
+  .save-status { margin-top:10px; font-weight:700; }
+  #certificate-preview { display:none; max-width:100%; border:1px solid #cbd5e1; border-radius:8px; margin-top:12px; }
+  .result-actions { display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin-top:12px; }
+  .result-actions button { padding:10px 14px; }
+
+  @media screen and (max-width: 767px) {
+    body { padding: 8px; }
+    header { flex-direction: column; align-items: stretch; gap: 12px; padding: 15px; }
+    header h1 { font-size: 1.1rem; line-height: 1.4; }
+    .header-status { flex-direction: column; width: 100%; }
+    .warning-box, .timer-box { width: 100%; text-align: center; font-size: 1.1rem; padding: 10px; }
+    .main-layout { flex-direction: column; width: 100%; gap: 15px; }
+    .grid-section { padding: 12px; }
+    #crossword-container { max-height: 60vh; }
+    .cell { width: 32px; height: 32px; }
+    .cell input { font-size: 14px; }
+    .controls button, #submit-btn { width: 100%; min-height: 46px; font-size: 0.95rem; }
+    .clues-section { max-height: none; padding: 12px; }
+    .clues-container { flex-direction: column; gap: 15px; overflow: visible; }
+    .modal-overlay { padding: 10px; overflow-y: auto; }
+    .modal-card { width: 100%; max-width: 100%; max-height: calc(100dvh - 20px); overflow-y: auto; padding: 20px; border-radius: 15px; }
+    .monitor-feed-container video { width: 120px; height: 90px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>CC 2103 - Data Structures &amp; Algorithms Preliminary Examination</h1>
+    <p style="margin:4px 0 0; color:#64748b;">Laguna University • College of Computing Studies • 50 Terminologies Crossword Examination</p>
+  </div>
+  <div class="header-status">
+    <div class="warning-box" id="warning-box">Warnings: 0/2</div>
+    <div class="timer-box" id="timer-box">Time Remaining: 60:00</div>
+  </div>
+</header>
+
+<!-- Adjustable & Movable Camera Monitor Feed -->
+<div class="monitor-feed-container" id="monitor-feed">
+  <div class="monitor-header" id="monitor-drag-handle">
+    <div class="rec-indicator"><div class="rec-dot"></div> REC</div>
+    <div class="monitor-controls">
+      <button class="monitor-btn" onclick="toggleMinimizeCamera()" title="Minimize / Expand">−</button>
+      <button class="monitor-btn" onclick="hideCameraFeed()" title="Hide Feed">✕</button>
+    </div>
+  </div>
+  <video id="webcam-preview" autoplay playsinline muted></video>
+</div>
+
+<button class="toggle-cam-btn" id="show-cam-btn" onclick="showCameraFeed()">📷 Show Camera</button>
+
+<div class="main-layout">
+  <div class="grid-section">
+    <div class="controls">
+      <button id="submit-btn" onclick="confirmSubmit()">Submit Examination</button>
+    </div>
+    <div id="crossword-container"></div>
+  </div>
+
+  <div class="clues-section">
+    <div class="clues-container">
+      <div class="clue-column">
+        <h2>ACROSS</h2>
+        <ul id="across-clues" class="clue-list"></ul>
+      </div>
+      <div class="clue-column">
+        <h2>DOWN</h2>
+        <ul id="down-clues" class="clue-list"></ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="student-info-modal">
+  <div class="modal-card">
+    <h2 style="margin-top:0;">Student Examination Information</h2>
+    <p style="color:#64748b;">Please complete your information and authorize monitoring permissions before starting.</p>
+    <div class="student-form">
+      <label for="student-name">Full Name</label>
+      <input id="student-name" type="text" autocomplete="name" placeholder="Last Name, First Name, Middle Name">
+      <label for="student-course">Course / Year / Section</label>
+      <input id="student-course" type="text" placeholder="e.g., BSIT 2-A">
+      <label>Instructor</label>
+      <input type="text" value="RONALD T. LAVA, MSIT" disabled>
+      <div id="student-form-error" class="form-error"></div>
+      <button id="start-exam-btn" onclick="startExam()">Start Examination &amp; Media Stream</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="result-modal">
+  <div class="modal-card">
+    <h2 id="modal-title" style="margin-top:0;">Exam Results</h2>
+    <p id="modal-msg">Your examination has been evaluated successfully.</p>
+    <div class="score-display" id="score-text">0 / 50</div>
+    <p id="detail-text" style="color:#64748b; font-weight:bold;"></p>
+    <div class="result-actions">
+      <button onclick="closeModal()">Review Grid</button>
+      <button id="download-certificate-btn" onclick="downloadCertificate()" style="display:none;">Download Certificate</button>
+    </div>
+    <img id="certificate-preview" alt="Certificate Preview">
+  </div>
+</div>
+
+<script>
+"use strict";
+
+const wordList = [
+  { word: "PRIMITIVE", clue: "Category of basic data types including integers, characters, and Booleans." },
+  { word: "FINITENESS", clue: "Algorithm property meaning execution eventually terminates." },
+  { word: "BIGO", clue: "Notation describing an upper-bound growth rate." },
+  { word: "SPACECOMPLEXITY", clue: "Amount of memory space required by the algorithm, during the course of its execution." },
+  { word: "TIMECOMPLEXITY", clue: "Way to represent the amount of time required by the program to run till its completion" },
+  { word: "NONPRIMITIVE", clue: "Complex data structures constructed from basic primitive types." },
+  { word: "ARRAY", clue: "Data structure declared by int[] scores in Java." },
+  { word: "INDEX", clue: "Numeric position used to access array elements." },
+  { word: "DIMENSION", clue: "Structural layout axis of an array (e.g., 1D vs 2D)." },
+  { word: "DIRECTINDEXING", clue: "Benefit enabling constant time access to array elements." },
+  { word: "TRAVERSAL", clue: "Operation that processes every value in a structure." },
+  { word: "UPDATE", clue: "Replaces one array value without moving other items." },
+  { word: "DELETION", clue: "Operation that removes an element from a data structure." },
+  { word: "SEARCHKEY", clue: "Value used to locate a particular record." },
+  { word: "LINEARSEARCH", clue: "Sequential search method examining matches one by one." },
+  { word: "BINARYSEARCH", clue: "Divides a sorted interval into two portions repeatedly." },
+  { word: "INTERPOLATIONSEARCH", clue: "Estimates target search position using data values." },
+  { word: "EXPONENTIALSEARCH", clue: "Expands range by powers before applying binary search." },
+  { word: "TERNARYSEARCH", clue: "Technique dividing search space into three portions." },
+  { word: "JUMPSEARCH", clue: "Skips fixed block sizes, then searches sequentially." },
+  { word: "DIVIDEANDCONQUER", clue: "Principle checking middle value and discarding half." },
+  { word: "SORTING", clue: "Arranging data according to a specified order." },
+  { word: "BUBBLESORT", clue: "Sorting algorithm comparing neighboring elements." },
+  { word: "SELECTIONSORT", clue: "Repeatedly chooses smallest element from unsorted portion." },
+  { word: "INSERTIONSORT", clue: "Builds sorted portion by placing each item properly." },
+  { word: "PIVOT", clue: "Element dividing data into partitions in Quick Sort." },
+  { word: "MERGESORT", clue: "Divides data and combines sorted sections recursively." },
+  { word: "QUICKSORT", clue: "Improves performance through thoughtful pivot selection." },
+  { word: "RECURSION", clue: "Self-referential processing style used in divide-and-conquer." },
+  { word: "PARTITION", clue: "Sub-division of an array created around a pivot point." },
+  { word: "COMPARISON", clue: "Basic operation checking order between two keys." },
+  { word: "SWAP", clue: "Exchanging memory positions of two elements." },
+  { word: "UPPERBOUND", clue: "Mathematical ceiling of an algorithm's growth rate." },
+  { word: "LOWERBOUND", clue: "Mathematical floor of an algorithm's growth rate." },
+  { word: "QUADRATIC", clue: "Growth rate multiplier when input size doubles (4x)." },
+  { word: "LINEAR", clue: "Growth complexity represented by O(n)." },
+  { word: "LOGARITHMIC", clue: "Growth complexity represented by O(log n)." },
+  { word: "CONSTANT", clue: "Execution complexity represented by O(1)." },
+  { word: "ZEROBASED", clue: "Indexing scheme where first element is position 0." },
+  { word: "MATRIX", clue: "Two-dimensional grid representation of data." },
+  { word: "NESTEDLOOP", clue: "Control structure used to iterate 2D arrays systematically." },
+  { word: "DATASTRUCTURE", clue: "Way of collecting and organizing data." },
+  { word: "ALGORITHM", clue: "Step-by-step procedure for solving a problem." },
+  { word: "BLOCKSIZE", clue: "Skipping interval used in jump search." },
+  { word: "ORDERED", clue: "Prerequisite data collection state for binary search." },
+  { word: "UNORDERED", clue: "Collection state where linear search is primary." },
+  { word: "RETURNVALUE", clue: "Output signal indicating found position or negative status." },
+  { word: "OPTIMIZATION", clue: "Improving code performance for memory or speed." },
+  { word: "PASS", clue: "Complete single traversal over a dataset during sorting." },
+  { word: "BIGTHETA", clue: "Asymptotic notation describing tight-bound complexity." }
+];
+
+let gridRows = 0, gridCols = 0, grid = [], placedWords = [];
+let timeLeft = 3600, timerInterval = null, examSubmitted = false, examStarted = false;
+let tabSwitchCount = 0;
+const MAX_WARNINGS = 2;
+
+let studentInfo = { fullName: "", courseYearSection: "", examDate: "", instructor: "RONALD T. LAVA, MSIT" };
+let certificateDataUrl = "";
+
+/* =====================================================
+   CAMERA & SCREEN RECORDING SYSTEM
+===================================================== */
+
+let cameraStream = null;
+let screenStream = null;
+let cameraRecorder = null;
+let screenRecorder = null;
+let cameraChunks = [];
+let screenChunks = [];
+
+async function initializeMediaMonitoring() {
+  try {
+    cameraStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+    document.getElementById("webcam-preview").srcObject = cameraStream;
+    document.getElementById("monitor-feed").style.display = "flex";
+
+    const cameraMime = MediaRecorder.isTypeSupported('video/webm') ? 'video/webm' : 'video/mp4';
+    cameraRecorder = new MediaRecorder(cameraStream, { mimeType: cameraMime });
+    cameraRecorder.ondataavailable = e => { if (e.data.size > 0) cameraChunks.push(e.data); };
+    cameraRecorder.start(1000);
+
+    if (navigator.mediaDevices.getDisplayMedia) {
+      try {
+        screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true });
+        screenStream.getVideoTracks()[0].onended = () => {
+          if (examStarted && !examSubmitted) {
+            autoSubmitExam("Examination automatically submitted because screen recording was terminated.");
+          }
+        };
+
+        const screenMime = MediaRecorder.isTypeSupported('video/webm') ? 'video/webm' : 'video/mp4';
+        screenRecorder = new MediaRecorder(screenStream, { mimeType: screenMime });
+        screenRecorder.ondataavailable = e => { if (e.data.size > 0) screenChunks.push(e.data); };
+        screenRecorder.start(1000);
+      } catch (screenErr) {
+        console.warn("Screen capture skipped or rejected:", screenErr);
+      }
+    }
+    initDraggableCamera();
+    return true;
+  } catch (err) {
+    alert("Camera monitoring authorization is required to take this examination: " + err.message);
+    return false;
+  }
+}
+
+function toggleMinimizeCamera() {
+  const container = document.getElementById("monitor-feed");
+  container.classList.toggle("minimized");
+}
+
+function hideCameraFeed() {
+  document.getElementById("monitor-feed").style.display = "none";
+  document.getElementById("show-cam-btn").style.display = "block";
+}
+
+function showCameraFeed() {
+  document.getElementById("monitor-feed").style.display = "flex";
+  document.getElementById("show-cam-btn").style.display = "none";
+}
+
+function initDraggableCamera() {
+  const el = document.getElementById("monitor-feed");
+  const handle = document.getElementById("monitor-drag-handle");
+  let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+
+  handle.onmousedown = dragMouseDown;
+  handle.ontouchstart = dragTouchStart;
+
+  function dragMouseDown(e) {
+    e.preventDefault();
+    pos3 = e.clientX;
+    pos4 = e.clientY;
+    document.onmouseup = closeDragElement;
+    document.onmousemove = elementDrag;
+  }
+
+  function elementDrag(e) {
+    e.preventDefault();
+    pos1 = pos3 - e.clientX;
+    pos2 = pos4 - e.clientY;
+    pos3 = e.clientX;
+    pos4 = e.clientY;
+    el.style.top = (el.offsetTop - pos2) + "px";
+    el.style.left = (el.offsetLeft - pos1) + "px";
+    el.style.bottom = 'auto';
+    el.style.right = 'auto';
+  }
+
+  function dragTouchStart(e) {
+    const touch = e.touches[0];
+    pos3 = touch.clientX;
+    pos4 = touch.clientY;
+    document.ontouchend = closeDragElement;
+    document.ontouchmove = elementTouchMove;
+  }
+
+  function elementTouchMove(e) {
+    const touch = e.touches[0];
+    pos1 = pos3 - touch.clientX;
+    pos2 = pos4 - touch.clientY;
+    pos3 = touch.clientX;
+    pos4 = touch.clientY;
+    el.style.top = (el.offsetTop - pos2) + "px";
+    el.style.left = (el.offsetLeft - pos1) + "px";
+    el.style.bottom = 'auto';
+    el.style.right = 'auto';
+  }
+
+  function closeDragElement() {
+    document.onmouseup = null;
+    document.onmousemove = null;
+    document.ontouchend = null;
+    document.ontouchmove = null;
+  }
+}
+
+function stopAndDownloadRecordings() {
+  if (cameraRecorder && cameraRecorder.state !== "inactive") {
+    cameraRecorder.stop();
+    cameraStream.getTracks().forEach(track => track.stop());
+    saveBlobAsFile(cameraChunks, `Camera_Record_${studentInfo.fullName.replace(/[^a-z0-9]+/gi, "_")}`);
+  }
+
+  if (screenRecorder && screenRecorder.state !== "inactive") {
+    screenRecorder.stop();
+    screenStream.getTracks().forEach(track => track.stop());
+    saveBlobAsFile(screenChunks, `Screen_Record_${studentInfo.fullName.replace(/[^a-z0-9]+/gi, "_")}`);
+  }
+
+  document.getElementById("monitor-feed").style.display = "none";
+  document.getElementById("show-cam-btn").style.display = "none";
+}
+
+function saveBlobAsFile(chunks, filename) {
+  if (!chunks.length) return;
+  const mime = chunks[0].type || 'video/webm';
+  const ext = mime.includes('mp4') ? 'mp4' : 'webm';
+  const blob = new Blob(chunks, { type: mime });
+  const url = URL.createObjectURL(blob);
+  
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `${filename}.${ext}`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+
+/* =====================================================
+   SECURITY & ANTI-CHEAT SYSTEM
+===================================================== */
+
+window.addEventListener("beforeunload", (e) => {
+  if (examStarted && !examSubmitted) {
+    e.preventDefault();
+    e.returnValue = "Warning: Leaving or refreshing this page will submit your exam.";
+    return e.returnValue;
+  }
+});
+
+document.addEventListener("visibilitychange", handleVisibilityChange);
+window.addEventListener("blur", handleWindowBlur);
+
+function handleVisibilityChange() {
+  if (document.hidden && examStarted && !examSubmitted) {
+    recordViolation("Tab switch or browser minimization detected.");
+  }
+}
+
+function handleWindowBlur() {
+  if (examStarted && !examSubmitted && !document.hidden) {
+    recordViolation("Window lost focus.");
+  }
+}
+
+function recordViolation(reason) {
+  tabSwitchCount++;
+  const warningEl = document.getElementById("warning-box");
+  warningEl.textContent = `Warnings: ${tabSwitchCount}/${MAX_WARNINGS}`;
+
+  if (tabSwitchCount > MAX_WARNINGS) {
+    autoSubmitExam(`Examination automatically submitted due to multiple policy violations (${reason}).`);
+  } else {
+    alert(`SECURITY WARNING #${tabSwitchCount}:\n${reason}\nSwitching tabs or leaving the examination screen is prohibited. Further attempts will result in automatic submission.`);
+  }
+}
+
+document.addEventListener("keydown", (e) => {
+  if (!examStarted || examSubmitted) return;
+
+  if (
+    e.key === "F5" ||
+    (e.ctrlKey && e.key.toLowerCase() === "r") ||
+    (e.metaKey && e.key.toLowerCase() === "r") ||
+    e.key === "F12" ||
+    (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === "i") ||
+    (e.metaKey && e.altKey && e.key.toLowerCase() === "i")
+  ) {
+    e.preventDefault();
+    alert("Refreshing or opening developer tools is disabled during the exam.");
+  }
+});
+
+document.addEventListener("contextmenu", (e) => {
+  if (examStarted && !examSubmitted) {
+    e.preventDefault();
+  }
+});
+
+/* =====================================================
+   EXAM LOGIC & DISPLAY
+===================================================== */
+
+function startTimer() {
+  timerInterval = setInterval(() => {
+    timeLeft--;
+    updateTimerDisplay();
+
+    if (timeLeft <= 0) {
+      clearInterval(timerInterval);
+      autoSubmitExam("Time expired! Your exam has been submitted automatically.");
+    }
+  }, 1000);
+}
+
+function updateTimerDisplay() {
+  const timerBox = document.getElementById("timer-box");
+  const mins = Math.floor(timeLeft / 60);
+  const secs = timeLeft % 60;
+  const formattedSecs = secs < 10 ? `0${secs}` : secs;
+  const formattedMins = mins < 10 ? `0${mins}` : mins;
+
+  timerBox.textContent = `Time Remaining: ${formattedMins}:${formattedSecs}`;
+
+  if (timeLeft <= 300) {
+    timerBox.classList.add("warning");
+  }
+}
+
+function generateCrossword() {
+  const words = [...wordList].sort((a, b) => b.word.length - a.word.length);
+  let bestResult = null;
+
+  for (let attempt = 0; attempt < 50; attempt++) {
+    const size = 55;
+    let tempGrid = Array(size).fill(null).map(() => Array(size).fill(null));
+    let tempPlaced = [];
+
+    const first = words[0];
+    const startRow = Math.floor(size / 2);
+    const startCol = Math.floor((size - first.word.length) / 2);
+    
+    placeWordOnGrid(tempGrid, first.word, startRow, startCol, "ACROSS");
+    tempPlaced.push({ ...first, row: startRow, col: startCol, direction: "ACROSS" });
+
+    for (let i = 1; i < words.length; i++) {
+      const item = words[i];
+      let bestPlacement = null;
+
+      for (const placed of tempPlaced) {
+        for (let pIdx = 0; pIdx < placed.word.length; pIdx++) {
+          for (let wIdx = 0; wIdx < item.word.length; wIdx++) {
+            if (placed.word[pIdx] === item.word[wIdx]) {
+              const newDir = placed.direction === "ACROSS" ? "DOWN" : "ACROSS";
+              const newRow = placed.direction === "ACROSS" ? placed.row - wIdx : placed.row + pIdx;
+              const newCol = placed.direction === "ACROSS" ? placed.col + pIdx : placed.col - wIdx;
+
+              if (canPlaceWord(tempGrid, item.word, newRow, newCol, newDir, size)) {
+                bestPlacement = { row: newRow, col: newCol, direction: newDir };
+                break;
+              }
+            }
+          }
+          if (bestPlacement) break;
+        }
+        if (bestPlacement) break;
+      }
+
+      if (bestPlacement) {
+        placeWordOnGrid(tempGrid, item.word, bestPlacement.row, bestPlacement.col, bestPlacement.direction);
+        tempPlaced.push({ ...item, ...bestPlacement });
+      }
+    }
+
+    if (!bestResult || tempPlaced.length > bestResult.tempPlaced.length) {
+      bestResult = { tempGrid, tempPlaced };
+      if (tempPlaced.length === words.length) break;
+    }
+  }
+
+  cropAndSetGrid(bestResult.tempGrid, bestResult.tempPlaced);
+}
+
+function canPlaceWord(grid, word, row, col, dir, max) {
+  if (row < 1 || col < 1) return false;
+  if (dir === "ACROSS" && col + word.length >= max - 1) return false;
+  if (dir === "DOWN" && row + word.length >= max - 1) return false;
+
+  if (dir === "ACROSS") {
+    if (grid[row][col - 1] !== null) return false;
+    if (grid[row][col + word.length] !== null) return false;
+  } else {
+    if (grid[row - 1][col] !== null) return false;
+    if (grid[row + word.length][col] !== null) return false;
+  }
+
+  for (let i = 0; i < word.length; i++) {
+    const r = dir === "ACROSS" ? row : row + i;
+    const c = dir === "ACROSS" ? col + i : col;
+    const currentCell = grid[r][c];
+
+    if (currentCell !== null) {
+      if (currentCell.char !== word[i]) return false;
+    } else {
+      if (dir === "ACROSS") {
+        if (grid[r - 1][c] !== null || grid[r + 1][c] !== null) return false;
+      } else {
+        if (grid[r][c - 1] !== null || grid[r][c + 1] !== null) return false;
+      }
+    }
+  }
+  return true;
+}
+
+function placeWordOnGrid(grid, word, row, col, dir) {
+  for (let i = 0; i < word.length; i++) {
+    const r = dir === "ACROSS" ? row : row + i;
+    const c = dir === "ACROSS" ? col + i : col;
+    grid[r][c] = { char: word[i] };
+  }
+}
+
+function cropAndSetGrid(tempGrid, tempPlaced) {
+  let minRow = 999, maxRow = 0, minCol = 999, maxCol = 0;
+
+  for (let r = 0; r < tempGrid.length; r++) {
+    for (let c = 0; c < tempGrid[0].length; c++) {
+      if (tempGrid[r][c] !== null) {
+        if (r < minRow) minRow = r;
+        if (r > maxRow) maxRow = r;
+        if (c < minCol) minCol = c;
+        if (c > maxCol) maxCol = c;
+      }
+    }
+  }
+
+  gridRows = maxRow - minRow + 1;
+  gridCols = maxCol - minCol + 1;
+  grid = Array(gridRows).fill(null).map(() => Array(gridCols).fill(null));
+
+  for (let r = minRow; r <= maxRow; r++) {
+    for (let c = minCol; c <= maxCol; c++) {
+      if (tempGrid[r][c] !== null) {
+        grid[r - minRow][c - minCol] = tempGrid[r][c];
+      }
+    }
+  }
+
+  placedWords = tempPlaced.map(item => ({
+    ...item,
+    row: item.row - minRow,
+    col: item.col - minCol
+  }));
+
+  assignClueNumbers();
+}
+
+function assignClueNumbers() {
+  placedWords.sort((a, b) => a.row === b.row ? a.col - b.col : a.row - b.row);
+  let num = 1;
+  const numMap = {};
+
+  placedWords.forEach(w => {
+    const key = `${w.row},${w.col}`;
+    if (!numMap[key]) {
+      numMap[key] = num++;
+    }
+    w.number = numMap[key];
+    grid[w.row][w.col].number = w.number;
+  });
+}
+
+function renderBoard() {
+  const container = document.getElementById("crossword-container");
+  container.innerHTML = "";
+
+  const gridEl = document.createElement("div");
+  gridEl.className = "crossword-grid";
+  
+  const cellSize = window.innerWidth <= 767 ? 32 : 28;
+  gridEl.style.gridTemplateColumns = `repeat(${gridCols}, ${cellSize}px)`;
+  gridEl.style.gridTemplateRows = `repeat(${gridRows}, ${cellSize}px)`;
+
+  for (let r = 0; r < gridRows; r++) {
+    for (let c = 0; c < gridCols; c++) {
+      const cellData = grid[r][c];
+      const cellEl = document.createElement("div");
+
+      if (!cellData) {
+        cellEl.className = "cell empty";
+      } else {
+        cellEl.className = "cell";
+        cellEl.dataset.row = r;
+        cellEl.dataset.col = c;
+
+        if (cellData.number) {
+          const numEl = document.createElement("span");
+          numEl.className = "cell-number";
+          numEl.textContent = cellData.number;
+          cellEl.appendChild(numEl);
+        }
+
+        const inputEl = document.createElement("input");
+        inputEl.type = "text";
+        inputEl.maxLength = 1;
+        inputEl.dataset.row = r;
+        inputEl.dataset.col = c;
+        
+        inputEl.addEventListener("input", (e) => handleInput(e, r, c));
+        inputEl.addEventListener("keydown", (e) => handleKeyDown(e, r, c));
+
+        cellEl.appendChild(inputEl);
+      }
+      gridEl.appendChild(cellEl);
+    }
+  }
+  container.appendChild(gridEl);
+  renderClues();
+}
+
+function renderClues() {
+  const acrossEl = document.getElementById("across-clues");
+  const downEl = document.getElementById("down-clues");
+
+  acrossEl.innerHTML = "";
+  downEl.innerHTML = "";
+
+  placedWords.forEach(w => {
+    const li = document.createElement("li");
+    li.className = "clue-item";
+    li.innerHTML = `<strong>${w.number}.</strong> ${w.clue}`;
+    li.onclick = () => highlightWord(w);
+
+    if (w.direction === "ACROSS") {
+      acrossEl.appendChild(li);
+    } else {
+      downEl.appendChild(li);
+    }
+  });
+}
+
+function handleInput(e, r, c) {
+  if (examSubmitted) return;
+  const value = e.target.value.toUpperCase();
+  e.target.value = value;
+
+  if (value) {
+    const nextInput = document.querySelector(`input[data-row="${r}"][data-col="${c + 1}"]`) ||
+                      document.querySelector(`input[data-row="${r + 1}"][data-col="${c}"]`);
+    if (nextInput) nextInput.focus();
+  }
+}
+
+function handleKeyDown(e, r, c) {
+  if (examSubmitted) return;
+  if (e.key === "Backspace" && !e.target.value) {
+    const prevInput = document.querySelector(`input[data-row="${r}"][data-col="${c - 1}"]`) ||
+                      document.querySelector(`input[data-row="${r - 1}"][data-col="${c}"]`);
+    if (prevInput) prevInput.focus();
+  }
+}
+
+function highlightWord(w) {
+  const input = document.querySelector(`input[data-row="${w.row}"][data-col="${w.col}"]`);
+  if (input) {
+    input.focus();
+    input.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
+  }
+}
+
+function confirmSubmit() {
+  if (confirm("Are you sure you want to submit your examination? This action cannot be undone.")) {
+    processExamSubmission("Examination Submitted");
+  }
+}
+
+function autoSubmitExam(message) {
+  processExamSubmission("Examination Submitted", message);
+}
+
+function processExamSubmission(title, message = "Your answers have been processed.") {
+  if (examSubmitted) return;
+  examSubmitted = true;
+  clearInterval(timerInterval);
+
+  document.removeEventListener("visibilitychange", handleVisibilityChange);
+  window.removeEventListener("blur", handleWindowBlur);
+
+  document.getElementById("submit-btn").disabled = true;
+  document.querySelectorAll("input").forEach(input => input.disabled = true);
+
+  stopAndDownloadRecordings();
+
+  let correctWordsCount = 0;
+
+  placedWords.forEach(w => {
+    let isWordCorrect = true;
+    for (let i = 0; i < w.word.length; i++) {
+      const r = w.direction === "ACROSS" ? w.row : w.row + i;
+      const c = w.direction === "ACROSS" ? w.col + i : w.col;
+      const input = document.querySelector(`input[data-row="${r}"][data-col="${c}"]`);
+      if (!input || input.value.toUpperCase() !== w.word[i]) {
+        isWordCorrect = false;
+        break;
+      }
+    }
+    if (isWordCorrect) correctWordsCount++;
+  });
+
+  const total = placedWords.length;
+  const percentage = Math.round((correctWordsCount / total) * 50 + 50);
+
+  document.getElementById("modal-title").textContent = title;
+  document.getElementById("modal-msg").textContent = message;
+  document.getElementById("score-text").textContent = `${correctWordsCount} / ${total}`;
+  document.getElementById("detail-text").textContent = `Final Grade: ${percentage}%`;
+
+  certificateDataUrl = createCertificateDataUrl(correctWordsCount, total, percentage);
+  const preview = document.getElementById("certificate-preview");
+  preview.src = certificateDataUrl;
+  preview.style.display = "block";
+  document.getElementById("download-certificate-btn").style.display = "inline-block";
+
+  const status = document.createElement("p");
+  status.id = "save-status";
+  status.className = "save-status";
+  status.textContent = "Saving examination result and video files locally...";
+  document.querySelector("#result-modal .modal-card").appendChild(status);
+
+  document.getElementById("result-modal").classList.add("open");
+
+  saveExamToLocalStorage(correctWordsCount, total, percentage);
+}
+
+function closeModal() {
+  document.getElementById("result-modal").classList.remove("open");
+}
+
+function getExamDate() {
+  return new Date().toLocaleString("en-PH", {
+    year:"numeric", month:"long", day:"numeric",
+    hour:"2-digit", minute:"2-digit", second:"2-digit"
+  });
+}
+
+async function startExam() {
+  const name = document.getElementById("student-name").value.trim();
+  const course = document.getElementById("student-course").value.trim();
+  const err = document.getElementById("student-form-error");
+
+  if (!name || !course) {
+    err.textContent = "Please enter the Full Name and Course / Year / Section.";
+    return;
+  }
+
+  studentInfo.fullName = name;
+  studentInfo.courseYearSection = course;
+  studentInfo.examDate = getExamDate();
+
+  const mediaApproved = await initializeMediaMonitoring();
+  if (!mediaApproved) return;
+
+  examStarted = true;
+
+  document.getElementById("student-info-modal").classList.add("closed");
+  generateCrossword();
+  renderBoard();
+  startTimer();
+}
+
+function createCertificateDataUrl(score, total, percentage) {
+  const canvas = document.createElement("canvas");
+  canvas.width = 1600;
+  canvas.height = 1100;
+  const ctx = canvas.getContext("2d");
+
+  ctx.fillStyle = "#ffffff";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  ctx.strokeStyle = "#1d4ed8";
+  ctx.lineWidth = 18;
+  ctx.strokeRect(35, 35, canvas.width - 70, canvas.height - 70);
+  ctx.strokeStyle = "#cbd5e1";
+  ctx.lineWidth = 3;
+  ctx.strokeRect(65, 65, canvas.width - 130, canvas.height - 130);
+
+  ctx.textAlign = "center";
+  ctx.fillStyle = "#0f172a";
+  ctx.font = "bold 38px Georgia";
+  ctx.fillText("LAGUNA UNIVERSITY", 800, 155);
+  ctx.font = "bold 28px Georgia";
+  ctx.fillText("College of Computing Studies", 800, 200);
+
+  ctx.fillStyle = "#1d4ed8";
+  ctx.font = "bold 64px Georgia";
+  ctx.fillText("CERTIFICATE OF COMPLETION", 800, 330);
+
+  ctx.fillStyle = "#475569";
+  ctx.font = "28px Arial";
+  ctx.fillText("This certificate is proudly presented to", 800, 405);
+
+  ctx.fillStyle = "#0f172a";
+  ctx.font = "bold 54px Georgia";
+  ctx.fillText(studentInfo.fullName, 800, 500);
+
+  ctx.strokeStyle = "#94a3b8";
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(360, 525);
+  ctx.lineTo(1240, 525);
+  ctx.stroke();
+
+  ctx.fillStyle = "#334155";
+  ctx.font = "28px Arial";
+  ctx.fillText("for successfully completing the", 800, 590);
+
+  ctx.fillStyle = "#0f172a";
+  ctx.font = "bold 34px Arial";
+  ctx.fillText("CC 2103 - Data Structures and Algorithms", 800, 650);
+  ctx.fillText("Preliminary Examination", 800, 700);
+
+  ctx.font = "bold 34px Arial";
+  ctx.fillStyle = "#1d4ed8";
+  ctx.fillText(`SCORE: ${score} / ${total}    •    FINAL GRADE: ${percentage}%`, 800, 765);
+
+  ctx.font = "26px Arial";
+  ctx.fillStyle = "#475569";
+  ctx.fillText("Course / Year / Section: " + studentInfo.courseYearSection, 800, 820);
+  ctx.fillText("Examination Date: " + studentInfo.examDate, 800, 865);
+
+  ctx.font = "bold 26px Arial";
+  ctx.fillStyle = "#0f172a";
+  ctx.fillText("Instructor: RONALD T. LAVA, MSIT", 800, 955);
+
+  ctx.font = "22px Arial";
+  ctx.fillStyle = "#64748b";
+  ctx.fillText("Laguna University • College of Computing Studies", 800, 1015);
+
+  return canvas.toDataURL("image/png");
+}
+
+function saveExamToLocalStorage(score, total, percentage) {
+  const payload = {
+    id: Date.now(),
+    full_name: studentInfo.fullName,
+    course_year_section: studentInfo.courseYearSection,
+    exam_date: studentInfo.examDate,
+    instructor: studentInfo.instructor,
+    score: score,
+    total_items: total,
+    percentage: percentage,
+    certificate_image: certificateDataUrl
+  };
+
+  try {
+    const existingRecords = JSON.parse(localStorage.getItem("cc2103_exam_records") || "[]");
+    existingRecords.push(payload);
+    localStorage.setItem("cc2103_exam_records", JSON.stringify(existingRecords));
+
+    document.getElementById("save-status").textContent =
+      "✓ Record saved locally. Video recordings auto-downloaded to your device.";
+    document.getElementById("save-status").style.color = "#166534";
+  } catch (error) {
+    document.getElementById("save-status").textContent =
+      "⚠ Local storage save failed: " + error.message;
+    document.getElementById("save-status").style.color = "#b91c1c";
+  }
+}
+
+function downloadCertificate() {
+  if (!certificateDataUrl) return;
+  const a = document.createElement("a");
+  a.href = certificateDataUrl;
+  a.download = "CC2103_Certificate_" +
+    studentInfo.fullName.replace(/[^a-z0-9]+/gi, "_") + ".png";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+}
+
+document.getElementById("student-info-modal").classList.remove("closed");
+</script>
+</body>
+</html>
