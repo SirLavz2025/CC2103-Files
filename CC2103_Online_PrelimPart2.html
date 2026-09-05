@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -477,6 +477,7 @@
 
 <script>
     const categories = ['cat1', 'cat2', 'cat3'];
+    const TOTAL_ITEMS = 30; // 3 sections * 10 points
     
     const correctAnswers = {
         cat1: ['cat1-1', 'cat1-2', 'cat1-3', 'cat1-4', 'cat1-5', 'cat1-6'],
@@ -803,7 +804,7 @@
             totalRawPoints += Math.round(catPoints);
         });
 
-        const finalGrade = (50 + (totalRawPoints / 30) * 50).toFixed(1);
+        const finalGrade = (50 + (totalRawPoints / TOTAL_ITEMS) * 50).toFixed(1);
 
         lastScoreData = {
             studentId: studentId,
@@ -818,7 +819,7 @@
         isSubmitted = true;
         lockExamUI();
 
-        alert(`Exam submitted successfully!\nRaw Score: ${totalRawPoints} / 30\nFinal Grade: ${finalGrade}%`);
+        alert(`Exam submitted successfully!\nRaw Score: ${totalRawPoints} / ${TOTAL_ITEMS}\nFinal Grade: ${finalGrade}%`);
         
         stopProctoring();
         if (timerInterval) clearInterval(timerInterval);
@@ -827,7 +828,7 @@
 
     function showModal(grade, raw) {
         document.getElementById('finalGrade').innerText = grade;
-        document.getElementById('scoreDetails').innerText = `Raw Score: ${raw} / 30 pts`;
+        document.getElementById('scoreDetails').innerText = `Raw Score: ${raw} / ${TOTAL_ITEMS} pts`;
         document.getElementById('scoreModal').style.display = 'flex';
     }
 
@@ -842,50 +843,66 @@
 
         const studentId = lastScoreData.studentId || "Student";
         const grade = lastScoreData.grade;
+        const rawScore = lastScoreData.raw !== undefined ? lastScoreData.raw : 0;
         const dateStr = new Date().toLocaleDateString();
 
+        // Outer Border
         doc.setLineWidth(3);
         doc.setDrawColor(37, 99, 235);
         doc.rect(10, 10, 277, 190);
 
+        // Inner Border
         doc.setLineWidth(1);
         doc.setDrawColor(15, 23, 42);
         doc.rect(14, 14, 269, 182);
 
+        // Title
         doc.setFont("helvetica", "bold");
         doc.setFontSize(28);
         doc.setTextColor(37, 99, 235);
-        doc.text("CERTIFICATE OF COMPLETION", 148.5, 45, { align: "center" });
+        doc.text("CERTIFICATE OF COMPLETION", 148.5, 42, { align: "center" });
 
+        // Subtitle
         doc.setFontSize(14);
         doc.setFont("helvetica", "normal");
         doc.setTextColor(15, 23, 42);
-        doc.text("This is to certify that student", 148.5, 65, { align: "center" });
+        doc.text("This is to certify that student", 148.5, 60, { align: "center" });
 
+        // Student ID
         doc.setFontSize(22);
         doc.setFont("helvetica", "bold");
         doc.setTextColor(22, 163, 74);
-        doc.text(`ID: ${studentId}`, 148.5, 80, { align: "center" });
+        doc.text(`ID: ${studentId}`, 148.5, 75, { align: "center" });
 
+        // Course Info
         doc.setFontSize(14);
         doc.setFont("helvetica", "normal");
         doc.setTextColor(15, 23, 42);
-        doc.text("has successfully completed the examination for", 148.5, 95, { align: "center" });
+        doc.text("has successfully completed the examination for", 148.5, 90, { align: "center" });
 
         doc.setFontSize(18);
         doc.setFont("helvetica", "bold");
-        doc.text("CC 2103: Data Structures and Algorithms - Prelim Exam Part 2", 148.5, 110, { align: "center" });
+        doc.text("CC 2103: Data Structures and Algorithms - Prelim Exam Part 2", 148.5, 105, { align: "center" });
+
+        // Scores & Grades Box
+        doc.setFontSize(14);
+        doc.setFont("helvetica", "bold");
+        doc.setTextColor(15, 23, 42);
+        doc.text(`Raw Score: ${rawScore} / ${TOTAL_ITEMS} Points`, 148.5, 125, { align: "center" });
 
         doc.setFontSize(16);
-        doc.setFont("helvetica", "normal");
-        doc.text(`Final Grade Attained: ${grade}%`, 148.5, 130, { align: "center" });
+        doc.setTextColor(37, 99, 235);
+        doc.text(`Final Grade Attained: ${grade}%`, 148.5, 137, { align: "center" });
 
+        // Footer details
         doc.setFontSize(11);
+        doc.setFont("helvetica", "normal");
+        doc.setTextColor(15, 23, 42);
         doc.text(`Issued On: ${dateStr}`, 40, 165);
 
         doc.setLineWidth(0.5);
         doc.line(200, 165, 260, 165);
-        doc.text("Exam Administrator", 230, 172, { align: "center" });
+        doc.text("RONALD T. LAVA, MSIT", 230, 172, { align: "center" });
 
         doc.save(`Exam_Certificate_${studentId}.pdf`);
     }
