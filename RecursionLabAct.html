@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Java Recursive Number Patterns Lab & Certification</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent: #38bdf8;
+            --accent-hover: #0ea5e9;
+            --code-bg: #090d16;
+            --border: #334155;
+            --lab-accent: #f59e0b;
+            --lab-hover: #d97706;
+            --success: #22c55e;
+            --error: #ef4444;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 2rem;
+            line-height: 1.6;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        header h1 {
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+        }
+
+        header p {
+            color: var(--text-muted);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s, border-color 0.2s;
+        }
+
+        .card.lab-card {
+            border-color: rgba(245, 158, 11, 0.4);
+        }
+
+        .card.lab-card:hover {
+            border-color: var(--lab-accent);
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+        }
+
+        .card h3 {
+            margin-top: 0;
+            color: var(--accent);
+            font-size: 1.25rem;
+        }
+
+        .card.lab-card h3 {
+            color: var(--lab-accent);
+        }
+
+        .pattern-output {
+            background-color: var(--code-bg);
+            border-radius: 8px;
+            padding: 1rem;
+            font-family: 'Courier New', Courier, monospace;
+            white-space: pre;
+            overflow-x: auto;
+            color: #4ade80;
+            font-size: 0.9rem;
+            margin: 1rem 0;
+            border: 1px solid #1e293b;
+        }
+
+        .btn {
+            background-color: var(--accent);
+            color: #0f172a;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            align-self: flex-start;
+        }
+
+        .btn:hover {
+            background-color: var(--accent-hover);
+        }
+
+        .btn.lab-btn {
+            background-color: var(--lab-accent);
+            color: #0f172a;
+        }
+
+        .btn.lab-btn:hover {
+            background-color: var(--lab-hover);
+        }
+
+        .btn-success {
+            background-color: var(--success);
+            color: #ffffff;
+            display: none;
+        }
+
+        .btn-success:hover {
+            background-color: #16a34a;
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(15, 23, 42, 0.85);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            z-index: 1000;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border);
+            width: 90%;
+            max-width: 850px;
+            max-height: 85vh;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+            transform: scale(0.95);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.active .modal {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            font-size: 1.25rem;
+            color: var(--accent);
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .close-btn:hover {
+            color: var(--text-main);
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+            overflow-y: auto;
+        }
+
+        .student-info-bar {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            background: #090d16;
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .student-info-bar input {
+            width: 100%;
+            padding: 0.5rem;
+            border-radius: 4px;
+            border: 1px solid var(--border);
+            background: #1e293b;
+            color: #fff;
+            font-size: 0.9rem;
+            box-sizing: border-box;
+        }
+
+        .student-info-bar label {
+            display: block;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 0.3rem;
+        }
+
+        .modal-body pre {
+            background-color: var(--code-bg);
+            padding: 1rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            color: #e2e8f0;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.85rem;
+            margin: 0;
+            line-height: 1.8;
+        }
+
+        /* Image-style Block Code Inputs */
+        .code-input {
+            background-color: #334155;
+            border: 2px solid transparent;
+            color: #fde047;
+            font-family: 'Courier New', Courier, monospace;
+            padding: 0.2rem 0.5rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+            transition: all 0.2s;
+            display: inline-block;
+            vertical-align: middle;
+        }
+
+        .code-input:focus {
+            outline: none;
+            border-color: var(--accent);
+            background-color: #1e293b;
+        }
+
+        .lab-actions {
+            margin-top: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .feedback-msg {
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .lab-badge {
+            background-color: var(--lab-accent);
+            color: #0f172a;
+            font-size: 0.75rem;
+            font-weight: bold;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+            display: inline-block;
+        }
+
+        /* Certificate Print Layout Styles */
+        #certificatePrintArea {
+            display: none;
+        }
+
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #certificatePrintArea, #certificatePrintArea * {
+                visibility: visible;
+            }
+            #certificatePrintArea {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                height: 100vh;
+                display: flex !important;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                background: white;
+                color: black;
+                font-family: 'Georgia', serif;
+                padding: 3rem;
+                box-sizing: border-box;
+                text-align: center;
+            }
+            .cert-box {
+                border: 8px double #1e293b;
+                padding: 3rem;
+                width: 100%;
+                max-width: 900px;
+                background: #fdfbf7;
+            }
+            .cert-title {
+                font-size: 2.5rem;
+                font-weight: bold;
+                color: #1e293b;
+                margin-bottom: 0.5rem;
+                text-transform: uppercase;
+                letter-spacing: 2px;
+            }
+            .cert-subtitle {
+                font-size: 1.1rem;
+                color: #64748b;
+                margin-bottom: 2rem;
+            }
+            .cert-name {
+                font-size: 2rem;
+                font-weight: bold;
+                color: #0f172a;
+                border-bottom: 2px solid #cbd5e1;
+                display: inline-block;
+                padding: 0 2rem 0.2rem 2rem;
+                margin: 1rem 0;
+            }
+            .cert-body {
+                font-size: 1.1rem;
+                color: #334155;
+                margin: 1.5rem 0;
+                line-height: 1.8;
+            }
+            .cert-footer {
+                display: flex;
+                justify-content: space-between;
+                margin-top: 3rem;
+                font-size: 1rem;
+                color: #475569;
+            }
+            .cert-sig {
+                border-top: 1px solid #94a3b8;
+                padding-top: 0.5rem;
+                width: 200px;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Java Recursive Number Patterns</h1>
+        <p>Interactive pattern examples catalog and block-style code assessment labs with certification.</p>
+    </header>
+
+    <div class="container" id="card-container"></div>
+
+    <!-- Modal Component -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 id="modalTitle">Code View</h2>
+                <button class="close-btn" id="closeModal">&times;</button>
+            </div>
+            <div class="modal-body" id="modalBodyContent"></div>
+        </div>
+    </div>
+
+    <!-- Hidden Certificate Template for Print/PDF generation -->
+    <div id="certificatePrintArea">
+        <div class="cert-box">
+            <div class="cert-title">Certificate of Completion</div>
+            <div class="cert-subtitle">Java Programming Laboratory Assessment</div>
+            <div class="cert-body">This is proudly presented to</div>
+            <div class="cert-name" id="certStudentName">Student Name</div>
+            <div class="cert-body">
+                Student ID: <span id="certStudentId">---</span><br>
+                Successfully completed and passed <strong><span id="certLabTitle">Lab Activity</span></strong><br>
+                with an auto-evaluated score of <strong id="certScoreDisplay">0/0</strong>.
+            </div>
+            <div class="cert-footer">
+                <div>Date: <span id="certDate">YYYY-MM-DD</span></div>
+                <div class="cert-sig">Instructor Signature</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Disable right-click context menu to deter inspection
+        document.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+        });
+
+        const patternsData = [
+            {
+                title: "1. Right-Angled Triangle",
+                type: "Example",
+                output: `1 \n1 2 \n1 2 3 \n1 2 3 4 \n1 2 3 4 5 `,
+                codeType: "code",
+                code: `public class RecursiveNumberPattern {
+    public static void printCols(int row, int col) {
+        if (col > row) return;
+        System.out.print(col + " ");
+        printCols(row, col + 1);
+    }
+
+    public static void printRows(int n, int row) {
+        if (row > n) return;
+        printCols(row, 1);
+        System.out.println();
+        printRows(n, row + 1);
+    }
+
+    public static void main(String[] args) {
+        printRows(5, 1);
+    }
+}`
+            },
+            {
+                title: "2. Consecutive Number Triangle",
+                type: "Example",
+                output: `1\t\n2\t3\t\n4\t5\t6\t\n7\t8\t9\t10\t`,
+                codeType: "code",
+                code: `public class ConsecutiveRecursivePattern {
+    public static void printTriangle(int n, int row, int col, int currentNum) {
+        if (row > n) return;
+        
+        if (col <= row) {
+            System.out.print(currentNum + "\\t");
+            printTriangle(n, row, col + 1, currentNum + 1);
+        } else {
+            System.out.println();
+            printTriangle(n, row + 1, 1, currentNum);
+        }
+    }
+
+    public static void main(String[] args) {
+        printTriangle(4, 1, 1, 1);
+    }
+}`
+            },
+            {
+                title: "3. Inverted Right-Angled Triangle",
+                type: "Example",
+                output: `1 2 3 4 5 \n1 2 3 4 \n1 2 3 \n1 2 \n1 `,
+                codeType: "code",
+                code: `public class InvertedRecursivePattern {
+    public static void printCols(int row, int col) {
+        if (col > row) return;
+        System.out.print(col + " ");
+        printCols(row, col + 1);
+    }
+
+    public static void printRows(int row) {
+        if (row < 1) return;
+        printCols(row, 1);
+        System.out.println();
+        printRows(row - 1);
+    }
+
+    public static void main(String[] args) {
+        printRows(5);
+    }
+}`
+            },
+            {
+                title: "4. Repeated Number Triangle",
+                type: "Example",
+                output: `1 \n2 2 \n3 3 3 \n4 4 4 4 \n5 5 5 5 5 `,
+                codeType: "code",
+                code: `public class RepeatedNumberPattern {
+    public static void printCols(int row, int count) {
+        if (count > row) return;
+        System.out.print(row + " ");
+        printCols(row, count + 1);
+    }
+
+    public static void printRows(int n, int row) {
+        if (row > n) return;
+        printCols(row, 1);
+        System.out.println();
+        printRows(n, row + 1);
+    }
+
+    public static void main(String[] args) {
+        printRows(5, 1);
+    }
+}`
+            },
+            {
+                title: "5. Centered Number Pyramid",
+                type: "Example",
+                output: `        1 \n      1 2 1 \n    1 2 3 2 1 \n  1 2 3 4 3 2 1 \n1 2 3 4 5 4 3 2 1 `,
+                codeType: "code",
+                code: `public class CenteredNumberPyramid {
+    public static void printSpaces(int spaces) {
+        if (spaces <= 0) return;
+        System.out.print("  ");
+        printSpaces(spaces - 1);
+    }
+
+    public static void printCols(int current, int target) {
+        if (current > target) return;
+        System.out.print(current + " ");
+        printCols(current + 1, target);
+    }
+
+    public static void printDescendingCols(int current) {
+        if (current < 1) return;
+        System.out.print(current + " ");
+        printDescendingCols(current - 1);
+    }
+
+    public static void printRows(int n, int row) {
+        if (row > n) return;
+        printSpaces(n - row);
+        printCols(1, row);
+        printDescendingCols(row - 1);
+        System.out.println();
+        printRows(n, row + 1);
+    }
+
+    public static void main(String[] args) {
+        printRows(5, 1);
+    }
+}`
+            },
+            {
+                title: "6. Symmetrical Number Diamond",
+                type: "Example",
+                output: `      1 \n    1 2 1 \n  1 2 3 2 1 \n1 2 3 4 3 2 1 \n  1 2 3 2 1 \n    1 2 1 \n      1 `,
+                codeType: "code",
+                code: `public class NumberDiamondPattern {
+    public static void printSpaces(int spaces) {
+        if (spaces <= 0) return;
+        System.out.print("  ");
+        printSpaces(spaces - 1);
+    }
+
+    public static void printAscending(int current, int target) {
+        if (current > target) return;
+        System.out.print(current + " ");
+        printAscending(current + 1, target);
+    }
+
+    public static void printDescending(int current) {
+        if (current < 1) return;
+        System.out.print(current + " ");
+        printDescending(current - 1);
+    }
+
+    public static void printRow(int n, int row) {
+        printSpaces(n - row);
+        printAscending(1, row);
+        printDescending(row - 1);
+        System.out.println();
+    }
+
+    public static void printTopHalf(int n, int row) {
+        if (row > n) return;
+        printRow(n, row);
+        printTopHalf(n, row + 1);
+    }
+
+    public static void printBottomHalf(int n, int row) {
+        if (row < 1) return;
+        printRow(n, row);
+        printBottomHalf(n, row - 1);
+    }
+
+    public static void main(String[] args) {
+        int n = 4;
+        printTopHalf(n, 1);
+        printBottomHalf(n, n - 1);
+    }
+}`
+            },
+            {
+                title: "Lab Prob 1: Inverted Pyramid",
+                type: "Laboratory Activity",
+                output: `1 2 3 4 3 2 1 \n  1 2 3 2 1 \n    1 2 1 \n      1 `,
+                codeType: "interactive",
+                template: `public class InvertedPyramidLab {
+    public static void printSpaces(int spaces) {
+        if (spaces <= 0) return;
+        System.out.print("  ");
+        printSpaces(spaces - 1);
+    }
+
+    public static void printAscending(int current, int target) {
+        <input type="text" class="code-input" style="width: 250px;" data-answer="if(current>target)return;System.out.print(current+\" \");printAscending(current+1,target);" placeholder="Base case & recursion">
+    }
+
+    public static void printDescending(int current) {
+        <input type="text" class="code-input" style="width: 250px;" data-answer="if(current<1)return;System.out.print(current+\" \");printDescending(current-1);" placeholder="Base case & recursion">
+    }
+
+    public static void printInvertedRows(int n, int row) {
+        <input type="text" class="code-input" style="width: 320px;" data-answer="if(row<1)return;printSpaces(n-row);printAscending(1,row);printDescending(row-1);System.out.println();printInvertedRows(n,row-1);" placeholder="Row countdown & print calls">
+    }
+
+    public static void main(String[] args) {
+        printInvertedRows(4, 4);
+    }
+}`
+            },
+            {
+                title: "Lab Prob 2: Number Hourglass",
+                type: "Laboratory Activity",
+                output: `1 2 3 4 3 2 1 \n  1 2 3 2 1 \n    1 2 1 \n      1 \n    1 2 1 \n  1 2 3 2 1 \n1 2 3 4 3 2 1 `,
+                codeType: "interactive",
+                template: `public class NumberHourglassLab {
+    public static void printSpaces(int spaces) {
+        if (spaces <= 0) return;
+        System.out.print("  ");
+        printSpaces(spaces - 1);
+    }
+
+    public static void printRow(int n, int row) {
+        printSpaces(n - row);
+        <input type="text" class="code-input" style="width: 230px;" data-answer="printAscending(1,row);printDescending(row-1);" placeholder="Ascending & descending calls">
+        System.out.println();
+    }
+
+    public static void printTopHourglass(int n, int row) {
+        <input type="text" class="code-input" style="width: 220px;" data-answer="if(row<1)return;printRow(n,row);printTopHourglass(n,row-1);" placeholder="Top narrowing half">
+    }
+
+    public static void printBottomHourglass(int n, int row) {
+        <input type="text" class="code-input" style="width: 220px;" data-answer="if(row>n)return;printRow(n,row);printBottomHourglass(n,row+1);" placeholder="Bottom widening half">
+    }
+
+    public static void main(String[] args) {
+        int n = 4;
+        <input type="text" class="code-input" style="width: 230px;" data-answer="printTopHourglass(n,n);printBottomHourglass(n,2);" placeholder="Initialize method calls">
+    }
+}`
+            }
+        ];
+
+        let activeLabTitle = "";
+
+        const container = document.getElementById('card-container');
+        const modalOverlay = document.getElementById('modalOverlay');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalBodyContent = document.getElementById('modalBodyContent');
+        const closeModal = document.getElementById('closeModal');
+
+        // Render cards dynamically
+        patternsData.forEach((item, index) => {
+            const card = document.createElement('div');
+            const isLab = item.type === 'Laboratory Activity';
+            card.className = isLab ? 'card lab-card' : 'card';
+            
+            let badgeHtml = isLab ? '<span class="lab-badge">Block Fill Lab Assessment</span>' : '';
+            let btnClass = isLab ? 'btn lab-btn' : 'btn';
+            let btnText = isLab ? 'Launch Lab Assessment' : 'View Java Code';
+
+            card.innerHTML = `
+                <div>
+                    ${badgeHtml}
+                    <h3>${item.title}</h3>
+                    <div class="pattern-output">${item.output}</div>
+                </div>
+                <button class="${btnClass}" onclick="openModal(${index})">${btnText}</button>
+            `;
+            container.appendChild(card);
+        });
+
+        function openModal(index) {
+            const item = patternsData[index];
+            activeLabTitle = item.title;
+            modalTitle.textContent = item.title;
+
+            if (item.codeType === 'code') {
+                modalBodyContent.innerHTML = `<pre><code>${item.code}</code></pre>`;
+            } else {
+                modalBodyContent.innerHTML = `
+                    <div class="student-info-bar">
+                        <div>
+                            <label for="studentNameInput">Student Full Name:</label>
+                            <input type="text" id="studentNameInput" placeholder="e.g. Ronald T. Lava">
+                        </div>
+                        <div>
+                            <label for="studentIdInput">Student ID Number:</label>
+                            <input type="text" id="studentIdInput" placeholder="e.g. 251-0001">
+                        </div>
+                    </div>
+                    <pre><code>${item.template}</code></pre>
+                    <div class="lab-actions">
+                        <div>
+                            <button class="btn lab-btn" onclick="checkAnswers()">Check Code Answers</button>
+                            <button class="btn btn-success" id="downloadCertBtn" onclick="generateCertificate()">Download Certificate (PDF)</button>
+                        </div>
+                        <span class="feedback-msg" id="feedbackMsg"></span>
+                    </div>
+                `;
+            }
+            modalOverlay.classList.add('active');
+        }
+
+        function checkAnswers() {
+            const nameVal = document.getElementById('studentNameInput').value.trim();
+            const idVal = document.getElementById('studentIdInput').value.trim();
+            const msg = document.getElementById('feedbackMsg');
+
+            if (!nameVal || !idVal) {
+                msg.style.color = 'var(--error)';
+                msg.textContent = '⚠️ Please enter your Student Name and ID first!';
+                return;
+            }
+
+            const inputs = document.querySelectorAll('.code-input');
+            let correctCount = 0;
+            let totalCount = inputs.length;
+
+            inputs.forEach(input => {
+                const userVal = input.value.replace(/\s+/g, '');
+                const expectedVal = input.getAttribute('data-answer').replace(/\s+/g, '');
+
+                if (userVal === expectedVal) {
+                    input.style.borderColor = 'var(--success)';
+                    input.style.color = 'var(--success)';
+                    correctCount++;
+                } else {
+                    input.style.borderColor = 'var(--error)';
+                    input.style.color = 'var(--error)';
+                }
+            });
+
+            if (correctCount === totalCount) {
+                msg.style.color = 'var(--success)';
+                msg.textContent = `🎉 Perfect Score! (${correctCount}/${totalCount})`;
+                document.getElementById('downloadCertBtn').style.display = 'inline-block';
+            } else {
+                msg.style.color = 'var(--error)';
+                msg.textContent = `❌ Score: ${correctCount}/${totalCount}. Review highlighted fields.`;
+                document.getElementById('downloadCertBtn').style.display = 'none';
+            }
+        }
+
+        function generateCertificate() {
+            const nameVal = document.getElementById('studentNameInput').value.trim();
+            const idVal = document.getElementById('studentIdInput').value.trim();
+            const inputs = document.querySelectorAll('.code-input');
+            
+            let correctCount = 0;
+            inputs.forEach(input => {
+                if (input.value.replace(/\s+/g, '') === input.getAttribute('data-answer').replace(/\s+/g, '')) {
+                    correctCount++;
+                }
+            });
+
+            // Populate certificate template values
+            document.getElementById('certStudentName').textContent = nameVal;
+            document.getElementById('certStudentId').textContent = idVal;
+            document.getElementById('certLabTitle').textContent = activeLabTitle;
+            document.getElementById('certScoreDisplay').textContent = `${correctCount}/${inputs.length}`;
+            
+            const currentDate = new Date().toISOString().split('T')[0];
+            document.getElementById('certDate').textContent = currentDate;
+
+            // Open print dialog (user selects "Save as PDF")
+            window.print();
+        }
+
+        function closeHandler() {
+            modalOverlay.classList.remove('active');
+        }
+
+        closeModal.addEventListener('click', closeHandler);
+        modalOverlay.addEventListener('click', (e) => {
+            if (e.target === modalOverlay) closeHandler();
+        });
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeHandler();
+        });
+    </script>
+</body>
+</html>
