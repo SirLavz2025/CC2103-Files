@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CC 2103 Lab: Student Information System using Java Linked List</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0f7ff',
+                            100: '#e0effe',
+                            500: '#0284c7',
+                            600: '#0369a1',
+                            700: '#075985',
+                            800: '#0c4a6e',
+                            900: '#0f172a',
+                        }
+                    },
+                    fontFamily: {
+                        mono: ['Fira Code', 'Consolas', 'Monaco', 'monospace'],
+                        sans: ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        pre, code { font-family: 'Fira Code', monospace; }
+        
+        /* Node Arrow Animation */
+        .node-pointer {
+            transition: all 0.3s ease-in-out;
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(0,0,0,0.05);
+        }
+        .dark ::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.05);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #94a3b8;
+            border-radius: 4px;
+        }
+        .dark ::-webkit-scrollbar-thumb {
+            background: #475569;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 transition-colors duration-200 min-h-screen flex flex-col">
+
+    <!-- Top Navigation Header -->
+    <header class="sticky top-0 z-50 bg-white/90 dark:bg-slate-900/90 backdrop-blur border-b border-slate-200 dark:border-slate-800 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="p-2 bg-brand-600 text-white rounded-lg shadow-md">
+                    <i class="fa-solid fa-code-fork text-xl"></i>
+                </div>
+                <div>
+                    <span class="text-xs font-semibold uppercase tracking-wider text-brand-600 dark:text-brand-500">College of Computing Studies</span>
+                    <h1 class="text-lg font-bold leading-none text-slate-900 dark:text-white">CC 2103: Data Structures and Algorithms</h1>
+                </div>
+            </div>
+
+            <div class="flex items-center space-x-3">
+                <button id="themeToggleBtn" onclick="toggleDarkMode()" class="p-2.5 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition" title="Toggle Theme">
+                    <i id="themeIcon" class="fa-solid fa-moon text-lg"></i>
+                </button>
+                <a href="#visualizerSection" class="hidden sm:inline-flex items-center gap-2 px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white text-sm font-medium rounded-xl shadow transition">
+                    <i class="fa-solid fa-play text-xs"></i> Memory Simulator
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-12">
+
+        <!-- Lab Header Banner -->
+        <section class="bg-gradient-to-r from-slate-900 via-brand-900 to-slate-900 text-white rounded-3xl p-6 sm:p-10 shadow-2xl relative overflow-hidden">
+            <div class="absolute -right-10 -bottom-10 w-80 h-80 bg-brand-500/10 rounded-full blur-3xl pointer-events-none"></div>
+            
+            <div class="relative z-10 space-y-4 max-w-3xl">
+                <div class="inline-flex items-center gap-2 px-3 py-1 bg-brand-500/20 border border-brand-400/30 rounded-full text-xs font-medium text-brand-300">
+                    <i class="fa-solid fa-flask"></i> Laboratory Activity #3
+                </div>
+                <h2 class="text-2xl sm:text-4xl font-extrabold tracking-tight leading-tight">
+                    Student Information System using Singly Linked List in Java
+                </h2>
+                <p class="text-slate-300 text-sm sm:text-base leading-relaxed">
+                    Explore how dynamic node allocation works under the hood. In this lab, you will implement a custom single-ended linked list from scratch to store and manage student records without relying on Java's built-in collections.
+                </p>
+                <div class="flex flex-wrap gap-4 pt-2 text-xs font-medium text-slate-300">
+                    <span class="flex items-center gap-1.5 bg-slate-800/80 px-3 py-1.5 rounded-lg border border-slate-700/60">
+                        <i class="fa-solid fa-clock text-brand-400"></i> Duration: 2.0 Hours
+                    </span>
+                    <span class="flex items-center gap-1.5 bg-slate-800/80 px-3 py-1.5 rounded-lg border border-slate-700/60">
+                        <i class="fa-solid fa-layer-group text-brand-400"></i> Topic: Pointer-based Dynamic Memory
+                    </span>
+                    <span class="flex items-center gap-1.5 bg-slate-800/80 px-3 py-1.5 rounded-lg border border-slate-700/60">
+                        <i class="fa-brands fa-java text-brand-400"></i> Language: Java SE
+                    </span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Objectives Section -->
+        <section class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="bg-white dark:bg-slate-800/80 p-6 rounded-2xl border border-slate-200 dark:border-slate-700/60 shadow-sm">
+                <div class="w-10 h-10 bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 rounded-xl flex items-center justify-center mb-4 text-lg font-bold">
+                    1
+                </div>
+                <h3 class="font-bold text-base mb-2 text-slate-900 dark:text-white">Node Construction</h3>
+                <p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+                    Understand how self-referential class structures contain data payload (`id`, `name`, `gpa`) alongside reference pointers (`next`) to adjacent memory blocks.
+                </p>
+            </div>
+
+            <div class="bg-white dark:bg-slate-800/80 p-6 rounded-2xl border border-slate-200 dark:border-slate-700/60 shadow-sm">
+                <div class="w-10 h-10 bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400 rounded-xl flex items-center justify-center mb-4 text-lg font-bold">
+                    2
+                </div>
+                <h3 class="font-bold text-base mb-2 text-slate-900 dark:text-white">Pointer Manipulation</h3>
+                <p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+                    Master list traversal (`current = current.next`), head re-assignment during updates, and interior node removal while avoiding memory leaks or NullPointerExceptions.
+                </p>
+            </div>
+
+            <div class="bg-white dark:bg-slate-800/80 p-6 rounded-2xl border border-slate-200 dark:border-slate-700/60 shadow-sm">
+                <div class="w-10 h-10 bg-purple-100 dark:bg-purple-900/50 text-purple-600 dark:text-purple-400 rounded-xl flex items-center justify-center mb-4 text-lg font-bold">
+                    3
+                </div>
+                <h3 class="font-bold text-base mb-2 text-slate-900 dark:text-white">Time & Space Complexity</h3>
+                <p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+                    Analyze linear time complexity $O(n)$ for search and traversal versus constant $O(1)$ operations at the head of the list.
+                </p>
+            </div>
+        </section>
+
+        <!-- Interactive Memory & Pointer Visualizer -->
+        <section id="visualizerSection" class="bg-white dark:bg-slate-800/90 rounded-3xl border border-slate-200 dark:border-slate-700 p-6 sm:p-8 shadow-xl space-y-6">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-200 dark:border-slate-700/80 pb-5">
+                <div>
+                    <span class="text-xs font-semibold text-brand-600 dark:text-brand-400 uppercase tracking-wider">Interactive Simulator</span>
+                    <h2 class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">Live Linked List Memory Visualizer</h2>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Test real-time operations and watch how pointers update dynamically in RAM.</p>
+                </div>
+
+                <!-- Simulation Controls Header Buttons -->
+                <div class="flex flex-wrap items-center gap-2">
+                    <button onclick="resetListSimulation()" class="px-3 py-1.5 text-xs font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg border border-slate-300 dark:border-slate-600 transition">
+                        <i class="fa-solid fa-rotate-right mr-1"></i> Reset List
+                    </button>
+                    <button onclick="loadSampleData()" class="px-3 py-1.5 text-xs font-medium text-brand-600 dark:text-brand-400 hover:bg-brand-50 dark:hover:bg-slate-700 rounded-lg border border-brand-200 dark:border-slate-600 transition">
+                        <i class="fa-solid fa-database mr-1"></i> Load Samples
+                    </button>
+                </div>
+            </div>
+
+            <!-- Operations Control Panel -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 bg-slate-50 dark:bg-slate-900/60 p-4 rounded-2xl border border-slate-200 dark:border-slate-700/50">
+                <!-- Inputs -->
+                <div class="space-y-2">
+                    <label class="block text-xs font-medium text-slate-700 dark:text-slate-300">Student ID</label>
+                    <input type="number" id="simIdInput" placeholder="e.g. 1" class="w-full text-xs px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-brand-500 outline-none">
+                </div>
+                <div class="space-y-2">
+                    <label class="block text-xs font-medium text-slate-700 dark:text-slate-300">Student Name</label>
+                    <input type="text" id="simNameInput" placeholder="e.g. Ronald T. Lava" class="w-full text-xs px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-brand-500 outline-none">
+                </div>
+                <div class="space-y-2">
+                    <label class="block text-xs font-medium text-slate-700 dark:text-slate-300">GPA (1.0 - 5.0)</label>
+                    <input type="number" step="0.1" id="simGpaInput" placeholder="e.g. 1.25" class="w-full text-xs px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-brand-500 outline-none">
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="flex flex-col justify-end space-y-2">
+                    <div class="grid grid-cols-2 gap-2">
+                        <button onclick="simAddTail()" class="px-3 py-2 bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold rounded-xl shadow transition flex items-center justify-center gap-1">
+                            <i class="fa-solid fa-plus text-[10px]"></i> Append Node
+                        </button>
+                        <button onclick="simDeleteNode()" class="px-3 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold rounded-xl shadow transition flex items-center justify-center gap-1">
+                            <i class="fa-solid fa-trash text-[10px]"></i> Delete ID
+                        </button>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button onclick="simSearchNode()" class="px-3 py-2 bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold rounded-xl shadow transition flex items-center justify-center gap-1">
+                            <i class="fa-solid fa-magnifying-glass text-[10px]"></i> Search ID
+                        </button>
+                        <button onclick="simTraverseList()" class="px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold rounded-xl shadow transition flex items-center justify-center gap-1">
+                            <i class="fa-solid fa-walking text-[10px]"></i> Traverse
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Feedback Log Box -->
+            <div id="simLog" class="text-xs font-mono px-4 py-2.5 rounded-xl bg-slate-900 text-emerald-400 border border-slate-800 flex items-center gap-2">
+                <i class="fa-solid fa-terminal text-slate-500"></i>
+                <span id="simLogText">System Ready. Add nodes or load sample data.</span>
+            </div>
+
+            <!-- Visual Canvas Stage -->
+            <div class="p-6 rounded-2xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 min-h-[220px] flex items-center overflow-x-auto relative scrollbar-thin">
+                <div id="visualListContainer" class="flex items-center space-x-2 py-4">
+                    <!-- Dynamic Nodes Render Here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Code Demonstration Section -->
+        <section class="bg-white dark:bg-slate-800/90 rounded-3xl border border-slate-200 dark:border-slate-700 p-6 sm:p-8 shadow-xl space-y-6">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 dark:border-slate-700/80 pb-5">
+                <div>
+                    <span class="text-xs font-semibold text-brand-600 dark:text-brand-400 uppercase tracking-wider">Java Code Reference</span>
+                    <h2 class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">Complete Starter Implementation</h2>
+                </div>
+                <button onclick="copyCode()" id="copyBtn" class="inline-flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white text-xs font-medium rounded-xl transition shadow">
+                    <i class="fa-solid fa-copy"></i> <span id="copyBtnText">Copy Java Code</span>
+                </button>
+            </div>
+
+            <!-- Code Explanation Tabs -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Left: Interactive Code View -->
+                <div class="lg:col-span-8 bg-slate-950 text-slate-100 rounded-2xl overflow-hidden border border-slate-800 shadow-inner flex flex-col">
+                    <div class="bg-slate-900 px-4 py-2.5 border-b border-slate-800 flex items-center justify-between text-xs text-slate-400">
+                        <span class="flex items-center gap-2 font-mono"><i class="fa-brands fa-java text-amber-500"></i> studentinfo_singlylinkedlist.java</span>
+                        <span>JDK 11+ Ready</span>
+                    </div>
+                    <pre class="p-4 text-xs font-mono overflow-x-auto leading-relaxed text-slate-300 max-h-[520px] scrollbar-thin"><code id="javaCodeBlock">import java.util.Scanner;
+
+ package studentinfo_singlylinkedlist;
+
+import java.util.Scanner;
+
+public class StudentInfo_SinglyLinkedList {
+
+    // Step 1: Self-Referential Node Structure (Made static so main can access it)
+    static class StudentNode {
+        int id;
+        String name;
+        double gpa;
+        StudentNode next; // Pointer to the next student node in memory
+
+        public StudentNode(int id, String name, double gpa) {
+            this.id = id;
+            this.name = name;
+            this.gpa = gpa;
+            this.next = null;
+        }
+    }
+
+    // Step 2: Custom Singly Linked List Implementation (Made static)
+    static class StudentLinkedList {
+        private StudentNode head; // Points to the first node in the list
+
+        public StudentLinkedList() {
+            this.head = null;
+        }
+
+        // Append student to the tail of the list
+        public void addStudent(int id, String name, double gpa) {
+            StudentNode newNode = new StudentNode(id, name, gpa);
+
+            if (head == null) {
+                head = newNode;
+                System.out.println("--> Success: Added as Head Node.");
+                return;
+            }
+
+            StudentNode current = head;
+            while (current.next != null) {
+                current = current.next;
+            }
+            current.next = newNode;
+            System.out.println("--> Success: Appended to List.");
+        }
+
+        // Traverse and display all student records
+        public void displayStudents() {
+            if (head == null) {
+                System.out.println("--> List is empty!");
+                return;
+            }
+
+            System.out.println("\n--- Current Student Records ---");
+            StudentNode current = head;
+            while (current != null) {
+                System.out.println("ID: " + current.id + " | Name: " + current.name + " | GPA: " + current.gpa);
+                current = current.next;
+            }
+        }
+
+        // Search for a student by ID
+        public void searchStudent(int id) {
+            StudentNode current = head;
+            while (current != null) {
+                if (current.id == id) {
+                    System.out.println("--> Record Found: " + current.name + " (GPA: " + current.gpa + ")");
+                    return;
+                }
+                current = current.next;
+            }
+            System.out.println("--> Record with ID " + id + " not found.");
+        }
+
+        // Delete a student node by ID
+        public void deleteStudent(int id) {
+            if (head == null) {
+                System.out.println("--> Error: List is empty.");
+                return;
+            }
+
+            // Case 1: Target node is Head
+            if (head.id == id) {
+                head = head.next;
+                System.out.println("--> Student " + id + " deleted (Head updated).");
+                return;
+            }
+
+            // Case 2: Target node is inside or at tail
+            StudentNode current = head;
+            StudentNode prev = null;
+
+            while (current != null && current.id != id) {
+                prev = current;
+                current = current.next;
+            }
+
+            if (current == null) {
+                System.out.println("--> Record not found.");
+            } else {
+                prev.next = current.next;
+                System.out.println("--> Student " + id + " deleted.");   
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        // Corrected: Use custom StudentLinkedList instead of java.util.LinkedList
+        StudentLinkedList list = new StudentLinkedList(); 
+        boolean running = true;
+
+        System.out.println("=========================================");
+        System.out.println("   STUDENT LINKED LIST MANAGEMENT SYSTEM ");
+        System.out.println("=========================================");
+
+        while (running) {
+            System.out.println("\n--- MENU ---");
+            System.out.println("1. Add Student");
+            System.out.println("2. Display All Students");
+            System.out.println("3. Search Student by ID");
+            System.out.println("4. Delete Student by ID");
+            System.out.println("5. Exit");
+            System.out.print("Select an option (1-5): ");
+
+            if (!scanner.hasNextInt()) {
+                System.out.println("--> Invalid input. Please enter a number.");
+                scanner.next(); // Clear invalid token
+                continue;
+            }
+
+            int choice = scanner.nextInt();
+
+            switch (choice) {
+                case 1:
+                    System.out.print("Enter Student ID: ");
+                    while (!scanner.hasNextInt()) {
+                        System.out.println("--> Invalid ID. Must be an integer.");
+                        scanner.next();
+                    }
+                    int id = scanner.nextInt();
+                    scanner.nextLine(); // Consume newline
+
+                    System.out.print("Enter Student Name: ");
+                    String name = scanner.nextLine();
+
+                    System.out.print("Enter GPA: ");
+                    while (!scanner.hasNextDouble()) {
+                        System.out.println("--> Invalid GPA. Must be a decimal number.");
+                        scanner.next();
+                    }
+                    double gpa = scanner.nextDouble();
+
+                    list.addStudent(id, name, gpa);
+                    break;
+
+                case 2:
+                    list.displayStudents();
+                    break;
+
+                case 3:
+                    System.out.print("Enter Student ID to Search: ");
+                    while (!scanner.hasNextInt()) {
+                        System.out.println("--> Invalid ID.");
+                        scanner.next();
+                    }
+                    int searchId = scanner.nextInt();
+                    list.searchStudent(searchId);
+                    break;
+
+                case 4:
+                    System.out.print("Enter Student ID to Delete: ");
+                    while (!scanner.hasNextInt()) {
+                        System.out.println("--> Invalid ID.");
+                        scanner.next();
+                    }
+                    int deleteId = scanner.nextInt();
+                    list.deleteStudent(deleteId);
+                    break;
+
+                case 5:
+                    running = false;
+                    System.out.println("\nExiting application. Goodbye!");
+                    break;
+
+                default:
+                    System.out.println("--> Invalid option. Please choose between 1 and 5.");
+            }
+        }
+
+        scanner.close();
+    }
+}</code></pre>
+                </div>
+
+                <!-- Right: Explanatory Breakdown Accordion -->
+                <div class="lg:col-span-4 space-y-3">
+                    <h3 class="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider">Key Components Breakdown</h3>
+
+                    <div class="p-3.5 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700/70 text-xs">
+                        <div class="font-bold text-brand-600 dark:text-brand-400 mb-1 flex items-center gap-1.5">
+                            <i class="fa-solid fa-cube"></i> StudentNode Class
+                        </div>
+                        <p class="text-slate-600 dark:text-slate-400">
+                            Holds student data fields along with `next` which acts as a pointer storing the address of the subsequent node.
+                        </p>
+                    </div>
+
+                    <div class="p-3.5 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700/70 text-xs">
+                        <div class="font-bold text-emerald-600 dark:text-emerald-400 mb-1 flex items-center gap-1.5">
+                            <i class="fa-solid fa-flag"></i> The Head Pointer
+                        </div>
+                        <p class="text-slate-600 dark:text-slate-400">
+                            Points strictly to the first element. If `head == null`, the memory list contains zero elements. Losing `head` causes memory reference loss.
+                        </p>
+                    </div>
+
+                    <div class="p-3.5 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700/70 text-xs">
+                        <div class="font-bold text-amber-600 dark:text-amber-400 mb-1 flex items-center gap-1.5">
+                            <i class="fa-solid fa-arrows-split-up-and-left"></i> Deletion Logic Edge Cases
+                        </div>
+                        <p class="text-slate-600 dark:text-slate-400">
+                            Requires updating pointers. Deleting `head` moves head pointer down (`head = head.next`). Deleting interior nodes links `prev.next` directly to `current.next`.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Student Exercises & Coding Tasks Section -->
+        <section class="bg-white dark:bg-slate-800/90 rounded-3xl border border-slate-200 dark:border-slate-700 p-6 sm:p-8 shadow-xl space-y-6">
+            <div>
+                <span class="text-xs font-semibold text-brand-600 dark:text-brand-400 uppercase tracking-wider">Hands-On Practice</span>
+                <h2 class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">Laboratory Tasks & Enhancement Challenges</h2>
+                <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Modify the base code above to complete the following assignment requirements.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Task 1 -->
+                <div class="p-5 rounded-2xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700/60 relative space-y-2">
+                    <div class="flex items-center justify-between">
+                        <span class="px-2.5 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 font-semibold text-[11px]">Task 1 • Easy</span>
+                        <span class="text-xs font-mono text-slate-400">O(1) Insertion</span>
+                    </div>
+                    <h3 class="font-bold text-sm text-slate-900 dark:text-white">Implement `addAtBeginning(id, name, gpa)`</h3>
+                    <p class="text-xs text-slate-600 dark:text-slate-400">
+                        Write a method that inserts a new student node at the front of the list, making it the new `head`. Contrast its $O(1)$ efficiency against appending at tail $O(n)$.
+                    </p>
+                </div>
+
+                <!-- Task 2 -->
+                <div class="p-5 rounded-2xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700/60 relative space-y-2">
+                    <div class="flex items-center justify-between">
+                        <span class="px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300 font-semibold text-[11px]">Task 2 • Medium</span>
+                        <span class="text-xs font-mono text-slate-400">List Traversal</span>
+                    </div>
+                    <h3 class="font-bold text-sm text-slate-900 dark:text-white">Implement `calculateAverageGPA()`</h3>
+                    <p class="text-xs text-slate-600 dark:text-slate-400">
+                        Traverse the entire linked list, sum up the `gpa` of all student nodes, and return the calculated arithmetic mean.
+                    </p>
+                </div>
+
+                <!-- Task 3 -->
+                <div class="p-5 rounded-2xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700/60 relative space-y-2">
+                    <div class="flex items-center justify-between">
+                        <span class="px-2.5 py-0.5 rounded-full bg-purple-100 dark:bg-purple-900/50 text-purple-700 dark:text-purple-300 font-semibold text-[11px]">Task 3 • Advanced</span>
+                        <span class="text-xs font-mono text-slate-400">Sorting Alg</span>
+                    </div>
+                    <h3 class="font-bold text-sm text-slate-900 dark:text-white">Sort Students by ID (`sortById()`)</h3>
+                    <p class="text-xs text-slate-600 dark:text-slate-400">
+                        Implement Bubble Sort or Selection Sort on the linked list structure to order all students by ID ascending without using built-in Java sorting utilities.
+                    </p>
+                </div>
+
+                <!-- Task 4 -->
+                <div class="p-5 rounded-2xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700/60 relative space-y-2">
+                    <div class="flex items-center justify-between">
+                        <span class="px-2.5 py-0.5 rounded-full bg-rose-100 dark:bg-rose-900/50 text-rose-700 dark:text-rose-300 font-semibold text-[11px]">Task 4 • Challenge</span>
+                        <span class="text-xs font-mono text-slate-400">Pointer Reversal</span>
+                    </div>
+                    <h3 class="font-bold text-sm text-slate-900 dark:text-white">Reverse List In-Place (`reverseList()`)</h3>
+                    <p class="text-xs text-slate-600 dark:text-slate-400">
+                        Reverse all pointers in the linked list using three iterative pointers (`prev`, `current`, `next`) so the tail becomes the new head.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Quiz Section -->
+        <section class="bg-white dark:bg-slate-800/90 rounded-3xl border border-slate-200 dark:border-slate-700 p-6 sm:p-8 shadow-xl space-y-6">
+            <div>
+                <span class="text-xs font-semibold text-brand-600 dark:text-brand-400 uppercase tracking-wider">Concept Check</span>
+                <h2 class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">Self-Assessment Quiz</h2>
+                <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Verify your understanding of Linked List dynamics before submitting your laboratory report.</p>
+            </div>
+
+            <div class="space-y-6">
+                <!-- Q1 -->
+                <div class="p-5 rounded-2xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700/60 space-y-3">
+                    <p class="text-xs sm:text-sm font-semibold text-slate-900 dark:text-white">
+                        1. What is the time complexity to search for a student by ID in an unsorted Singly Linked List of size $N$?
+                    </p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                        <button onclick="checkQuiz(this, false, 'q1')" class="quiz-opt p-3 text-left rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 transition">A) $O(1)$</button>
+                        <button onclick="checkQuiz(this, true, 'q1')" class="quiz-opt p-3 text-left rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 transition">B) $O(N)$</button>
+                        <button onclick="checkQuiz(this, false, 'q1')" class="quiz-opt p-3 text-left rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 transition">C) $O(\log N)$</button>
+                        <button onclick="checkQuiz(this, false, 'q1')" class="quiz-opt p-3 text-left rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 transition">D) $O(N^2)$</button>
+                    </div>
+                </div>
+
+                <!-- Q2 -->
+                <div class="p-5 rounded-2xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700/60 space-y-3">
+                    <p class="text-xs sm:text-sm font-semibold text-slate-900 dark:text-white">
+                        2. What happens if you execute `head = head.next` when `head` is the only element in the list?
+                    </p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                        <button onclick="checkQuiz(this, false, 'q2')" class="quiz-opt p-3 text-left rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 transition">A) Throws NullPointerException</button>
+                        <button onclick="checkQuiz(this, true, 'q2')" class="quiz-opt p-3 text-left rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 transition">B) `head` becomes `null`, list becomes empty</button>
+                        <button onclick="checkQuiz(this, false, 'q2')" class="quiz-opt p-3 text-left rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 transition">C) Causes an infinite loop</button>
+                        <button onclick="checkQuiz(this, false, 'q2')" class="quiz-opt p-3 text-left rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 transition">D) Memory leak occurs immediately</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 mt-12 py-6 text-center text-xs text-slate-500">
+        <div class="max-w-7xl mx-auto px-4">
+            <p>CC 2103 Data Structures and Algorithms • Java Computer Laboratory Module</p>
+        </div>
+    </footer>
+
+    <script>
+        // --- Dark Mode State Management ---
+        function toggleDarkMode() {
+            const html = document.documentElement;
+            const icon = document.getElementById('themeIcon');
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark');
+                icon.className = 'fa-solid fa-moon text-lg';
+            } else {
+                html.classList.add('dark');
+                icon.className = 'fa-solid fa-sun text-lg';
+            }
+        }
+
+        // --- Copy Java Code Snippet ---
+        function copyCode() {
+            const codeText = document.getElementById('javaCodeBlock').innerText;
+            const btnText = document.getElementById('copyBtnText');
+            
+            // Clipboard Fallback Strategy
+            const textarea = document.createElement('textarea');
+            textarea.value = codeText;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+
+            btnText.textContent = "Copied to Clipboard!";
+            setTimeout(() => {
+                btnText.textContent = "Copy Java Code";
+            }, 2000);
+        }
+
+        // --- Interactive Memory Visualizer State ---
+        class NodeSim {
+            constructor(id, name, gpa) {
+                this.id = id;
+                this.name = name;
+                this.gpa = gpa;
+                this.next = null;
+            }
+        }
+
+        let simHead = null;
+
+        function updateLog(msg, isError = false) {
+            const logText = document.getElementById('simLogText');
+            const logBox = document.getElementById('simLog');
+            logText.textContent = msg;
+            if (isError) {
+                logBox.className = "text-xs font-mono px-4 py-2.5 rounded-xl bg-slate-900 text-rose-400 border border-rose-900/50 flex items-center gap-2";
+            } else {
+                logBox.className = "text-xs font-mono px-4 py-2.5 rounded-xl bg-slate-900 text-emerald-400 border border-slate-800 flex items-center gap-2";
+            }
+        }
+
+        function renderVisualList(highlightId = null, activePointerIndex = null) {
+            const container = document.getElementById('visualListContainer');
+            container.innerHTML = '';
+
+            if (!simHead) {
+                container.innerHTML = `
+                    <div class="flex items-center gap-3 text-slate-400 dark:text-slate-500 font-mono text-xs">
+                        <span class="px-3 py-1 bg-slate-200 dark:bg-slate-800 rounded-lg text-slate-600 dark:text-slate-400 font-semibold">head</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                        <span class="px-3 py-1 bg-rose-100 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 rounded-lg border border-rose-300 dark:border-rose-800">null (List Empty)</span>
+                    </div>
+                `;
+                return;
+            }
+
+            // Render Head Label
+            const headLabel = document.createElement('div');
+            headLabel.className = 'flex items-center gap-1.5 text-xs font-mono font-bold text-brand-600 dark:text-brand-400 mr-2';
+            headLabel.innerHTML = '<span>head</span> <i class="fa-solid fa-arrow-right"></i>';
+            container.appendChild(headLabel);
+
+            let current = simHead;
+            let index = 0;
+
+            while (current !== null) {
+                const isHighlight = current.id === highlightId;
+                const isPointerActive = index === activePointerIndex;
+
+                const nodeCard = document.createElement('div');
+                nodeCard.className = `flex items-center flex-shrink-0 transition-all duration-300 ${isHighlight ? 'scale-105' : ''}`;
+                
+                let borderClass = 'border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800';
+                if (isHighlight) borderClass = 'border-amber-500 ring-2 ring-amber-400 bg-amber-50 dark:bg-amber-950/40';
+                if (isPointerActive) borderClass = 'border-brand-500 ring-2 ring-brand-400 bg-brand-50 dark:bg-brand-950/40';
+
+                nodeCard.innerHTML = `
+                    <div class="border ${borderClass} rounded-2xl shadow-md p-3 w-44 flex flex-col justify-between text-xs font-mono relative">
+                        <div class="flex justify-between items-center border-b border-slate-200 dark:border-slate-700/80 pb-1.5 mb-1.5">
+                            <span class="font-bold text-slate-900 dark:text-white">ID: ${current.id}</span>
+                            <span class="text-[10px] text-brand-600 dark:text-brand-400 font-semibold">Node #${index+1}</span>
+                        </div>
+                        <div class="text-slate-600 dark:text-slate-300 truncate">Name: ${current.name}</div>
+                        <div class="text-slate-500 dark:text-slate-400">GPA: ${current.gpa}</div>
+                        <div class="mt-2 pt-1 border-t border-slate-100 dark:border-slate-700/50 flex justify-between text-[10px] text-slate-400">
+                            <span>next:</span>
+                            <span class="text-emerald-600 dark:text-emerald-400 font-semibold">${current.next ? '0x' + Math.abs(current.next.id * 1024).toString(16) : 'null'}</span>
+                        </div>
+                    </div>
+                    ${current.next ? `
+                        <div class="px-2 text-slate-400 dark:text-slate-600 flex items-center">
+                            <i class="fa-solid fa-arrow-right text-lg text-brand-500"></i>
+                        </div>
+                    ` : `
+                        <div class="px-3 text-xs font-mono text-rose-500 flex items-center gap-1">
+                            <i class="fa-solid fa-arrow-right"></i> null
+                        </div>
+                    `}
+                `;
+
+                container.appendChild(nodeCard);
+                current = current.next;
+                index++;
+            }
+        }
+
+        function simAddTail() {
+            const idInput = document.getElementById('simIdInput');
+            const nameInput = document.getElementById('simNameInput');
+            const gpaInput = document.getElementById('simGpaInput');
+
+            const id = parseInt(idInput.value);
+            const name = nameInput.value.trim() || 'Student';
+            const gpa = parseFloat(gpaInput.value) || 2.0;
+
+            if (isNaN(id)) {
+                updateLog("Error: Please provide a valid numeric Student ID.", true);
+                return;
+            }
+
+            const newNode = new NodeSim(id, name, gpa);
+
+            if (!simHead) {
+                simHead = newNode;
+                updateLog(`Node ID ${id} created as the HEAD node.`);
+            } else {
+                let curr = simHead;
+                while (curr.next !== null) {
+                    curr = curr.next;
+                }
+                curr.next = newNode;
+                updateLog(`Node ID ${id} appended to the end of the list.`);
+            }
+
+            idInput.value = '';
+            nameInput.value = '';
+            gpaInput.value = '';
+            renderVisualList(id);
+        }
+
+        function simDeleteNode() {
+            const idInput = document.getElementById('simIdInput');
+            const id = parseInt(idInput.value);
+
+            if (isNaN(id)) {
+                updateLog("Error: Enter a Student ID to delete.", true);
+                return;
+            }
+
+            if (!simHead) {
+                updateLog("Error: Linked list is currently empty.", true);
+                return;
+            }
+
+            if (simHead.id === id) {
+                simHead = simHead.next;
+                updateLog(`Head node ID ${id} deleted. New head updated.`);
+                renderVisualList();
+                return;
+            }
+
+            let curr = simHead;
+            let prev = null;
+
+            while (curr !== null && curr.id !== id) {
+                prev = curr;
+                curr = curr.next;
+            }
+
+            if (!curr) {
+                updateLog(`Student ID ${id} not found in the list.`, true);
+            } else {
+                prev.next = curr.next;
+                updateLog(`Deleted Student ID ${id}. Pointers re-linked.`);
+                renderVisualList();
+            }
+        }
+
+        function simSearchNode() {
+            const idInput = document.getElementById('simIdInput');
+            const id = parseInt(idInput.value);
+
+            if (isNaN(id)) {
+                updateLog("Error: Enter a Student ID to search.", true);
+                return;
+            }
+
+            let curr = simHead;
+            let found = false;
+
+            while (curr !== null) {
+                if (curr.id === id) {
+                    found = true;
+                    break;
+                }
+                curr = curr.next;
+            }
+
+            if (found) {
+                updateLog(`SUCCESS: Found Student ID ${id} (${curr.name}).`);
+                renderVisualList(id);
+            } else {
+                updateLog(`SEARCH FAILED: Student ID ${id} is not in the list.`, true);
+                renderVisualList();
+            }
+        }
+
+        function simTraverseList() {
+            if (!simHead) {
+                updateLog("List is empty. Nothing to traverse.", true);
+                return;
+            }
+
+            let curr = simHead;
+            let step = 0;
+
+            function stepTraverse() {
+                if (curr !== null) {
+                    updateLog(`Traversing... Visiting Node #${step+1} (ID: ${curr.id}, Name: ${curr.name})`);
+                    renderVisualList(null, step);
+                    curr = curr.next;
+                    step++;
+                    setTimeout(stepTraverse, 800);
+                } else {
+                    updateLog("Traversal Complete: Reached end of list (null).");
+                    setTimeout(() => renderVisualList(), 1000);
+                }
+            }
+
+            stepTraverse();
+        }
+
+        function loadSampleData() {
+            simHead = new NodeSim(1, "Ronald T. Lava", 1.25);
+            simHead.next = new NodeSim(2, "Joshua Dela Rueda", 1.50);
+            simHead.next.next = new NodeSim(3, "Patrecia Toledo", 1.75);
+            updateLog("Sample student records loaded successfully.");
+            renderVisualList();
+        }
+
+        function resetListSimulation() {
+            simHead = null;
+            updateLog("List reset. Memory cleared.");
+            renderVisualList();
+        }
+
+        // Quiz Logic
+        function checkQuiz(button, isCorrect, qId) {
+            const parent = button.parentElement;
+            const buttons = parent.querySelectorAll('.quiz-opt');
+            
+            buttons.forEach(btn => {
+                btn.disabled = true;
+                btn.classList.remove('hover:bg-slate-100', 'dark:hover:bg-slate-800');
+            });
+
+            if (isCorrect) {
+                button.classList.add('bg-emerald-100', 'dark:bg-emerald-900/60', 'border-emerald-500', 'text-emerald-800', 'dark:text-emerald-200');
+            } else {
+                button.classList.add('bg-rose-100', 'dark:bg-rose-900/60', 'border-rose-500', 'text-rose-800', 'dark:text-rose-200');
+            }
+        }
+
+        // Initialize Simulator with Sample Data on Load
+        window.onload = function() {
+            loadSampleData();
+        };
+    </script>
+</body>
+</html>
