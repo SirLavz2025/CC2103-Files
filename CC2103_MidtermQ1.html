@@ -1,0 +1,1172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Laguna University — CC 2103 Midterm Quiz</title>
+<style>
+:root {
+    --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #311042 100%);
+    --card-bg: rgba(255, 255, 255, 0.07);
+    --card-border: rgba(255, 255, 255, 0.15);
+    --primary: #818cf8;
+    --accent: #f43f5e;
+    --gold: #fbbf24;
+    --success: #10b981;
+    --text: #f8fafc;
+    --text-muted: #94a3b8;
+    --slot-bg: rgba(255, 255, 255, 0.08);
+    --slot-border: rgba(255, 255, 255, 0.25);
+    --lu-blue: #1e3a8a;
+}
+
+* {
+    box-sizing: border-box;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: var(--bg-gradient);
+    color: var(--text);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 12px;
+}
+
+.header {
+    width: min(800px, 100%);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    gap: 10px;
+}
+
+.header-title h1 {
+    margin: 0;
+    font-size: clamp(18px, 4vw, 24px);
+    background: linear-gradient(90deg, #c084fc, #60a5fa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+}
+
+.header-title p {
+    margin: 2px 0 0;
+    color: var(--text-muted);
+    font-size: clamp(10px, 2.5vw, 12px);
+}
+
+.camera-box {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid var(--card-border);
+    border-radius: 10px;
+    padding: 4px;
+    text-align: center;
+}
+
+.camera-box small {
+    display: block;
+    font-size: 8px;
+    color: #a5b4fc;
+    text-transform: uppercase;
+    margin-bottom: 2px;
+}
+
+#proctorCam {
+    width: clamp(48px, 12vw, 64px);
+    height: clamp(36px, 9vw, 48px);
+    object-fit: cover;
+    border-radius: 6px;
+    transform: scaleX(-1);
+    background: #000;
+}
+
+.main-container {
+    width: min(800px, 100%);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.stats-bar {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    backdrop-filter: blur(10px);
+    padding: 10px 12px;
+    border-radius: 16px;
+    text-align: center;
+}
+
+.stat-item {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.stat-label {
+    font-size: clamp(9px, 2vw, 11px);
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.stat-val {
+    font-size: clamp(14px, 3.5vw, 18px);
+    font-weight: bold;
+    color: var(--gold);
+}
+
+.timer-val {
+    color: #f87171;
+    font-family: monospace;
+}
+
+.game-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    backdrop-filter: blur(12px);
+    border-radius: 20px;
+    padding: clamp(16px, 4vw, 30px);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.category-badge {
+    background: rgba(129, 140, 248, 0.2);
+    border: 1px solid rgba(129, 140, 248, 0.4);
+    color: #a5b4fc;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: clamp(10px, 2.5vw, 12px);
+    font-weight: 600;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.question-text {
+    font-size: clamp(14px, 3.2vw, 18px);
+    line-height: 1.4;
+    margin-bottom: 20px;
+    min-height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.word-slots-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: clamp(8px, 2vw, 15px);
+    margin-bottom: 20px;
+    min-height: 50px;
+    width: 100%;
+}
+
+.word-group {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.slot {
+    width: clamp(28px, 7vw, 42px);
+    height: clamp(36px, 9vw, 50px);
+    background: var(--slot-bg);
+    border: 2px solid var(--slot-border);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: clamp(14px, 4vw, 22px);
+    font-weight: 800;
+    color: var(--gold);
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    transition: all 0.2s ease;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.slot.active {
+    border-color: var(--primary);
+    background: rgba(129, 140, 248, 0.15);
+}
+
+.slot.correct {
+    border-color: var(--success);
+    background: rgba(16, 185, 129, 0.2);
+    color: #34d399;
+}
+
+.slot.wrong {
+    border-color: var(--accent);
+    background: rgba(244, 63, 94, 0.2);
+    color: #f87171;
+    animation: shake 0.4s ease;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-5px); }
+    40%, 80% { transform: translateX(5px); }
+}
+
+.wheel-section {
+    position: relative;
+    width: clamp(180px, 45vw, 220px);
+    height: clamp(180px, 45vw, 220px);
+    margin: 5px 0 15px;
+    touch-action: none;
+}
+
+.wheel-canvas {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.letter-btn {
+    position: absolute;
+    width: clamp(38px, 9vw, 48px);
+    height: clamp(38px, 9vw, 48px);
+    border-radius: 50%;
+    background: linear-gradient(145deg, #312e81, #1e1b4b);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    color: #ffffff;
+    font-size: clamp(14px, 3.5vw, 20px);
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+    transition: transform 0.15s, border-color 0.15s;
+    z-index: 2;
+    transform: translate(-50%, -50%);
+}
+
+.letter-btn:active {
+    transform: translate(-50%, -50%) scale(0.95);
+}
+
+.letter-btn.selected {
+    background: linear-gradient(145deg, #4f46e5, #3730a3);
+    border-color: var(--gold);
+    box-shadow: 0 0 12px rgba(251, 191, 36, 0.6);
+}
+
+.controls-row {
+    display: flex;
+    gap: 8px;
+    width: 100%;
+    justify-content: center;
+    margin-top: 5px;
+    flex-wrap: wrap;
+}
+
+.btn {
+    flex: 1;
+    min-width: 100px;
+    max-width: 140px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    padding: clamp(8px, 2vw, 12px);
+    border-radius: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    font-size: clamp(11px, 2.5vw, 13px);
+}
+
+.btn:active {
+    transform: scale(0.98);
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #6366f1, #4f46e5);
+    border: none;
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.4);
+}
+
+.btn-danger {
+    background: linear-gradient(135deg, #e11d48, #be123c);
+    border: none;
+    box-shadow: 0 4px 12px rgba(225, 29, 72, 0.4);
+}
+
+.nav-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(28px, 1fr));
+    gap: 6px;
+    background: var(--card-bg);
+    padding: 12px;
+    border-radius: 16px;
+    border: 1px solid var(--card-border);
+}
+
+.nav-dot {
+    aspect-ratio: 1;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: var(--text-muted);
+    font-size: clamp(10px, 2.2vw, 12px);
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.nav-dot.active {
+    border-color: var(--gold);
+    color: var(--gold);
+    background: rgba(251, 191, 36, 0.15);
+}
+
+.nav-dot.solved {
+    background: rgba(16, 185, 129, 0.2);
+    border-color: var(--success);
+    color: #34d399;
+}
+
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.95);
+    backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    z-index: 100;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+    overflow-y: auto;
+}
+
+.modal-overlay.show {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.modal-box {
+    background: #1e1b4b;
+    border: 2px solid var(--gold);
+    border-radius: 20px;
+    padding: clamp(20px, 5vw, 35px);
+    text-align: center;
+    max-width: 440px;
+    width: 100%;
+    box-shadow: 0 25px 60px rgba(0,0,0,0.6);
+}
+
+.modal-box h2 {
+    color: var(--gold);
+    margin-top: 0;
+    font-size: clamp(20px, 5vw, 26px);
+}
+
+.form-group {
+    text-align: left;
+    margin-bottom: 12px;
+}
+
+.form-group label {
+    font-size: 11px;
+    color: #cbd5e1;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+}
+
+.form-input, .form-select {
+    width: 100%;
+    padding: 10px;
+    margin-top: 4px;
+    border-radius: 8px;
+    border: 1px solid var(--card-border);
+    background: rgba(255,255,255,0.1);
+    color: #fff;
+    font-size: 13px;
+    outline: none;
+    box-sizing: border-box;
+    font-family: inherit;
+}
+
+.form-select option {
+    background-color: #1e1b4b;
+    color: #fff;
+}
+
+.cert-modal-box {
+    background: #fdfbf7;
+    color: #172033;
+    border: 8px double #1e3a8a;
+    border-radius: 12px;
+    padding: clamp(20px, 4vw, 35px);
+    text-align: center;
+    max-width: 750px;
+    width: 100%;
+    box-shadow: 0 25px 60px rgba(0,0,0,0.8);
+    position: relative;
+    user-select: text;
+    -webkit-user-select: text;
+}
+
+.cert-header h3 {
+    margin: 0;
+    font-size: clamp(14px, 3.2vw, 20px);
+    color: #1e3a8a;
+    text-transform: uppercase;
+    font-weight: 800;
+    letter-spacing: 1px;
+}
+
+.cert-header h4 {
+    margin: 4px 0 15px;
+    font-size: clamp(11px, 2.5vw, 14px);
+    color: #475569;
+    font-weight: 600;
+}
+
+.cert-title {
+    font-family: Georgia, serif;
+    font-size: clamp(22px, 5vw, 32px);
+    color: #1e3a8a;
+    margin: 15px 0 10px;
+    letter-spacing: 1px;
+}
+
+.cert-student-name {
+    font-family: Georgia, serif;
+    font-size: clamp(20px, 4.5vw, 28px);
+    font-weight: bold;
+    color: #0f172a;
+    border-bottom: 2px solid #94a3b8;
+    display: inline-block;
+    padding: 0 20px 4px;
+    margin: 10px 0;
+}
+
+.cert-course {
+    font-size: clamp(13px, 3vw, 16px);
+    font-weight: 700;
+    color: #1e3a8a;
+    margin: 10px 0;
+}
+
+.cert-score-box {
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    border-radius: 12px;
+    padding: 12px;
+    margin: 15px auto;
+    max-width: 320px;
+}
+
+.cert-score-val {
+    font-size: clamp(20px, 4.5vw, 26px);
+    font-weight: 900;
+    color: #16a34a;
+}
+
+.cert-signatures {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 35px;
+    gap: 20px;
+}
+
+.cert-sig {
+    border-top: 2px solid #1e3a8a;
+    width: 200px;
+    padding-top: 6px;
+    font-weight: 700;
+    font-size: 13px;
+    color: #1e293b;
+}
+
+.cert-sig small {
+    display: block;
+    font-weight: normal;
+    color: #64748b;
+    font-size: 11px;
+}
+
+@media print {
+    body * { visibility: hidden; }
+    #certModal, #certModal * { visibility: visible; }
+    #certModal {
+        position: absolute;
+        left: 0; top: 0;
+        width: 100%;
+        background: white;
+    }
+    .cert-actions { display: none !important; }
+}
+</style>
+</head>
+<body>
+
+<div class="modal-overlay show" id="startModal">
+    <div class="modal-box">
+        <h2 style="font-size: clamp(18px, 4vw, 22px);">Laguna University</h2>
+        <p style="font-size: 12px; color: #a5b4fc; margin-top: -10px; margin-bottom: 15px;">College of Computing Studies</p>
+        
+        <div class="form-group">
+            <label>Student Full Name:</label>
+            <input type="text" id="inputStudentName" class="form-input" placeholder="e.g., Dela Cruz, Juan A.">
+        </div>
+
+        <div class="form-group">
+            <label>Course:</label>
+            <select id="inputCourse" class="form-select">
+                <option value="" disabled selected>-- Select Course --</option>
+                <option value="BSIT">BSIT - Bachelor of Science in Information Technology</option>
+                <option value="BSCS">BSCS - Bachelor of Science in Computer Science</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Year & Section:</label>
+            <select id="inputYearSection" class="form-select">
+                <option value="" disabled selected>-- Select Year & Section --</option>
+                <option value="2A">2A</option>
+                <option value="2B">2B</option>
+                <option value="2C">2C</option>
+                <option value="2D">2D</option>
+            </select>
+        </div>
+
+        <p style="font-size: clamp(10px, 2.5vw, 11px); color:#cbd5e1; line-height:1.4; text-align: left; margin-top: 15px;">
+            <strong>Proctoring Notice:</strong><br>
+            • Subject: <strong>CC 2103 — Data Structure and Algorithms</strong><br>
+            • Time Limit: <strong>30 Minutes</strong><br>
+            • Webcam proctoring and anti-tab switching rules are strictly enforced.
+        </p>
+        <button class="btn btn-primary" style="margin: 15px auto 0; max-width: 100%;" onclick="startExam()">Start Quiz & Enable Camera →</button>
+    </div>
+</div>
+
+<div class="header">
+    <div class="header-title">
+        <h1>Laguna University</h1>
+        <p>College of Computing Studies • CC 2103</p>
+    </div>
+
+    <div class="camera-box">
+        <small>Proctor Cam</small>
+        <video id="proctorCam" autoplay playsinline muted></video>
+    </div>
+</div>
+
+<div class="main-container">
+    <div class="stats-bar">
+        <div class="stat-item">
+            <span class="stat-label">Timer</span>
+            <span class="stat-val timer-val" id="timerDisplay">30:00</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">Item</span>
+            <span class="stat-val" id="itemProgress">1 / 24</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">Score</span>
+            <span class="stat-val" id="scoreDisplay">0 / 240</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">Alerts</span>
+            <span class="stat-val" style="color:#f87171;" id="violationDisplay">0</span>
+        </div>
+    </div>
+
+    <div class="game-card">
+        <div class="category-badge" id="categoryBadge">Module 5: Recursion</div>
+        <div class="question-text" id="questionText">Loading...</div>
+
+        <div class="word-slots-container" id="wordSlots"></div>
+
+        <div class="wheel-section" id="wheelSection">
+            <canvas class="wheel-canvas" id="wheelCanvas"></canvas>
+            <div id="lettersContainer"></div>
+        </div>
+
+        <div class="controls-row">
+            <button class="btn" onclick="clearSelection()">↺ Clear</button>
+            <button class="btn" onclick="shuffleLetters()">🔀 Shuffle</button>
+            <button class="btn btn-primary" onclick="submitWord()">✓ Submit</button>
+            <button class="btn btn-danger" onclick="confirmEarlySubmit()">🏁 Finish Exam</button>
+        </div>
+    </div>
+
+    <div class="nav-grid" id="navGrid"></div>
+</div>
+
+<div class="modal-overlay" id="confirmModal">
+    <div class="modal-box">
+        <h2 style="color: #f87171;">⚠️ Submit Quiz Early?</h2>
+        <p style="font-size: 13px; color: #cbd5e1; line-height: 1.5;" id="confirmText">
+            Are you sure you want to finish and submit your exam now? Unanswered questions will receive 0 points.
+        </p>
+        <div style="display: flex; gap: 10px; margin-top: 20px;">
+            <button class="btn" style="flex:1; max-width: 100%;" onclick="closeConfirmModal()">Continue Exam</button>
+            <button class="btn btn-danger" style="flex:1; max-width: 100%;" onclick="finishExam()">Yes, Submit</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="certModal">
+    <div class="cert-modal-box">
+        <div class="cert-header">
+            <h3>Laguna University</h3>
+            <h4>College of Computing Studies</h4>
+        </div>
+
+        <div class="cert-title">Certificate of Completion</div>
+        <p style="font-size: 13px; color: #64748b; margin: 5px 0;">This official digital result certifies that</p>
+        
+        <div class="cert-student-name" id="certStudentName">STUDENT NAME</div>
+        <div style="font-size: 13px; font-weight: 700; color: #475569; margin-top: 2px;" id="certStudentMeta">BSIT • Section 2A</div>
+        
+        <p style="font-size: 13px; color: #475569; margin: 12px 0 4px;">has completed the proctored online examination for</p>
+        <div class="cert-course">CC 2103 — Data Structure and Algorithms Midterm Quiz</div>
+        <p style="font-size: 12px; color: #64748b; margin: 0;">Covering Modules: Recursion & Linked Lists</p>
+
+        <div class="cert-score-box">
+            <div style="font-size: 11px; color: #1e3a8a; font-weight: bold; text-transform: uppercase;">Official Score</div>
+            <div class="cert-score-val" id="certFinalScore">0 / 240 (0%)</div>
+            <div style="font-size: 11px; color: #64748b; margin-top: 2px;" id="certMetaDetails">Completed in --:-- | Alerts: 0</div>
+        </div>
+
+        <div class="cert-signatures">
+            <div class="cert-sig">
+                RONALD T. LAVA, MSIT
+                <small>Instructor, CCS</small>
+            </div>
+        </div>
+
+        <div class="cert-actions" style="margin-top: 30px; display: flex; gap: 10px; justify-content: center;">
+            <button class="btn btn-primary" onclick="window.print()">🖨️ Print / Save Certificate</button>
+        </div>
+    </div>
+</div>
+
+<script>
+const quizData = [
+    { cat: "Module 5: Recursion", q: "What is a technique where a method makes one or more calls to itself during execution?", a: "RECURSION" },
+    { cat: "Module 5: Recursion", q: "What type of recursion occurs when a function directly calls itself?", a: "DIRECT RECURSION" },
+    { cat: "Module 5: Recursion", q: "What type of recursion occurs when two or more functions call one another in a circular manner?", a: "INDIRECT RECURSION" },
+    { cat: "Module 5: Recursion", q: "What is a direct recursion where the recursive call is the last statement in the function?", a: "TAIL RECURSION" },
+    { cat: "Module 5: Recursion", q: "What is a direct recursion where the recursive call is the first statement in the function?", a: "HEAD RECURSION" },
+    { cat: "Module 5: Recursion", q: "What is it called when a recursive function calls itself exactly one time?", a: "LINEAR RECURSION" },
+    { cat: "Module 5: Recursion", q: "What is it called when a recursive function calls itself more than once?", a: "TREE RECURSION" },
+    { cat: "Module 5: Recursion", q: "What is it called when a recursive function passes a parameter that is a recursive call?", a: "NESTED RECURSION" },
+    { cat: "Module 5: Recursion", q: "What represents the simplest, smallest instance of a problem that stops recursion?", a: "BASE CASE" },
+    { cat: "Module 5: Recursion", q: "What part of an implementation decomposes a larger problem into smaller instances?", a: "RECURSIVE STEP" },
+    { cat: "Module 5: Recursion", q: "Which function is defined recursively as n times (n-1)! with base case 0! = 1?", a: "FACTORIAL FUNCTION" },
+    { cat: "Module 5: Recursion", q: "Which sequence has each number defined as the sum of the two preceding numbers?", a: "FIBONACCI NUMBERS" },
+    { cat: "Module 5: Recursion", q: "What search algorithm splits sorted sequences in half recursively?", a: "RECURSIVE BINARY SEARCH" },
+    { cat: "Module 6: Linked List", q: "What is a dynamic collection of components called nodes linked sequentially?", a: "LINKED LIST" },
+    { cat: "Module 6: Linked List", q: "What basic building block of a linked list contains data fields and pointer fields?", a: "NODE" },
+    { cat: "Module 6: Linked List", q: "What pointer reference stores the address of the first node in a linked list?", a: "HEAD" },
+    { cat: "Module 6: Linked List", q: "What pointer reference points to the last node of a linked list?", a: "TAIL" },
+    { cat: "Module 6: Linked List", q: "What special link value indicates the end of a linked list?", a: "NULL" },
+    { cat: "Module 6: Linked List", q: "What list type contains a next pointer pointing only to the succeeding element?", a: "SINGLY LINKED LIST" },
+    { cat: "Module 6: Linked List", q: "What list type contains data, a next pointer, and a previous pointer in each node?", a: "DOUBLY LINKED LIST" },
+    { cat: "Module 6: Linked List", q: "What linked list type has all nodes forming a continuous circle where the last points to the first?", a: "CIRCULAR LINKED LIST" },
+    { cat: "Module 6: Linked List", q: "What is the process of visiting each node in a linked list sequentially?", a: "TRAVERSAL" },
+    { cat: "Module 6: Linked List", q: "What dynamic operation adds a new node at the beginning, middle, or end of a list?", a: "INSERTION" },
+    { cat: "Module 6: Linked List", q: "What operation unlinks and removes a target node from a linked list?", a: "DELETION" }
+];
+
+let currentIndex = 0;
+let solvedStatus = new Array(quizData.length).fill(false);
+let selectedLetters = [];
+let wheelChars = [];
+let score = 0;
+let violations = 0;
+let examStarted = false;
+let timerInterval = null;
+let timeLeft = 30 * 60;
+let examRecordId = null;
+
+let studentInfo = {
+    name: "",
+    course: "",
+    yearSection: ""
+};
+
+let mediaStream = null;
+
+const canvas = document.getElementById('wheelCanvas');
+const ctx = canvas.getContext('2d');
+
+document.addEventListener("contextmenu", e => e.preventDefault());
+
+document.addEventListener("keydown", e => {
+    if (
+        e.key === "F12" ||
+        (e.ctrlKey && e.shiftKey && (e.key === "I" || e.key === "i" || e.key === "J" || e.key === "j" || e.key === "C" || e.key === "c")) ||
+        (e.ctrlKey && (e.key === "U" || e.key === "u"))
+    ) {
+        e.preventDefault();
+        alert("SECURITY WARNING: Inspect element is disabled during the exam!");
+        return false;
+    }
+
+    if (!examStarted) return;
+
+    if (e.key === 'Backspace') {
+        if (selectedLetters.length > 0) deselectLetter(selectedLetters[selectedLetters.length - 1]);
+    } else if (e.key === 'Enter') {
+        submitWord();
+    } else if (/^[a-zA-Z]$/.test(e.key)) {
+        const char = e.key.toUpperCase();
+        for (let i = 0; i < wheelChars.length; i++) {
+            if (wheelChars[i] === char && !selectedLetters.includes(i)) {
+                selectLetter(i);
+                break;
+            }
+        }
+    }
+});
+
+document.addEventListener("visibilitychange", () => {
+    if (examStarted && document.hidden) {
+        violations++;
+        document.getElementById('violationDisplay').textContent = violations;
+        alert(`SECURITY VIOLATION #${violations}: Tab switching or leaving the exam window is prohibited!`);
+    }
+});
+
+/* START EXAM & SAVE INITIAL RECORD TO XAMPP MYSQL */
+async function startExam() {
+    const nameInput = document.getElementById('inputStudentName').value.trim();
+    const courseInput = document.getElementById('inputCourse').value;
+    const yearSecInput = document.getElementById('inputYearSection').value;
+
+    if (!nameInput || !courseInput || !yearSecInput) {
+        alert("Please complete all student information fields (Full Name, Course, and Year & Section) before starting.");
+        return;
+    }
+
+    studentInfo.name = nameInput;
+    studentInfo.course = courseInput;
+    studentInfo.yearSection = yearSecInput;
+
+    // Check secure context requirement for HTTPS / localhost
+    const isSecureContext = window.isSecureContext || window.location.protocol === 'https:' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    
+    if (!isSecureContext) {
+        alert("Webcam proctoring requires a secure context.\n\nPlease open this page via 'http://localhost:3000' or over HTTPS.");
+        return;
+    }
+
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        alert("Your browser or node environment blocked camera access. Check browser site permissions.");
+        return;
+    }
+
+    // Sequence of camera constraints to attempt in descending complexity order
+    const constraintOptions = [
+        { video: { facingMode: "user", width: { ideal: 640 }, height: { ideal: 480 } }, audio: false },
+        { video: { facingMode: "user" }, audio: false },
+        { video: true, audio: false },
+        { video: { width: { min: 320 } }, audio: false }
+    ];
+
+    let streamGranted = false;
+
+    for (const constraints of constraintOptions) {
+        try {
+            mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
+            const videoElem = document.getElementById('proctorCam');
+            videoElem.srcObject = mediaStream;
+            
+            await videoElem.play().catch(e => console.warn("Autoplay handler caught:", e));
+            
+            streamGranted = true;
+            break;
+        } catch (err) {
+            console.warn("Camera constraint attempt failed:", constraints, err);
+        }
+    }
+
+    if (streamGranted) {
+        // Send initial student record to XAMPP MySQL backend
+        try {
+            const res = await fetch('/api/start-exam', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(studentInfo)
+            });
+            const data = await res.json();
+            if (data.recordId) {
+                examRecordId = data.recordId;
+            }
+        } catch (err) {
+            console.warn("MySQL backend unreachable, proceeding in offline mode:", err);
+        }
+
+        document.getElementById('startModal').classList.remove('show');
+        examStarted = true;
+        initGame();
+        startTimer();
+    } else {
+        alert("Unable to access camera.\n\nCheck the following:\n1. Ensure camera permission is granted in your browser address bar.\n2. Ensure no other application (Zoom, Teams, Discord) is holding the camera.\n3. Access via 'http://localhost:3000' rather than an internal IP address.");
+    }
+}
+
+function startTimer() {
+    timerInterval = setInterval(() => {
+        timeLeft--;
+        const mins = Math.floor(timeLeft / 60);
+        const secs = timeLeft % 60;
+        document.getElementById('timerDisplay').textContent = 
+            `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+
+        if (timeLeft <= 0) {
+            clearInterval(timerInterval);
+            alert("Time is up! Your quiz will now be submitted automatically.");
+            finishExam();
+        }
+    }, 1000);
+}
+
+function initGame() {
+    buildNavGrid();
+    loadQuestion(0);
+    window.addEventListener('resize', () => {
+        renderWheel();
+        drawLines();
+    });
+}
+
+function buildNavGrid() {
+    const nav = document.getElementById('navGrid');
+    nav.innerHTML = '';
+    quizData.forEach((_, idx) => {
+        const dot = document.createElement('div');
+        dot.className = `nav-dot ${idx === 0 ? 'active' : ''}`;
+        dot.textContent = idx + 1;
+        dot.onclick = () => loadQuestion(idx);
+        dot.id = `nav-${idx}`;
+        nav.appendChild(dot);
+    });
+}
+
+function updateNavGrid() {
+    quizData.forEach((_, idx) => {
+        const dot = document.getElementById(`nav-${idx}`);
+        if (!dot) return;
+        dot.className = 'nav-dot';
+        if (idx === currentIndex) dot.classList.add('active');
+        if (solvedStatus[idx]) dot.classList.add('solved');
+    });
+}
+
+function loadQuestion(index) {
+    currentIndex = index;
+    selectedLetters = [];
+    const item = quizData[index];
+
+    document.getElementById('categoryBadge').textContent = item.cat;
+    document.getElementById('questionText').textContent = item.q;
+    document.getElementById('itemProgress').textContent = `${index + 1} / ${quizData.length}`;
+
+    renderSlots();
+    generateWheelLetters();
+    updateNavGrid();
+    clearCanvas();
+}
+
+function renderSlots() {
+    const container = document.getElementById('wordSlots');
+    container.innerHTML = '';
+    const answer = quizData[currentIndex].a;
+    const words = answer.split(' ');
+
+    words.forEach(word => {
+        const group = document.createElement('div');
+        group.className = 'word-group';
+        for (let i = 0; i < word.length; i++) {
+            const slot = document.createElement('div');
+            slot.className = 'slot';
+            if (solvedStatus[currentIndex]) {
+                slot.textContent = word[i];
+                slot.classList.add('correct');
+            }
+            group.appendChild(slot);
+        }
+        container.appendChild(group);
+    });
+}
+
+function generateWheelLetters() {
+    const answer = quizData[currentIndex].a.replace(/\s+/g, '');
+    const chars = answer.split('');
+    const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    while (chars.length < 7) {
+        chars.push(alphabet[Math.floor(Math.random() * alphabet.length)]);
+    }
+
+    wheelChars = chars.sort(() => Math.random() - 0.5);
+    renderWheel();
+}
+
+function shuffleLetters() {
+    wheelChars.sort(() => Math.random() - 0.5);
+    selectedLetters = [];
+    clearCanvas();
+    renderWheel();
+    updateSlotsFromSelection();
+}
+
+function renderWheel() {
+    const container = document.getElementById('lettersContainer');
+    const wheelSection = document.getElementById('wheelSection');
+    container.innerHTML = '';
+
+    const width = wheelSection.clientWidth;
+    const total = wheelChars.length;
+    const radius = (width / 2) * 0.70;
+    const centerX = width / 2;
+    const centerY = width / 2;
+
+    wheelChars.forEach((char, idx) => {
+        const angle = (idx / total) * 2 * Math.PI - (Math.PI / 2);
+        const x = centerX + radius * Math.cos(angle);
+        const y = centerY + radius * Math.sin(angle);
+
+        const btn = document.createElement('div');
+        btn.className = 'letter-btn';
+        if (selectedLetters.includes(idx)) btn.classList.add('selected');
+        btn.textContent = char;
+        btn.style.left = `${x}px`;
+        btn.style.top = `${y}px`;
+        btn.id = `btn-letter-${idx}`;
+        
+        btn.onclick = () => handleLetterClick(idx);
+
+        container.appendChild(btn);
+    });
+
+    resizeCanvas();
+}
+
+function handleLetterClick(idx) {
+    if (solvedStatus[currentIndex]) return;
+    const selIdx = selectedLetters.indexOf(idx);
+    if (selIdx !== -1) {
+        if (selIdx === selectedLetters.length - 1) deselectLetter(idx);
+    } else {
+        selectLetter(idx);
+    }
+}
+
+function selectLetter(idx) {
+    selectedLetters.push(idx);
+    document.getElementById(`btn-letter-${idx}`).classList.add('selected');
+    drawLines();
+    updateSlotsFromSelection();
+}
+
+function deselectLetter(idx) {
+    selectedLetters.pop();
+    document.getElementById(`btn-letter-${idx}`).classList.remove('selected');
+    drawLines();
+    updateSlotsFromSelection();
+}
+
+function clearSelection() {
+    selectedLetters.forEach(idx => {
+        const btn = document.getElementById(`btn-letter-${idx}`);
+        if (btn) btn.classList.remove('selected');
+    });
+    selectedLetters = [];
+    clearCanvas();
+    updateSlotsFromSelection();
+}
+
+function updateSlotsFromSelection() {
+    if (solvedStatus[currentIndex]) return;
+    const currentString = selectedLetters.map(i => wheelChars[i]).join('');
+    const slots = document.querySelectorAll('.slot');
+
+    slots.forEach((slot, idx) => {
+        if (currentString[idx]) {
+            slot.textContent = currentString[idx];
+            slot.classList.add('active');
+            slot.classList.remove('wrong');
+        } else {
+            slot.textContent = '';
+            slot.classList.remove('active', 'wrong');
+        }
+    });
+}
+
+function resizeCanvas() {
+    const rect = document.getElementById('wheelSection').getBoundingClientRect();
+    canvas.width = rect.width;
+    canvas.height = rect.height;
+}
+
+function clearCanvas() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+}
+
+function drawLines() {
+    clearCanvas();
+    if (selectedLetters.length < 2) return;
+
+    ctx.beginPath();
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = '#fbbf24';
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+
+    selectedLetters.forEach((btnIdx, index) => {
+        const btn = document.getElementById(`btn-letter-${btnIdx}`);
+        if (!btn) return;
+        const x = btn.offsetLeft;
+        const y = btn.offsetTop;
+
+        if (index === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+    });
+
+    ctx.stroke();
+}
+
+function submitWord() {
+    if (solvedStatus[currentIndex]) {
+        const nextUnsolved = solvedStatus.findIndex((status, i) => !status && i > currentIndex);
+        if (nextUnsolved !== -1) loadQuestion(nextUnsolved);
+        else {
+            const firstUnsolved = solvedStatus.indexOf(false);
+            if (firstUnsolved !== -1) loadQuestion(firstUnsolved);
+        }
+        return;
+    }
+
+    const playerAnswer = selectedLetters.map(i => wheelChars[i]).join('');
+    const targetAnswer = quizData[currentIndex].a.replace(/\s+/g, '');
+    const slots = document.querySelectorAll('.slot');
+
+    if (playerAnswer === targetAnswer) {
+        solvedStatus[currentIndex] = true;
+        score += 10;
+        document.getElementById('scoreDisplay').textContent = `${score} / 240`;
+
+        slots.forEach(slot => {
+            slot.classList.remove('active');
+            slot.classList.add('correct');
+        });
+
+        const solvedCount = solvedStatus.filter(Boolean).length;
+
+        setTimeout(() => {
+            if (solvedCount === quizData.length) {
+                finishExam();
+            } else {
+                const next = solvedStatus.findIndex((s, idx) => !s && idx > currentIndex);
+                if (next !== -1) loadQuestion(next);
+                else loadQuestion(solvedStatus.indexOf(false));
+            }
+        }, 800);
+
+    } else {
+        slots.forEach(slot => {
+            if (slot.textContent !== '') slot.classList.add('wrong');
+        });
+
+        setTimeout(() => {
+            clearSelection();
+        }, 600);
+    }
+}
+
+function confirmEarlySubmit() {
+    const solvedCount = solvedStatus.filter(Boolean).length;
+    const remaining = quizData.length - solvedCount;
+    document.getElementById('confirmText').innerHTML = 
+        `You have answered <strong>${solvedCount} of ${quizData.length}</strong> questions.<br>
+         Submitting now will leave <strong>${remaining} unanswered questions</strong> receiving 0 points.`;
+    document.getElementById('confirmModal').classList.add('show');
+}
+
+function closeConfirmModal() {
+    document.getElementById('confirmModal').classList.remove('show');
+}
+
+/* SUBMIT FINAL EXAM RESULTS TO XAMPP MYSQL */
+async function finishExam() {
+    closeConfirmModal();
+    clearInterval(timerInterval);
+    if (mediaStream) {
+        mediaStream.getTracks().forEach(track => track.stop());
+    }
+
+    const totalPossible = quizData.length * 10;
+    const percentage = Math.round((score / totalPossible) * 100);
+    const elapsedSeconds = (30 * 60) - timeLeft;
+    const elapsedMins = Math.floor(elapsedSeconds / 60);
+    const elapsedSecs = elapsedSeconds % 60;
+    const timeFormatted = `${String(elapsedMins).padStart(2, '0')}:${String(elapsedSecs).padStart(2, '0')}`;
+
+    // Populate Certificate Data
+    document.getElementById('certStudentName').textContent = studentInfo.name.toUpperCase();
+    document.getElementById('certStudentMeta').textContent = `${studentInfo.course} • Section ${studentInfo.yearSection}`;
+    document.getElementById('certFinalScore').textContent = `${score} / ${totalPossible} (${percentage}%)`;
+    document.getElementById('certMetaDetails').textContent = `Time Elapsed: ${timeFormatted} | Security Alerts Logged: ${violations}`;
+
+    // Send final grade to Node.js / XAMPP MySQL
+    try {
+        await fetch('/api/submit-exam', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                recordId: examRecordId,
+                studentName: studentInfo.name,
+                course: studentInfo.course,
+                yearSection: studentInfo.yearSection,
+                score: score,
+                totalScore: totalPossible,
+                percentage: percentage,
+                timeElapsed: timeFormatted,
+                violations: violations
+            })
+        });
+    } catch (err) {
+        console.warn("Could not save results to MySQL database:", err);
+    }
+
+    // Show Certificate
+    document.getElementById('certModal').classList.add('show');
+}
+</script>
+</body>
+</html>
